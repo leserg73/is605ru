@@ -1,0 +1,37 @@
+// SetupLdr version resource
+// Compiled with RC.EXE from the Platform SDK
+//
+// Note: The \0's in the values are to make this resource script compatible
+// with Borland's BRCC32 as well. BRCC32 does not automatically null-terminate
+// string values like Microsoft's RC does, resulting in garbage characters on
+// Explorer's Version tab (on Windows 2000) if \0's aren't included.
+// The spaces are placeholders. Longer texts will be truncated to the placeholder length.
+
+1 VERSIONINFO
+ FILEVERSION 0,0,0,0
+ PRODUCTVERSION 0,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "Comments", "This installation was built with Inno Setup.\0"
+            VALUE "CompanyName", "                                                            \0"
+            VALUE "FileDescription", "                                                            \0"
+            VALUE "FileVersion", "                    \0"
+            VALUE "LegalCopyright", "                                                                                                    \0"
+            VALUE "OriginalFileName", "                                                  \0"
+            VALUE "ProductName", "                                                            \0"
+            VALUE "ProductVersion", "                                                  \0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
