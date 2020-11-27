@@ -2,14 +2,14 @@ object StartupForm: TStartupForm
   Left = 328
   Top = 174
   BorderIcons = [biSystemMenu]
-  Caption = 'Welcome'
+  Caption = 'Добро пожаловать!'
   ClientHeight = 419
   ClientWidth = 579
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -26,7 +26,7 @@ object StartupForm: TStartupForm
     Width = 73
     Height = 23
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = 'ОК'
     Default = True
     ModalResult = 1
     TabOrder = 2
@@ -39,7 +39,7 @@ object StartupForm: TStartupForm
     Height = 23
     Anchors = [akRight, akBottom]
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Отмена'
     ModalResult = 2
     TabOrder = 3
   end
@@ -49,7 +49,7 @@ object StartupForm: TStartupForm
     Width = 563
     Height = 61
     Anchors = [akLeft, akTop, akRight]
-    Caption = ' New file '
+    Caption = ' Новый файл '
     TabOrder = 0
     DesignSize = (
       563
@@ -60,7 +60,6 @@ object StartupForm: TStartupForm
       Width = 16
       Height = 16
       AutoSize = True
-      Transparent = True
     end
     object EmptyRadioButton: TRadioButton
       Left = 40
@@ -68,7 +67,7 @@ object StartupForm: TStartupForm
       Width = 511
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Create a new &empty script file'
+      Caption = 'Создать пустой файл сценария'
       TabOrder = 0
       OnClick = RadioButtonClick
       OnDblClick = DblClick_
@@ -79,7 +78,7 @@ object StartupForm: TStartupForm
       Width = 511
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Create a new script file using the &Script Wizard'
+      Caption = 'Создать новый файл сценария с помощью Мастера'
       TabOrder = 1
       OnClick = RadioButtonClick
       OnDblClick = DblClick_
@@ -91,7 +90,7 @@ object StartupForm: TStartupForm
     Width = 563
     Height = 303
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = ' Open file '
+    Caption = ' Открыть файл '
     TabOrder = 1
     DesignSize = (
       563
@@ -102,7 +101,6 @@ object StartupForm: TStartupForm
       Width = 16
       Height = 16
       AutoSize = True
-      Transparent = True
     end
     object OpenRadioButton: TRadioButton
       Left = 40
@@ -110,7 +108,7 @@ object StartupForm: TStartupForm
       Width = 511
       Height = 17
       Anchors = [akLeft, akTop, akRight]
-      Caption = 'Open an e&xisting script file'
+      Caption = 'Открыть существующий файл сценария'
       TabOrder = 0
       OnClick = RadioButtonClick
       OnDblClick = DblClick_
@@ -134,7 +132,7 @@ object StartupForm: TStartupForm
     Height = 17
     TabStop = False
     Anchors = [akLeft, akRight, akBottom]
-    Caption = '&Don'#39't show this dialog again'
+    Caption = 'Больше не показывать этот диалог'
     TabOrder = 4
   end
 end

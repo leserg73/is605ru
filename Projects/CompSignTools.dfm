@@ -2,14 +2,14 @@ object SignToolsForm: TSignToolsForm
   Left = 330
   Top = 188
   BorderIcons = [biSystemMenu]
-  Caption = 'Configure Sign Tools'
+  Caption = 'Конфигурация цифровой подписи'
   ClientHeight = 247
   ClientWidth = 577
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -26,7 +26,7 @@ object SignToolsForm: TSignToolsForm
     Width = 561
     Height = 201
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = ' Sign Tools '
+    Caption = ' Цифровая подпись '
     TabOrder = 0
     DesignSize = (
       561
@@ -47,7 +47,7 @@ object SignToolsForm: TSignToolsForm
       Width = 73
       Height = 23
       Anchors = [akTop, akRight]
-      Caption = '&Add...'
+      Caption = 'Добавить...'
       Default = True
       TabOrder = 1
       OnClick = AddButtonClick
@@ -58,7 +58,7 @@ object SignToolsForm: TSignToolsForm
       Width = 73
       Height = 23
       Anchors = [akTop, akRight]
-      Caption = 'Remo&ve'
+      Caption = 'Удалить'
       TabOrder = 3
       OnClick = RemoveButtonClick
     end
@@ -68,7 +68,7 @@ object SignToolsForm: TSignToolsForm
       Width = 73
       Height = 23
       Anchors = [akTop, akRight]
-      Caption = '&Edit...'
+      Caption = 'Изменить...'
       TabOrder = 2
       OnClick = EditButtonClick
     end
@@ -79,7 +79,7 @@ object SignToolsForm: TSignToolsForm
     Width = 73
     Height = 23
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = 'ОК'
     Default = True
     ModalResult = 1
     TabOrder = 1
@@ -91,7 +91,7 @@ object SignToolsForm: TSignToolsForm
     Height = 23
     Anchors = [akRight, akBottom]
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Отмена'
     ModalResult = 2
     TabOrder = 2
   end

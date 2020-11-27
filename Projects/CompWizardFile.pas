@@ -74,13 +74,13 @@ type
 const
   DestRootDirs: array[0..6] of TConstant =
   (
-    ( Constant: '{app}'; Description: 'Application directory'),
-    ( Constant: '{autopf}'; Description: 'Program Files directory'),
-    ( Constant: '{autocf}'; Description: 'Common Files directory'),
-    ( Constant: '{win}'; Description: 'Windows directory'),
-    ( Constant: '{sys}'; Description: 'Windows system directory'),
-    ( Constant: '{src}'; Description: 'Setup source directory'),
-    ( Constant: '{sd}'; Description: 'System drive root directory')
+    ( Constant: '{app}'; Description: 'Папка приложения'),
+    ( Constant: '{autopf}'; Description: 'Папка "Program Files"'),
+    ( Constant: '{autocf}'; Description: 'Папка "Common Files"'),
+    ( Constant: '{win}'; Description: 'Папка "Windows"'),
+    ( Constant: '{sys}'; Description: 'Системная папка "Windows"'),
+    ( Constant: '{src}'; Description: 'Исходная папка установки'),
+    ( Constant: '{sd}'; Description: 'Корневая папка системного диска')
   );
 
 procedure TWizardFileForm.SetWizardFile(WizardFile: PWizardFile);
@@ -129,7 +129,7 @@ begin
 
   for I := Low(DestRootDirs) to High(DestRootDirs) do
     DestRootDirComboBox.Items.Add(DestRootDirs[I].Description);
-  DestRootDirComboBox.Items.Add('(Custom)');
+  DestRootDirComboBox.Items.Add('(По выбору пользователя)');
   DestRootDirComboBox.ItemIndex := 0;
 end;
 

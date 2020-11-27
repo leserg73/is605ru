@@ -105,6 +105,8 @@ type
     MinVersion, OnlyBelowVersion: TSetupVersionData;
     BackColor, BackColor2: Longint;
     WizardStyle: TSetupWizardStyle;
+    SetupStyle: Boolean;
+    TaskBarOn: Boolean;
     WizardSizePercentX, WizardSizePercentY: Integer;
     WizardImageAlphaFormat: (afIgnored, afDefined, afPremultiplied); // Must be same as Graphics.TAlphaFormat
     PasswordHash: TSHA1Digest;

@@ -16,7 +16,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   SetupForm, StdCtrls, ExtCtrls, BitmapImage, NewProgressBar, NewStaticText,
-  NewNotebook, BidiCtrls;
+  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles;
 
 type
   TUninstallProgressForm = class(TSetupForm)
@@ -63,6 +63,7 @@ type
 
 var
   UninstallProgressForm: TUninstallProgressForm;
+  ASetupStyle: Boolean;
 
 implementation
 
@@ -77,7 +78,7 @@ procedure UninstallMessageBoxCallback(const Flags: LongInt; const After: Boolean
   const Param: LongInt);
 const
   States: array [TNewProgressBarState] of TTaskbarProgressState =
-    (tpsNormal, tpsError, tpsPaused);
+    (tpsNormal, tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
 var
   UninstallProgressForm: TUninstallProgressForm;
   NewState: TNewProgressBarState;
@@ -112,13 +113,20 @@ begin
 
   PageNameLabel.Font.Style := [fsBold];
   PageNameLabel.Caption := SetupMessages[msgWizardUninstalling];
-  WizardSmallBitmapImage.Bitmap.Canvas.Brush.Color := clWindow;
+  if ASetupStyle then begin
+     WizardSmallBitmapImage.Bitmap.Canvas.Brush.Color := StyleServices.GetStyleColor(scPanel){clBtnFace};
+     WizardSmallBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
+  end
+  else
+     WizardSmallBitmapImage.Bitmap.Canvas.Brush.Color := clWindow;
   WizardSmallBitmapImage.Bitmap.Width := Application.Icon.Width;
   WizardSmallBitmapImage.Bitmap.Height := Application.Icon.Height;
   WizardSmallBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
   if SetupMessages[msgBeveledLabel] <> '' then begin
     BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' ';
     BeveledLabel.Visible := True;
+    BeveledLabel.Transparent := False;
+    BeveledLabel.Top := Bevel.Top;
   end;
   CancelButton.Caption := SetupMessages[msgButtonCancel];
 end;
@@ -138,8 +146,12 @@ begin
   StatusLabel.Caption := FmtSetupMessage1(msgStatusUninstalling, AAppName);
   
   if AModernStyle then begin
-    OuterNotebook.Color := clWindow;
-    Bevel1.Visible := False;
+    if ASetupStyle then
+       OuterNotebook.Color := clBtnFace
+    else begin
+       OuterNotebook.Color := clWindow;
+       Bevel1.Visible := False;
+    end;
   end;
 end;
 

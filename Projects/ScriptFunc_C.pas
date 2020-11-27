@@ -117,6 +117,8 @@ begin
   RegisterRealEnum('TDotNetVersion', TypeInfo(TDotNetVersion));
 
   RegisterType('TExecWait', '(ewNoWait, ewWaitUntilTerminated, ewWaitUntilIdle)');
+
+  RegisterType('TTaskbarProgressState', '(tpsNoProgress, tpsIndeterminate, tpsNormal, tpsErrog, tpsPaused)');
   
   ScriptCompiler.AddTypeS('TFindRec',
     'record' +

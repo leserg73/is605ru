@@ -11,6 +11,9 @@ unit Install;
 
 interface
 
+uses
+  Windows, SysUtils, Messages, Classes, Forms;
+
 {$I VERSION.INC}
 
 procedure PerformInstall(var Succeeded: Boolean; const ChangesEnvironment,
@@ -18,11 +21,17 @@ procedure PerformInstall(var Succeeded: Boolean; const ChangesEnvironment,
 
 procedure ExtractTemporaryFile(const BaseName: String);
 function ExtractTemporaryFiles(const Pattern: String): Integer;
+{$IFNDEF PS_MINIVCL}
+procedure ExtractTemporaryFileEx(const BaseName: String; const DirName: String);
+procedure ExtractTemporaryFileToStream(const BaseName: String; const BaseStream: TStream);
+function ExtractTemporaryFileSize(const BaseName: String): Cardinal;
+function HInstance: LongWord;
+{$ENDIF}
 
 implementation
 
 uses
-  Windows, SysUtils, Messages, Classes, Forms, ShlObj, Struct, Undo, SetupTypes,
+  ShlObj, Struct, Undo, SetupTypes,
   InstFunc, InstFnc2, SecurityFunc, Msgs, Main, Logging, Extract, FileClass,
   Compress, SHA1, PathFunc, CmnFunc, CmnFunc2, RedirFunc, Int64Em, MsgIDs,
   Wizard, DebugStruct, DebugClient, VerInfo, ScriptRunner, RegDLL, Helper,
@@ -63,7 +72,7 @@ procedure InstallMessageBoxCallback(const Flags: LongInt; const After: Boolean;
   const Param: LongInt);
 const
   States: array [TNewProgressBarState] of TTaskbarProgressState =
-    (tpsNormal, tpsError, tpsPaused);
+    (tpsNormal, tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
 var
   NewState: TNewProgressBarState;
 begin
@@ -3057,6 +3066,8 @@ begin
         Include(UninstLog.Flags, ufPowerUserInstalled);
       if SetupHeader.WizardStyle = wsModern then
         Include(UninstLog.Flags, ufModernStyle);
+      if SetupHeader.SetupStyle then { Style usage Flag }
+        Include(UninstLog.Flags, ufSetupStyle);
       if shUninstallRestartComputer in SetupHeader.Options then
         Include(UninstLog.Flags, ufAlwaysRestart);
       if ChangesEnvironment then
@@ -3351,5 +3362,172 @@ begin
   if Result = 0 then
     InternalError(Format('ExtractTemporaryFiles: No files matching "%s" found', [Pattern]));
 end;
+
+{$IFNDEF PS_MINIVCL}
+
+{ procedure InternalExtractTemporaryFileEx }
+procedure InternalExtractTemporaryFileEx(const DestName: String;
+  const CurFile: PSetupFileEntry; const CurFileLocation: PSetupFileLocationEntry;
+  const DestDir: String; const CreateDirs: Boolean);
+var
+  DisableFsRedir: Boolean;
+  DestFile: String;
+  DestF: TFile;
+  CurFileDate: TFileTime;
+begin
+  DestFile := AddBackslash(DestDir) + DestName;
+
+  Log('Extracting file: ' + DestFile);
+
+  DisableFsRedir := InstallDefaultDisableFsRedir;
+  if CreateDirs then
+    ForceDirectories(DisableFsRedir, PathExtractPath(DestFile));
+  DestF := TFileRedir.Create(DisableFsRedir, DestFile, fdCreateAlways, faWrite, fsNone);
+  try
+    try
+      FileExtractor.SeekTo(CurFileLocation^, nil);
+      FileExtractor.DecompressFile(CurFileLocation^, DestF, nil,
+        not (foDontVerifyChecksum in CurFile^.Options));
+
+      if foTimeStampInUTC in CurFileLocation^.Flags then
+        CurFileDate := CurFileLocation^.SourceTimeStamp
+      else
+        LocalFileTimeToFileTime(CurFileLocation^.SourceTimeStamp, CurFileDate);
+      SetFileTime(DestF.Handle, nil, nil, @CurFileDate);
+    finally
+      DestF.Free;
+    end;
+  except
+    DeleteFileRedir(DisableFsRedir, DestFile);
+    raise;
+  end;
+  AddAttributesToFile(DisableFsRedir, DestFile, CurFile^.Attribs);
+end;
+
+procedure ExtractTemporaryFileEx(const BaseName: String; const DirName: String);
+
+  function EscapeBraces(const S: String): String;
+  { Changes all '{' to '{{'. Uses ConstLeadBytes^ for the lead byte table. }
+  var
+    I: Integer;
+  begin
+    Result := S;
+    I := 1;
+    while I <= Length(Result) do begin
+      if Result[I] = '{' then begin
+        Insert('{', Result, I);
+        Inc(I);
+  {$IFDEF UNICODE}
+      end;
+  {$ELSE}
+      end
+      else if Result[I] in ConstLeadBytes^ then
+        Inc(I);
+  {$ENDIF}
+      Inc(I);
+    end;
+  end;
+
+var
+  EscapedBaseName, EscapedDestBaseName: String;
+  CurFileNumber: Integer;
+  CurFile: PSetupFileEntry;
+begin
+  { We compare BaseName to the filename portion of TSetupFileEntry.DestName
+    which has braces escaped, but BaseName does not; escape it to match }
+  EscapedBaseName := EscapeBraces(BaseName);
+  EscapedDestBaseName := PathExtractDir(DirName);
+  for CurFileNumber := 0 to Entries[seFile].Count-1 do begin
+    CurFile := PSetupFileEntry(Entries[seFile][CurFileNumber]);
+    if (CurFile^.LocationEntry <> -1) and (CompareText(PathExtractName(CurFile^.DestName), EscapedBaseName) = 0) then begin
+      InternalExtractTemporaryFileEx(BaseName, CurFile, Entries[seFileLocation][CurFile^.LocationEntry], EscapedDestBaseName, True);
+      Exit;
+    end;
+  end;
+  InternalError(Format('ExtractTemporaryFileEx: The file "%s" was not found', [BaseName]));
+end;
+
+{ function ExtractTemporaryFileSize }
+function ExtractTemporaryFileSize(const BaseName: String): Cardinal;
+var
+  CurFileNumber: Integer;
+  CurFileSize: Integer64;
+  CurFile: PSetupFileEntry;
+begin
+  Result := 0;
+  for CurFileNumber := 0 to Entries[seFile].Count-1 do begin
+    CurFile := PSetupFileEntry(Entries[seFile][CurFileNumber]);
+    if (CurFile^.LocationEntry <> -1) and (CompareText(PathExtractName(CurFile^.DestName), BaseName) = 0) then begin
+      CurFileSize := PSetupFileLocationEntry(Entries[seFileLocation][CurFile^.LocationEntry])^.OriginalSize;
+      Result := CurFileSize.Lo;
+    end;
+  end;
+  if Result = 0 then
+    InternalError(Format('ExtractTemporaryFileSize: The file "%s" was not found', [BaseName]));
+end;
+
+{ procedure InternalExtractTemporaryFileToStream }
+procedure InternalExtractTemporaryFileToStream(const DestName: String;
+  const CurFile: PSetupFileEntry; const CurFileLocation: PSetupFileLocationEntry;
+  const BaseMStream: TStream);
+begin
+  Log('Extracting file to memory: ' + DestName);
+  try
+    FileExtractor.SeekTo(CurFileLocation^, nil);
+    FileExtractor.DecompressFileM(CurFileLocation^, BaseMStream, nil, not (foDontVerifyChecksum in CurFile^.Options));
+  except
+    raise;
+  end
+end;
+
+procedure ExtractTemporaryFileToStream(const BaseName: String; const BaseStream: TStream);
+
+  function EscapeBraces(const S: String): String;
+  { Changes all '{' to '{{'. Uses ConstLeadBytes^ for the lead byte table. }
+  var
+    I: Integer;
+  begin
+    Result := S;
+    I := 1;
+    while I <= Length(Result) do begin
+      if Result[I] = '{' then begin
+        Insert('{', Result, I);
+        Inc(I);
+  {$IFDEF UNICODE}
+      end;
+  {$ELSE}
+      end
+      else if Result[I] in ConstLeadBytes^ then
+        Inc(I);
+  {$ENDIF}
+      Inc(I);
+    end;
+  end;
+
+var
+  EscapedBaseName: String;
+  CurFileNumber: Integer;
+  CurFile: PSetupFileEntry;
+begin
+  { We compare BaseName to the filename portion of TSetupFileEntry.DestName
+    which has braces escaped, but BaseName does not; escape it to match }
+  EscapedBaseName := EscapeBraces(BaseName);
+  for CurFileNumber := 0 to Entries[seFile].Count-1 do begin
+    CurFile := PSetupFileEntry(Entries[seFile][CurFileNumber]);
+    if (CurFile^.LocationEntry <> -1) and (CompareText(PathExtractName(CurFile^.DestName), EscapedBaseName) = 0) then begin
+      InternalExtractTemporaryFileToStream(BaseName, CurFile, Entries[seFileLocation][CurFile^.LocationEntry], BaseStream);
+      Exit;
+    end;
+  end;
+  InternalError(Format('ExtractTemporaryFileToStream: The file "%s" was not found', [BaseName]));
+end;
+
+{ function get HInstance }
+function HInstance: LongWord;
+begin
+  Result := MainInstance;
+end;
+
+{$ENDIF}
 
 end.

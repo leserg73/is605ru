@@ -9,14 +9,22 @@ program Setup;
   Setup program
 }
 
-{$SetPEFlags 1} 
-{$SETPEOSVERSION 6.0}
-{$SETPESUBSYSVERSION 6.0}
-{$WEAKLINKRTTI ON}
+{$SetPEFlags 1}
+{$IFNDEF IS_WINXP}
+  {$SETPEOSVERSION 6.0}
+  {$SETPESUBSYSVERSION 6.0}
+{$ELSE}
+  {$SETPEOSVERSION 5.1}
+  {$SETPESUBSYSVERSION 5.1}
+{$ENDIF}
+{$IFNDEF VER200}
+  {$WEAKLINKRTTI ON}
+{$ENDIF}
 
 uses
   SafeDLLPath in 'SafeDLLPath.pas',
   XPTheme in 'XPTheme.pas',
+  //D2009Win2kFix in 'D2009Win2kFix.pas',
   Forms,
   Windows,
   SysUtils,
@@ -71,7 +79,25 @@ uses
   SpawnCommon in 'SpawnCommon.pas',
   SpawnServer in 'SpawnServer.pas',
   SpawnClient in 'SpawnClient.pas',
-  TaskDialog in 'TaskDialog.pas';
+  TaskDialog in 'TaskDialog.pas',
+  Vcl.Themes,
+  Vcl.Styles,
+  Vcl.Styles.Hooks in '..\Components\VCL\Vcl.Styles.Hooks.pas',
+  Vcl.Styles.UxTheme in '..\Components\VCL\Vcl.Styles.UxTheme.pas',
+  Vcl.Styles.Utils.Graphics in '..\Components\VCL\Vcl.Styles.Utils.Graphics.pas',
+  Vcl.Styles.Utils.SysControls in '..\Components\VCL\Vcl.Styles.Utils.SysControls.pas',
+  Vcl.Styles.Utils.SysStyleHook in '..\Components\VCL\Vcl.Styles.Utils.SysStyleHook.pas',
+  Vcl.Styles.Utils.ComCtrls in '..\Components\VCL\Vcl.Styles.Utils.ComCtrls.pas',
+  Vcl.Styles.Utils.StdCtrls in '..\Components\VCL\Vcl.Styles.Utils.StdCtrls.pas',
+  Vcl.Styles.Utils.Forms in '..\Components\VCL\Vcl.Styles.Utils.Forms.pas',
+  Vcl.Styles.Utils.Menus in '..\Components\VCL\Vcl.Styles.Utils.Menus.pas',
+  Vcl.Styles.Utils.ScreenTips in '..\Components\VCL\Vcl.Styles.Utils.ScreenTips.pas',
+  Vcl.Styles.FontAwesome in '..\Components\VCL\Vcl.Styles.FontAwesome.pas',
+  Vcl.Styles.Utils.Misc in '..\Components\VCL\Vcl.Styles.Utils.Misc.pas',
+  Vcl.Styles.NewCheckListBox in '..\Components\VCL\Vcl.Styles.NewCheckListBox.pas',
+  DDetours in '..\Components\VCL\delphi-detours-library\DDetours.pas',
+  InstDecode in '..\Components\VCL\delphi-detours-library\InstDecode.pas',
+  CPUID in '..\Components\VCL\delphi-detours-library\CPUID.pas'; 
 
 {$R *.RES}
 {$IFDEF UNICODE}
@@ -82,6 +108,17 @@ uses
 {$R IMAGES.RES}
 
 {$I VERSION.INC}
+
+procedure LoadStyles;
+var
+  VCLName: String;
+begin
+  VCLName := TStyleManager.StyleNames[1];
+  if VCLName <> '' then
+    TStyleManager.SetStyle(VCLName)
+  else
+    TStyleManager.SetStyle('Windows');
+end;
 
 procedure ShowExceptionMsg;
 var
@@ -290,6 +327,7 @@ begin
   ShowWindow(Application.Handle, SW_SHOW);
   Application.OnException := TMainForm.ShowException;
   try
+    LoadStyles;
     Application.Initialize;
     InitializeSetup;
     Application.CreateForm(TMainForm, MainForm);

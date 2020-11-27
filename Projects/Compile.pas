@@ -9,6 +9,11 @@ unit Compile;
   Compiler
 }
 
+{ Enhanced edition of Inno Setup (restools) Restored by Leserg }
+{$IFNDEF PS_MINIVCL}
+  {$DEFINE IS_ENHANCED}
+{$ENDIF}
+
 {x$DEFINE STATICPREPROC}
 { For debugging purposes, remove the 'x' to have it link the ISPP code
   into this program and not depend on ISPP.dll. Most useful when combined
@@ -147,7 +152,14 @@ type
     ssReserveBytes,
     ssRestartApplications,
     ssRestartIfNeededByRun,
+    {$IFNDEF PS_MINIVCL}
+      ssRawDataResource,
+      ssIconResource,
+      ssBitmapResource,
+    {$ENDIF}
     ssSetupIconFile,
+    ssTaskBarView,
+    ssSetupStyleFile,
     ssSetupLogging,
     ssSetupMutex,
     ssShowComponentSizes,
@@ -189,6 +201,9 @@ type
     ssUsePreviousUserInfo,
     ssUseSetupLdr,
     ssUserInfoPage,
+    {$IFNDEF PS_MINIVCL}
+      ssVersionInfoComments,
+    {$ENDIF}
     ssVersionInfoCompany,
     ssVersionInfoCopyright,
     ssVersionInfoDescription,
@@ -394,10 +409,13 @@ type
     DefaultDialogFontName: String;
 
     VersionInfoVersion, VersionInfoProductVersion: TFileVersionNumbers;
-    VersionInfoVersionOriginalValue, VersionInfoCompany, VersionInfoCopyright,
+    VersionInfoVersionOriginalValue, {$IFNDEF PS_MINIVCL}VersionInfoComments, {$ENDIF}VersionInfoCompany, VersionInfoCopyright,
       VersionInfoDescription, VersionInfoTextVersion, VersionInfoProductName, VersionInfoOriginalFileName,
       VersionInfoProductTextVersion, VersionInfoProductVersionOriginalValue: String;
-    SetupIconFilename: String;
+    SetupIconFilename, SetupStyleFilename: String;
+    {$IFNDEF PS_MINIVCL}
+      RawDataResourceList, IconResourceList, BitmapResourceList: String;
+    {$ENDIF}
 
     CodeText: TStringList;
     CodeCompiler: TScriptCompiler;
@@ -2889,6 +2907,17 @@ function TSetupCompiler.CheckConst(const S: String; const MinVersion: TSetupVers
 const
   UserConsts: array[0..3] of String = (
     'userpf', 'usercf', 'usersavedgames', 'username');
+{$IFNDEF PS_MINIVCL}
+  // Added 'apphwnd'
+  Consts: array[0..43] of String = (
+    'src', 'srcexe', 'tmp', 'app', 'win', 'sys', 'sd', 'groupname', 'fonts', 'hwnd',
+    'commonpf', 'commonpf32', 'commonpf64', 'commoncf', 'commoncf32', 'commoncf64',
+    'autopf', 'autopf32', 'autopf64', 'autocf', 'autocf32', 'autocf64',
+    'computername', 'dao', 'cmd', 'wizardhwnd', 'sysuserinfoname', 'sysuserinfoorg',
+    'userinfoname', 'userinfoorg', 'userinfoserial', 'uninstallexe',
+    'language', 'syswow64', 'sysnative', 'log', 'dotnet11', 'dotnet20', 'dotnet2032',
+    'dotnet2064', 'dotnet40', 'dotnet4032', 'dotnet4064', 'apphwnd');
+{$ELSE}
   Consts: array[0..42] of String = (
     'src', 'srcexe', 'tmp', 'app', 'win', 'sys', 'sd', 'groupname', 'fonts', 'hwnd',
     'commonpf', 'commonpf32', 'commonpf64', 'commoncf', 'commoncf32', 'commoncf64',
@@ -2897,6 +2926,7 @@ const
     'userinfoname', 'userinfoorg', 'userinfoserial', 'uninstallexe',
     'language', 'syswow64', 'sysnative', 'log', 'dotnet11', 'dotnet20', 'dotnet2032',
     'dotnet2064', 'dotnet40', 'dotnet4032', 'dotnet4064');
+{$ENDIF}
   UserShellFolderConsts: array[0..8] of String = (
     'userdesktop', 'userstartmenu', 'userprograms', 'userstartup',
     'userappdata', 'userdocs', 'usertemplates', 'userfavorites', 'usersendto');
@@ -4142,8 +4172,13 @@ begin
           Invalid;
         if SetupHeader.MinVersion.WinVersion <> 0 then
           AbortCompileOnLine(SCompilerMinVersionWinMustBeZero);
-        if SetupHeader.MinVersion.NTVersion < $06000000 then
-          AbortCompileOnLineFmt(SCompilerMinVersionNTTooLow, ['6.0']);
+        {$IFNDEF IS_WINXP}
+          if SetupHeader.MinVersion.NTVersion < $06000000 then
+            AbortCompileOnLineFmt(SCompilerMinVersionNTTooLow, ['6.0']);
+        {$ELSE}
+          if SetupHeader.MinVersion.NTVersion < $05010000 then
+            AbortCompileOnLineFmt(SCompilerMinVersionNTTooLow, ['5.1']);
+        {$ENDIF}
       end;
     ssOnlyBelowVersion: begin
         if not StrToVersionNumbers(Value, SetupHeader.OnlyBelowVersion) then
@@ -4198,10 +4233,36 @@ begin
     ssRestartIfNeededByRun: begin
         SetSetupHeaderOption(shRestartIfNeededByRun);
       end;
+    {$IFNDEF PS_MINIVCL}
+    ssRawDataResource: begin
+        if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
+          AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
+        RawDataResourceList := Value;
+      end;
+    ssIconResource: begin
+        if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
+          AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
+        IconResourceList := Value;
+      end;
+    ssBitmapResource: begin
+        if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
+          AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
+        BitmapResourceList := Value;
+      end;
+    {$ENDIF}
     ssSetupIconFile: begin
         if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
           AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
         SetupIconFilename := Value;
+      end;
+    ssTaskBarView: begin
+        SetupHeader.TaskBarOn := StrToBool(Value);
+      end;
+    ssSetupStyleFile: begin
+        if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
+          AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
+        SetupStyleFilename := Value;
+        SetupHeader.SetupStyle := True;
       end;
     ssSetupLogging: begin
         SetSetupHeaderOption(shSetupLogging);
@@ -4378,6 +4439,11 @@ begin
     ssUserInfoPage: begin
         SetSetupHeaderOption(shUserInfoPage);
       end;
+    {$IFNDEF PS_MINIVCL}
+    ssVersionInfoComments: begin
+        VersionInfoComments := Value;
+      end;
+    {$ENDIF}
     ssVersionInfoCompany: begin
         VersionInfoCompany := Value;
       end;
@@ -8406,8 +8472,12 @@ var
 
   procedure PrepareSetupE32(var M: TMemoryFile);
   var
-    TempFilename, E32Filename, ConvertFilename: String;
+    TempFilename, E32Filename, ConvertFilename{$IFNDEF PS_MINIVCL}, NameResRaw{$ENDIF}: String;
     ConvertFile: TFile;
+    {$IFNDEF PS_MINIVCL}
+      ResRawDates: TStringList;
+      i : Integer;
+    {$ENDIF}
   begin
     TempFilename := '';
     try
@@ -8417,16 +8487,89 @@ var
       CopyFileOrAbort(E32Filename, ConvertFilename);
       SetFileAttributes(PChar(ConvertFilename), FILE_ATTRIBUTE_ARCHIVE);
       TempFilename := ConvertFilename;
+      if SetupStyleFilename <> '' then begin
+        { make style resource }
+        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        LineNumber := SetupDirectiveLines[ssSetupStyleFile];
+        AddStatus(Format(SCompilerStatusReadingFile, ['SetupStyleFile']));
+        AddStatus(Format(SCompilerStatusReadingInFile, [PrependSourceDirName(SetupStyleFilename)]));
+        UpdateResRaw(ConvertFileName, PrependSourceDirName(SetupStyleFilename), 'ISS', 50); // VCLSTYLE
+        LineNumber := 0;
+      end;
+    {$IFNDEF PS_MINIVCL}
+      if RawDataResourceList <> '' then begin
+        { make raw data resource RT_RCDATA }
+        ResRawDates := TStringList.Create;
+        ResRawDates.NameValueSeparator := '>';
+        ResRawDates.CommaText := RawDataResourceList;
+        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        LineNumber := SetupDirectiveLines[ssRawDataResource];
+        AddStatus(Format(SCompilerStatusReadingFile, ['RawDataResource']));
+        try
+          for i := 0 to ResRawDates.Count-1 do
+            begin
+              NameResRaw := '_IS_' + ResRawDates.Names[i];
+              AddStatus(Format(SCompilerStatusReadingInFile, [PrependSourceDirName(ResRawDates.ValueFromIndex[i])]));
+              UpdateResRaw(ConvertFileName, PrependSourceDirName(ResRawDates.ValueFromIndex[i]), NameResRaw, 10); // RT_RCDATA
+              LineNumber := 0;
+            end;
+        finally
+          ResRawDates.Free;
+        end;
+      end;
+
+      if BitmapResourceList <> '' then begin
+        { make Bitmap data resource RT_BITMAP }
+        ResRawDates := TStringList.Create;
+        ResRawDates.NameValueSeparator := '>';
+        ResRawDates.CommaText := BitmapResourceList;
+        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        LineNumber := SetupDirectiveLines[ssRawDataResource];
+        AddStatus(Format(SCompilerStatusReadingFile, ['BitmapResource']));
+        try
+          for i := 0 to ResRawDates.Count-1 do
+            begin
+              NameResRaw := '_IS_' + ResRawDates.Names[i];
+              AddStatus(Format(SCompilerStatusReadingInFile, [PrependSourceDirName(ResRawDates.ValueFromIndex[i])]));
+              UpdateResRaw(ConvertFileName, PrependSourceDirName(ResRawDates.ValueFromIndex[i]), NameResRaw, 2); // RT_BITMAP
+              LineNumber := 0;
+            end;
+        finally
+          ResRawDates.Free;
+        end;
+      end;
+
+      if IconResourceList <> '' then begin
+        { make Icon data resource RT_ICON and RT_GROUP_ICON}
+        ResRawDates := TStringList.Create;
+        ResRawDates.NameValueSeparator := '>';
+        ResRawDates.CommaText := IconResourceList;
+        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        LineNumber := SetupDirectiveLines[ssRawDataResource];
+        AddStatus(Format(SCompilerStatusReadingFile, ['IconResource']));
+        try
+          for i := 0 to ResRawDates.Count-1 do
+            begin
+              NameResRaw := '_IS_' + ResRawDates.Names[i];
+              AddStatus(Format(SCompilerStatusReadingInFile, [PrependSourceDirName(ResRawDates.ValueFromIndex[i])]));
+              UpdateIconsRaw(ConvertFileName, PrependSourceDirName(ResRawDates.ValueFromIndex[i]), NameResRaw);
+              LineNumber := 0;
+            end;
+        finally
+          ResRawDates.Free;
+        end;
+      end;
+    {$ENDIF}
       if SetupIconFilename <> '' then begin
         AddStatus(Format(SCompilerStatusUpdatingIcons, ['SETUP.E32']));
         LineNumber := SetupDirectiveLines[ssSetupIconFile];
         UpdateIcons(ConvertFileName, PrependSourceDirName(SetupIconFilename));
         LineNumber := 0;
-      end;
+        end;
       AddStatus(Format(SCompilerStatusUpdatingVersionInfo, ['SETUP.E32']));
       ConvertFile := TFile.Create(ConvertFilename, fdOpenExisting, faReadWrite, fsNone);
       try
-        UpdateVersionInfo(ConvertFile, TFileVersionNumbers(nil^), VersionInfoProductVersion, VersionInfoCompany,
+        UpdateVersionInfo(ConvertFile, TFileVersionNumbers(nil^), VersionInfoProductVersion, {$IFNDEF PS_MINIVCL}VersionInfoComments, {$ENDIF}VersionInfoCompany,
           '', '', VersionInfoCopyright, VersionInfoProductName, VersionInfoProductTextVersion, VersionInfoOriginalFileName,
           False);
       finally
@@ -8618,7 +8761,11 @@ begin
     ReserveBytes := 0;
     TimeStampRounding := 2;
     SetupHeader.MinVersion.WinVersion := 0;
-    SetupHeader.MinVersion.NTVersion := $06000000;
+    {$IFNDEF IS_WINXP}
+      SetupHeader.MinVersion.NTVersion := $06000000;
+    {$ELSE}
+      SetupHeader.MinVersion.NTVersion := $05010000;
+    {$ENDIF}
     SetupHeader.Options := [shDisableStartupPrompt, shCreateAppDir,
       shWindowStartMaximized, shWindowShowCaption, shWindowResizable,
       shUsePreviousAppDir, shUsePreviousGroup,
@@ -8651,6 +8798,11 @@ begin
     SetupHeader.WizardImageAlphaFormat := afIgnored;
     UsedUserAreasWarning := True;
     SetupHeader.WizardStyle := wsClassic;
+    {$IFNDEF PS_MINIVCL}
+      VersionInfoComments := 'This installation was built with Inno Setup.';
+    {$ENDIF}
+    SetupHeader.SetupStyle := False;
+    SetupHeader.TaskBarOn := False;
 
     { Read [Setup] section }
     EnumIniSection(EnumSetupProc, 'Setup', 0, True, True, '', False, False);
@@ -8756,6 +8908,10 @@ begin
         WarningsList.Add(Format(SCompilerDirectiveNotUsingDefault,
           ['VersionInfoDescription', 'AppName']));
     end;
+    {$IFNDEF PS_MINIVCL}
+    if SetupDirectiveLines[ssVersionInfoComments] = 0 then
+      VersionInfoComments := 'This installation was built with Inno Setup.';
+    {$ENDIF}
     if SetupDirectiveLines[ssVersionInfoCompany] = 0 then begin
       { Use AppPublisher as VersionInfoCompany if possible, otherwise warn }
       if not AppPublisherHasConsts then
@@ -9222,7 +9378,7 @@ begin
 
             { Update version info }
             AddStatus(Format(SCompilerStatusUpdatingVersionInfo, ['SETUP.EXE']));
-            UpdateVersionInfo(ExeFile, VersionInfoVersion, VersionInfoProductVersion, VersionInfoCompany,
+            UpdateVersionInfo(ExeFile, VersionInfoVersion, VersionInfoProductVersion, {$IFNDEF PS_MINIVCL}VersionInfoComments, {$ENDIF}VersionInfoCompany,
               VersionInfoDescription, VersionInfoTextVersion,
               VersionInfoCopyright, VersionInfoProductName, VersionInfoProductTextVersion, VersionInfoOriginalFileName,
               True);

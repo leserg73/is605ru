@@ -2,7 +2,7 @@ unit ScriptClasses_C;
 
 {
   Inno Setup
-  Copyright (C) 1997-2019 Jordan Russell
+  Copyright (C) 1997-2020 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
@@ -22,7 +22,8 @@ implementation
 
 uses
   SetupTypes,
-  uPSC_std, uPSC_classes, uPSC_graphics, uPSC_controls, uPSC_stdctrls,
+  uPSC_std, uPSC_classes, uPSC_graphics, uPSC_controls, uPSC_stdctrls, 
+  {$IFNDEF PS_MINIVCL}uPSC_menus, uPSC_buttons, {$ENDIF}
   uPSC_forms, uPSC_extctrls, uPSC_comobj;
 
 procedure RegisterWinControl_C(Cl: TPSPascalCompiler);
@@ -50,21 +51,24 @@ begin
     RegisterProperty('ParentFont', 'Boolean', iptrw);
     RegisterProperty('ShowAccelChar', 'Boolean', iptrw);
     RegisterProperty('WordWrap', 'Boolean', iptrw);
+    RegisterProperty('Transparent', 'Boolean', iptrw);
     RegisterProperty('OnClick', 'TNotifyEvent', iptrw);
     RegisterProperty('OnDblClick', 'TNotifyEvent', iptrw);
 
     {$IFNDEF PS_MINIVCL}
-    RegisterProperty('DragCursor', 'Longint', iptrw);
-    RegisterProperty('DragMode', 'TDragMode', iptrw);
-    RegisterProperty('ParentShowHint', 'Boolean', iptrw);
-    RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
-    RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
-    RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
-    RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
-    RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
-    RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
-    RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
-    RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
+      RegisterProperty('DragCursor', 'Longint', iptrw);
+      RegisterProperty('DragMode', 'TDragMode', iptrw);
+      RegisterProperty('ParentShowHint', 'Boolean', iptrw);
+      RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
+      RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
+      RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
+      RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
+      RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
+      RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
+      RegisterProperty('OnMouseEnter', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseLeave', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
+      RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
     {$ENDIF}
   end;
 end;
@@ -86,6 +90,8 @@ begin
     RegisterProperty('ItemLevel', 'Byte Integer', iptr);
     RegisterProperty('ItemObject', 'TObject Integer', iptrw);
     RegisterProperty('ItemSubItem', 'String Integer', iptrw);
+    RegisterProperty('ItemFontStyle', 'TFontStyles Integer', iptrw);
+    RegisterProperty('SubItemFontStyle', 'TFontStyles Integer', iptrw);
     RegisterProperty('Flat', 'Boolean', iptrw);
     RegisterProperty('MinItemHeight', 'Integer', iptrw);
     RegisterProperty('Offset', 'Integer', iptrw);
@@ -107,19 +113,21 @@ begin
     RegisterProperty('OnExit', 'TNotifyEvent', iptrw);
 
     {$IFNDEF PS_MINIVCL}
-    RegisterProperty('Ctl3D', 'Boolean', iptrw);
-    RegisterProperty('DragCursor', 'Longint', iptrw);
-    RegisterProperty('DragMode', 'TDragMode', iptrw);
-    RegisterProperty('ParentCtl3D', 'Boolean', iptrw);
-    RegisterProperty('ParentShowHint', 'Boolean', iptrw);
-    RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
-    RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
-    RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
-    RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
-    RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
-    RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
-    RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
-    RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
+      RegisterProperty('Ctl3D', 'Boolean', iptrw);
+      RegisterProperty('DragCursor', 'Longint', iptrw);
+      RegisterProperty('DragMode', 'TDragMode', iptrw);
+      RegisterProperty('ParentCtl3D', 'Boolean', iptrw);
+      RegisterProperty('ParentShowHint', 'Boolean', iptrw);
+      RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
+      RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
+      RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
+      RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
+      RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
+      RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
+      RegisterProperty('OnMouseEnter', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseLeave', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
+      RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
     {$ENDIF}
   end;
 end;
@@ -178,21 +186,23 @@ begin
     RegisterProperty('OnExit', 'TNotifyEvent', iptrw);
 
     {$IFNDEF PS_MINIVCL}
-    RegisterProperty('CharCase', 'TEditCharCase', iptrw);
-    RegisterProperty('Ctl3D', 'Boolean', iptrw);
-    RegisterProperty('DragCursor', 'Longint', iptrw);
-    RegisterProperty('DragMode', 'TDragMode', iptrw);
-    RegisterProperty('OEMConvert', 'Boolean', iptrw);
-    RegisterProperty('ParentCtl3D', 'Boolean', iptrw);
-    RegisterProperty('ParentShowHint', 'Boolean', iptrw);
-    RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
-    RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
-    RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
-    RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
-    RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
-    RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
-    RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
-    RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
+      RegisterProperty('CharCase', 'TEditCharCase', iptrw);
+      RegisterProperty('Ctl3D', 'Boolean', iptrw);
+      RegisterProperty('DragCursor', 'Longint', iptrw);
+      RegisterProperty('DragMode', 'TDragMode', iptrw);
+      RegisterProperty('OEMConvert', 'Boolean', iptrw);
+      RegisterProperty('ParentCtl3D', 'Boolean', iptrw);
+      RegisterProperty('ParentShowHint', 'Boolean', iptrw);
+      RegisterProperty('PopupMenu', 'TPopupMenu', iptrw);
+      RegisterProperty('OnDragDrop', 'TDragDropEvent', iptrw);
+      RegisterProperty('OnDragOver', 'TDragOverEvent', iptrw);
+      RegisterProperty('OnEndDrag', 'TEndDragEvent', iptrw);
+      RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
+      RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
+      RegisterProperty('OnMouseEnter', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseLeave', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
+      RegisterProperty('OnStartDrag', 'TStartDragEvent', iptrw);
     {$ENDIF}
   end;
 end;
@@ -213,6 +223,10 @@ begin
   with Cl.AddClassN(Cl.FindClass('TCustomFolderTreeView'),'TFolderTreeView') do
   begin
     RegisterProperty('Anchors', 'TAnchors', iptrw);
+    {$IFNDEF PS_MINIVCL}
+      RegisterProperty('BorderStyle', 'TBorderStyle', iptrw);
+      RegisterProperty('Ctl3D', 'Boolean', iptrw);
+    {$ENDIF}
     RegisterProperty('OnChange', 'TNotifyEvent', iptrw);
     RegisterProperty('OnRename', 'TFolderRenameEvent', iptrw);
   end;
@@ -224,6 +238,10 @@ begin
   begin
     RegisterMethod('procedure SetPaths(const AUserPrograms, ACommonPrograms, AUserStartup, ACommonStartup: String)');
     RegisterProperty('Anchors', 'TAnchors', iptrw);
+    {$IFNDEF PS_MINIVCL}
+      RegisterProperty('BorderStyle', 'TBorderStyle', iptrw);
+      RegisterProperty('Ctl3D', 'Boolean', iptrw);
+    {$ENDIF}
     RegisterProperty('OnChange', 'TNotifyEvent', iptrw);
     RegisterProperty('OnRename', 'TFolderRenameEvent', iptrw);
   end;
@@ -248,12 +266,22 @@ begin
     RegisterProperty('Stretch', 'Boolean', iptrw);
     RegisterProperty('OnClick', 'TNotifyEvent', iptrw);
     RegisterProperty('OnDblClick', 'TNotifyEvent', iptrw);
+    {$IFNDEF PS_MINIVCL}
+      RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
+      RegisterProperty('OnMouseMove', 'TMouseMoveEvent', iptrw);
+      RegisterProperty('OnMouseEnter', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseLeave', 'TNotifyEvent', iptrw);
+      RegisterProperty('OnMouseUp', 'TMouseEvent', iptrw);
+    {$ENDIF}
   end;
 end;
 
 procedure RegisterBidiCtrls_C(Cl: TPSPascalCompiler);
 begin
   Cl.AddClassN(Cl.FindClass('TEdit'), 'TNewEdit');
+  {$IFNDEF PS_MINIVCL}
+    Cl.AddClassN(Cl.FindClass('TGroupBox'), 'TNewGroupBox');
+  {$ENDIF}
   Cl.AddClassN(Cl.FindClass('TMemo'), 'TNewMemo');
   Cl.AddClassN(Cl.FindClass('TComboBox'), 'TNewComboBox');
   Cl.AddClassN(Cl.FindClass('TListBox'), 'TNewListBox');
@@ -295,6 +323,7 @@ procedure RegisterSetupForm_C(Cl: TPSPascalCompiler);
 begin
   with Cl.AddClassN(Cl.FindClass('TUIStateForm'), 'TSetupForm') do
   begin
+    RegisterMethod('function CalculateButtonWidth(const ButtonCaptions: array of String): Integer;');
     RegisterMethod('function ShouldSizeX: Boolean;');
     RegisterMethod('function ShouldSizeY: Boolean;');
     RegisterMethod('procedure FlipSizeAndCenterIfNeeded(const ACenterInsideControl: Boolean; const CenterInsideControlCtl: TWinControl; const CenterInsideControlInsideClientArea: Boolean)');
@@ -565,9 +594,17 @@ begin
   SIRegisterTStringList(Cl);
   SIRegisterTHandleStream(Cl);
   SIRegisterTFileStream(Cl);
-{$IFDEF UNICODE}
-  SIRegisterTStringStream(Cl);
-{$ENDIF}
+  {$IFDEF UNICODE}
+    SIRegisterTStringStream(Cl);
+  {$ENDIF}
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTCustomMemoryStream(Cl);
+    SIRegisterTMemoryStream(Cl);
+    SIRegisterTResourceStream(Cl);
+    SIRegisterTParser(Cl);
+    SIRegisterTCollectionItem(Cl);
+    SIRegisterTCollection(Cl);
+  {$ENDIF}
 
   { Graphics }
   SIRegister_Graphics_TypesAndConsts(Cl);
@@ -579,6 +616,11 @@ begin
   SIRegisterTCanvas(Cl);
   SIRegisterTGraphic(Cl);
   SIRegisterTBitmap(Cl, True);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTIcon(Cl, True);
+    SIRegisterTPicture(Cl, True);
+    SIRegisterTPngImage(Cl, True);
+  {$ENDIF}
 
   { Controls }
   SIRegister_Controls_TypesAndConsts(Cl);
@@ -591,11 +633,25 @@ begin
 
   { Forms }
   SIRegister_Forms_TypesAndConsts(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTControlScrollBar(Cl);
+  {$ENDIF}
   SIRegisterTScrollingWinControl(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTScrollBox(Cl);
+  {$ENDIF}
   SIRegisterTForm(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTApplication(Cl);
+    SIRegisterTScreen(CL);
+  {$ENDIF}
 
   { StdCtrls }
   SIRegister_StdCtrls_TypesAndConsts(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTCustomGroupBox(Cl);
+    SIRegisterTGroupBox(Cl);
+  {$ENDIF}
   SIRegisterTCustomLabel(Cl);
   SIRegisterTLabel(Cl);
   SIRegisterTCustomEdit(Cl);
@@ -605,16 +661,44 @@ begin
   SIRegisterTCustomComboBox(Cl);
   SIRegisterTComboBox(Cl);
   SIRegisterTButtonControl(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTCustomButton(Cl);
+  {$ENDIF}
   SIRegisterTButton(Cl);
   SIRegisterTCustomCheckBox(Cl);
   SIRegisterTCheckBox(Cl);
   SIRegisterTRadioButton(Cl);
   SIRegisterTCustomListBox(Cl);
   SIRegisterTListBox(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTScrollBar(Cl);
+  {$ENDIF}
+
+  { ComCtrls }
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTTrackBar(Cl);
+    SIRegisterTCustomUpDown(Cl);
+    SIRegisterTUpDown(Cl);
+    SIRegisterTCustomHotKey(Cl);
+    SIRegisterTHotKey(Cl);
+    SIRegisterTCustomImageList(Cl);
+    SIRegisterTImageList(Cl);
+    SIRegister_StatusBar(Cl);
+    SIRegister_TListView(Cl);
+  {$ENDIF}
 
   { ExtCtrls }
   SIRegister_ExtCtrls_TypesAndConsts(cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTShape(Cl);
+    SIRegisterTImage(Cl);
+    SIRegisterTPaintBox(Cl);
+    SIRegisterTHeader(Cl);
+  {$ENDIF}
   SIRegisterTBevel(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTTimer(Cl);
+  {$ENDIF}
   SIRegisterTCustomPanel(Cl);
   SIRegisterTPanel(Cl);
 
@@ -651,10 +735,27 @@ begin
   RegisterOutputProgressWizardPage_C(Cl);
 
   RegisterHandCursor_C(Cl);
-  
+
+  { Buttons }
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_Buttons_TypesAndConsts(Cl);
+    SIRegisterTSpeedButton(Cl);
+    SIRegisterTBitBtn(Cl);
+  {$ENDIF}
+
+  { Menus }
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_Menus(Cl);
+  {$ENDIF}
+
+  {$IFNDEF PS_MINIVCL}
+    AddImportedClassVariable(Cl, 'Application', 'TApplication');
+    AddImportedClassVariable(Cl, 'Screen', 'TScreen');
+  {$ENDIF}
   AddImportedClassVariable(Cl, 'WizardForm', 'TWizardForm');
   AddImportedClassVariable(Cl, 'MainForm', 'TMainForm');
   AddImportedClassVariable(Cl, 'UninstallProgressForm', 'TUninstallProgressForm');
+
 end;
 
 end.

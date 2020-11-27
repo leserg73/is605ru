@@ -3,13 +3,13 @@ object WizardFileForm: TWizardFileForm
   Top = 219
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Script Wizard File'
+  Caption = 'Мастер сценария'
   ClientHeight = 297
   ClientWidth = 350
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
@@ -18,18 +18,24 @@ object WizardFileForm: TWizardFileForm
   object RequiredLabel1: TNewStaticText
     Left = 8
     Top = 271
-    Width = 21
-    Height = 14
-    Caption = 'bold'
+    Width = 9
+    Height = 15
+    Caption = '*'
     Enabled = False
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 4
   end
   object RequiredLabel2: TNewStaticText
-    Left = 36
+    Left = 18
     Top = 271
-    Width = 51
+    Width = 135
     Height = 14
-    Caption = ' = required'
+    Caption = '= требуется ввод данных'
     Enabled = False
     TabOrder = 5
   end
@@ -38,7 +44,7 @@ object WizardFileForm: TWizardFileForm
     Top = 265
     Width = 73
     Height = 23
-    Caption = 'OK'
+    Caption = 'ОК'
     Default = True
     ModalResult = 1
     TabOrder = 1
@@ -50,7 +56,7 @@ object WizardFileForm: TWizardFileForm
     Width = 73
     Height = 23
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Отмена'
     ModalResult = 2
     TabOrder = 2
   end
@@ -59,14 +65,14 @@ object WizardFileForm: TWizardFileForm
     Top = 108
     Width = 333
     Height = 149
-    Caption = ' Destination '
+    Caption = ' Вывод данных '
     TabOrder = 0
     object DestRootDirLabel: TNewStaticText
       Left = 12
       Top = 20
-      Width = 112
+      Width = 122
       Height = 14
-      Caption = 'Destination &base folder:'
+      Caption = 'Главная папка вывода:'
       FocusControl = DestRootDirComboBox
       TabOrder = 0
     end
@@ -91,9 +97,9 @@ object WizardFileForm: TWizardFileForm
     object SubDirLabel: TNewStaticText
       Left = 12
       Top = 96
-      Width = 103
+      Width = 91
       Height = 14
-      Caption = 'Destination &subfolder:'
+      Caption = 'Путь к подпапке:'
       FocusControl = DestSubDirEdit
       TabOrder = 3
     end
@@ -110,14 +116,14 @@ object WizardFileForm: TWizardFileForm
     Top = 8
     Width = 333
     Height = 93
-    Caption = ' Source '
+    Caption = ' Исходные данные '
     TabOrder = 3
     object SourceLabel: TNewStaticText
       Left = 12
       Top = 20
-      Width = 95
+      Width = 145
       Height = 14
-      Caption = '&Source file or folder:'
+      Caption = '*Исходный файл или папка:'
       Enabled = False
       TabOrder = 0
     end
@@ -135,7 +141,7 @@ object WizardFileForm: TWizardFileForm
       Top = 68
       Width = 141
       Height = 17
-      Caption = '&Recurse subfolders'
+      Caption = 'Добавить подпапки'
       TabOrder = 2
       OnClick = RecurseSubDirsCheckClick
     end
@@ -144,7 +150,7 @@ object WizardFileForm: TWizardFileForm
       Top = 68
       Width = 165
       Height = 17
-      Caption = '&Include empty subfolders'
+      Caption = 'Добавить пустые подпапки'
       TabOrder = 3
     end
   end

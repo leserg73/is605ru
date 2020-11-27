@@ -2,7 +2,7 @@ unit ScriptClasses_R;
 
 {
   Inno Setup
-  Copyright (C) 1997-2019 Jordan Russell
+  Copyright (C) 1997-2020 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
@@ -23,7 +23,8 @@ implementation
 
 uses
   Windows, Controls, Forms, StdCtrls, Graphics,
-  uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms,
+  uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms, 
+  {$IFNDEF PS_MINIVCL}uPSR_menus, Menus, uPSR_buttons, Buttons, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg, {$ENDIF}
   uPSR_stdctrls, uPSR_extctrls, uPSR_comobj, {$IFNDEF UNICODE} uPSUtils, {$ENDIF}
   NewStaticText, NewCheckListBox, NewProgressBar, RichEditViewer,
   ExtCtrls, UIStateForm, SetupForm, Main, Wizard, SetupTypes, PasswordEdit,
@@ -66,6 +67,10 @@ procedure TNewCheckListBoxItemObject_R(Self: TNewCheckListBox; var T: TObject; t
 procedure TNewCheckListBoxItemObject_W(Self: TNewCheckListBox; const T: TObject; t1: Integer); begin Self.ItemObject[t1] := T; end;
 procedure TNewCheckListBoxItemSubItem_R(Self: TNewCheckListBox; var T: String; t1: Integer); begin T := Self.ItemSubItem[t1]; end;
 procedure TNewCheckListBoxItemSubItem_W(Self: TNewCheckListBox; const T: String; t1: Integer); begin Self.ItemSubItem[t1] := T; end;
+procedure TNewCheckListBoxItemFontStyle_R(Self: TNewCheckListBox; var T: TFontStyles; const t1: Integer); begin T := Self.ItemFontStyle[t1]; end;
+procedure TNewCheckListBoxItemFontStyle_W(Self: TNewCheckListBox; const T: TFontStyles; const t1: Integer); begin Self.ItemFontStyle[t1] := T; end;
+procedure TNewCheckListBoxSubItemFontStyle_R(Self: TNewCheckListBox; var T: TFontStyles; const t1: Integer); begin T := Self.SubItemFontStyle[t1]; end;
+procedure TNewCheckListBoxSubItemFontStyle_W(Self: TNewCheckListBox; const T: TFontStyles; const t1: Integer); begin Self.SubItemFontStyle[t1] := T; end;
 
 procedure RegisterNewCheckListBox_R(Cl: TPSRuntimeClassImporter);
 begin
@@ -82,6 +87,8 @@ begin
     RegisterPropertyHelper(@TNewCheckListBoxItemLevel_R, nil, 'ItemLevel');
     RegisterPropertyHelper(@TNewCheckListBoxItemObject_R, @TNewCheckListBoxItemObject_W, 'ItemObject');
     RegisterPropertyHelper(@TNewCheckListBoxItemSubItem_R, @TNewCheckListBoxItemSubItem_W, 'ItemSubItem');
+    RegisterPropertyHelper(@TNewCheckListBoxItemFontStyle_R, @TNewCheckListBoxItemFontStyle_W, 'ItemFontStyle');
+    RegisterPropertyHelper(@TNewCheckListBoxSubItemFontStyle_R, @TNewCheckListBoxSubItemFontStyle_W, 'SubItemFontStyle');
   end;
 end;
 
@@ -146,6 +153,9 @@ end;
 procedure RegisterBidiCtrls_R(Cl: TPSRuntimeClassImporter);
 begin
   Cl.Add(TNewEdit);
+  {$IFNDEF PS_MINIVCL}
+    Cl.Add(TNewGroupBox);
+  {$ENDIF}
   Cl.Add(TNewMemo);
   Cl.Add(TNewComboBox);
   Cl.Add(TNewListBox);
@@ -187,6 +197,7 @@ procedure RegisterSetupForm_R(Cl: TPSRuntimeClassImporter);
 begin
   with Cl.Add(TSetupForm) do
   begin
+    RegisterMethod(@TSetupForm.CalculateButtonWidth, 'CalculateButtonWidth');
     RegisterMethod(@TSetupForm.ShouldSizeX, 'ShouldSizeX');
     RegisterMethod(@TSetupForm.ShouldSizeY, 'ShouldSizeY');
     RegisterMethod(@TSetupForm.FlipSizeAndCenterIfNeeded, 'FlipSizeAndCenterIfNeeded');
@@ -337,9 +348,17 @@ begin
     RIRegisterTStringList(Cl);
     RIRegisterTHandleStream(Cl);
     RIRegisterTFileStream(Cl);
-{$IFDEF UNICODE}
-    RIRegisterTStringStream(Cl);
-{$ENDIF}
+    {$IFDEF UNICODE}
+      RIRegisterTStringStream(Cl);
+    {$ENDIF}
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTCustomMemoryStream(Cl);
+      RIRegisterTMemoryStream(Cl);
+      RIRegisterTResourceStream(Cl);
+      RIRegisterTParser(Cl);
+      RIRegisterTCollectionItem(Cl);
+      RIRegisterTCollection(Cl);
+    {$ENDIF}
 
     { Graphics }
     RIRegisterTGraphicsObject(Cl);
@@ -349,6 +368,11 @@ begin
     RIRegisterTBrush(Cl);
     RIRegisterTGraphic(Cl);
     RIRegisterTBitmap(Cl, True);
+  {$IFNDEF PS_MINIVCL}
+    RIRegisterTIcon(Cl, True);
+    RIRegisterTPicture(Cl, True);
+    RIRegisterTPngImage(Cl, True);
+  {$ENDIF}
 
     { Controls }
     RIRegisterTControl(Cl);
@@ -356,13 +380,27 @@ begin
     RIRegisterTGraphicControl(Cl);
     RIRegisterTCustomControl(Cl);
     RIRegister_TDragObject(Cl);
-    RIRegisterTSizeConstraints(cl);
+    RIRegisterTSizeConstraints(Cl);
 
     { Forms }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTControlScrollBar(Cl);
+    {$ENDIF}
     RIRegisterTScrollingWinControl(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTScrollBox(Cl);
+    {$ENDIF}
     RIRegisterTForm(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTApplication(Cl);
+      RIRegisterTScreen(CL);
+    {$ENDIF}
 
     { StdCtrls }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTCustomGroupBox(Cl);
+      RIRegisterTGroupBox(Cl);
+    {$ENDIF}
     RIRegisterTCustomLabel(Cl);
     RIRegisterTLabel(Cl);
     RIRegisterTCustomEdit(Cl);
@@ -372,15 +410,43 @@ begin
     RIRegisterTCustomComboBox(Cl);
     RIRegisterTComboBox(Cl);
     RIRegisterTButtonControl(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTCustomButton(Cl);
+    {$ENDIF}
     RIRegisterTButton(Cl);
     RIRegisterTCustomCheckBox(Cl);
     RIRegisterTCheckBox(Cl);
     RIRegisterTRadioButton(Cl);
     RIRegisterTCustomListBox(Cl);
     RIRegisterTListBox(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTScrollBar(Cl);
+    {$ENDIF}
+
+    { ComCtrls }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTTrackBar(Cl);
+      RIRegisterTCustomUpDown(Cl);
+      RIRegisterTUpDown(Cl);
+      RIRegisterTCustomHotKey(Cl);
+      RIRegisterTHotKey(Cl);
+      RIRegisterTCustomImageList(Cl);
+      RIRegisterTImageList(Cl);
+      RIRegister_StatusBar(Cl);
+      RIRegister_TListView(Cl);
+    {$ENDIF}
 
     { ExtCtrls }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTShape(Cl);
+      RIRegisterTImage(Cl);
+      RIRegisterTPaintBox(Cl);
+      RIRegisterTHeader(Cl);
+    {$ENDIF}
     RIRegisterTBevel(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTTimer(Cl);
+    {$ENDIF}
     RIRegisterTCustomPanel(Cl);
     RIRegisterTPanel(Cl);
 
@@ -418,6 +484,18 @@ begin
 
     RegisterHandCursor_R(Cl);
 
+    { Buttons }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTSpeedButton(Cl);
+      RIRegisterTBitBtn(Cl);
+    {$ENDIF}
+
+    { Menu }
+    {$IFNDEF PS_MINIVCL}
+      RIRegister_Menus(CL);
+      RIRegister_Menus_Routines(ScriptInterpreter);
+    {$ENDIF}
+
     RegisterClassLibraryRuntime(ScriptInterpreter, Cl);
   except
     Cl.Free;
@@ -429,6 +507,10 @@ end;
 
 procedure ScriptClassesLibraryUpdateVars(ScriptInterpreter: TIFPSExec);
 begin
+  {$IFNDEF PS_MINIVCL}
+    SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('APPLICATION')), Application);
+    SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('SCREEN')), Screen);
+  {$ENDIF}
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('WIZARDFORM')), WizardForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('MAINFORM')), MainForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('UNINSTALLPROGRESSFORM')), UninstallProgressForm);

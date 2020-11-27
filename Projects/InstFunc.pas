@@ -643,7 +643,7 @@ begin
           end;
       end;
     except
-      { don't propogate exceptions (e.g. from StrToInt) }
+      { don't propagate exceptions (e.g. from StrToInt) }
     end;
     { If we failed to read the count, or it's in some type we don't recognize,
       don't touch it }
@@ -1146,7 +1146,7 @@ begin
       end;
     end;
   except
-    { don't propogate exceptions }
+    { don't propagate exceptions }
   end;
   Result := MD5Final(Context);
 end;
@@ -1336,7 +1336,11 @@ procedure RefreshEnvironment;
   changed. Based on code from KB article 104011.
   Note: Win9x's Explorer ignores this message. }
 var
+{$IFDEF VER200}
+  MsgResult: DWORD;
+{$ELSE}
   MsgResult: DWORD_PTR;
+{$ENDIF}
 begin
   { Note: We originally used SendNotifyMessage to broadcast the message but it
     turned out that while it worked fine on NT 4 and 2000 it didn't work on XP
@@ -1344,8 +1348,13 @@ begin
     end (why I'm not exactly sure). We now use SendMessageTimeout as directed
     in the KB article 104011. It isn't as elegant since it could cause us to
     be delayed if another app is hung, but it'll have to do. }
+{$IFDEF VER200}
+  SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0,
+    LPARAM(PChar('Environment')), SMTO_ABORTIFHUNG, 5000, MsgResult);
+{$ELSE}
   SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0,
     LPARAM(PChar('Environment')), SMTO_ABORTIFHUNG, 5000, @MsgResult);
+{$ENDIF}
 end;
 
 procedure SplitNewParamStr(const Index: Integer; var AName, AValue: String);

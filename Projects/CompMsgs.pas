@@ -20,66 +20,66 @@ const
 
   { Compiler form labels }
   SCompilerFormCaption = 'Inno Setup Compiler';
-  SCompilerScriptFileLabel = 'Script &File:';
-  SCompilerStatusLabel = 'Status &Messages:';
-  SCompilerScriptBrowseButton = '&Browse...';
-  SCompilerStartButton = '&Start';
-  SCompilerExitButton = 'E&xit';
-  SCompilerOpenFilter = 'Inno Setup Scripts (*.iss)|*.iss|All Files|*.*';
-  SCompilerExampleScripts = 'Example scripts...';
-  SCompilerMoreFiles = 'More files...';
+  SCompilerScriptFileLabel = 'Сценарий:';
+  SCompilerStatusLabel = 'Сообщения:';
+  SCompilerScriptBrowseButton = 'Обзор...';
+  SCompilerStartButton = 'Старт';
+  SCompilerExitButton = 'Выход';
+  SCompilerOpenFilter = 'Сценарии Inno Setup (*.iss)|*.iss|Все файлы|*.*';
+  SCompilerExampleScripts = 'Примеры сценариев...';
+  SCompilerMoreFiles = 'Другие файлы сценариев...';
 
   { Compiler Script Wizard }
-  SWizardDefaultName = 'Inno Setup Script Wizard';
-  SWizardWelcome = 'Welcome';
-  SWizardAppInfo = 'Application Information';
-  SWizardAppInfo2 = 'Please specify some basic information about your application.';
-  SWizardAppDir = 'Application Folder';
-  SWizardAppDir2 = 'Please specify folder information about your application.';
-  SWizardAppFiles = 'Application Files';
-  SWizardAppFiles2 = 'Please specify the files that are part of your application.';
-  SWizardAppFiles3 = 'Please specify the source folder.';
-  SWizardAppFilesSubDirsMessage = 'Should files in subfolders of "%s" also be included?';
-  SWizardAppExeFilter = 'Application files (*.exe)|*.exe|All Files|*.*';
+  SWizardDefaultName = 'Мастер создания сценариев Inno Setup';
+  SWizardWelcome = 'Добро пожаловать';
+  SWizardAppInfo = 'Информация о приложении';
+  SWizardAppInfo2 = 'Пожалуйста, введите информацию о вашем приложении.';
+  SWizardAppDir = 'Каталог установки';
+  SWizardAppDir2 = 'Пожалуйста, укажите папку для установки вашего приложения.';
+  SWizardAppFiles = 'Файлы приложения';
+  SWizardAppFiles2 = 'Пожалуйста, укажите файлы вашего приложения.';
+  SWizardAppFiles3 = 'Пожалуйста, укажите папку с исходными файлами:';
+  SWizardAppFilesSubDirsMessage = 'Следует ли также добавить все файлы, находящиеся в подпапках "%s"?';
+  SWizardAppExeFilter = 'Файлы приложений (*.exe)|*.exe|Все файлы|*.*';
   SWizardAppExeDefaultExt = 'exe';
-  SWizardAppIcons = 'Application Shortcuts';
-  SWizardAppIcons2 = 'Please specify which shortcuts should be created for your application.';
-  SWizardAppDocs = 'Application Documentation';
-  SWizardAppDocs2 = 'Please specify which documentation files should be shown by Setup during installation.';
-  SWizardAppDocsFilter = 'Documentation files (*.rtf,*.txt)|*.rtf;*.txt|All Files|*.*';
+  SWizardAppIcons = 'Иконки приложения';
+  SWizardAppIcons2 = 'Пожалуйста, укажите место создания иконок для вашего приложения.';
+  SWizardAppDocs = 'Документация приложения';
+  SWizardAppDocs2 = 'Пожалуйста, укажите текстовую информацию, которая должна быть показана в процессе установки.';
+  SWizardAppDocsFilter = 'Файлы документов (*.rtf,*.txt)|*.rtf;*.txt|Все файлы|*.*';
   SWizardAppDocsDefaultExt = 'rtf';
-  SWizardPrivilegesRequired = 'Setup Install Mode';
-  SWizardPrivilegesRequired2 = 'Please specify in which install mode Setup should run.';
-  SWizardLanguages = 'Setup Languages';
-  SWizardLanguages2 = 'Please specify which Setup languages should be included.';
-  SWizardCompiler = 'Compiler Settings';
-  SWizardCompiler2 = 'Please specify some basic compiler settings.';
-  SWizardCompilerSetupIconFileFilter = 'Icon files (*.ico)|*.ico|All Files|*.*';
+  SWizardPrivilegesRequired = 'Режим установки';
+  SWizardPrivilegesRequired2 = 'Пожалуйста, выберите режим запуска установки.';
+  SWizardLanguages = 'Языковая поддержка';
+  SWizardLanguages2 = 'Пожалуйста, выберите языки, которые необходимо добавить к установке вашего приложения.';
+  SWizardCompiler = 'Параметры компилятора';
+  SWizardCompiler2 = 'Пожалуйста, укажите основные параметры компилятора.';
+  SWizardCompilerSetupIconFileFilter = 'Файлы значков (*.ico)|*.ico|Все файлы|*.*';
   SWizardCompilerSetupIconFileDefaultExt = 'ico';
-  SWizardCompilerOutputDir = 'Please specify the folder.';
-  SWizardISPP = 'Inno Setup Preprocessor';
-  SWizardISPP2 = 'Please specify whether Inno Setup Preprocessor should be used.';
-  SWizardISPPLabel = 'The [name] can use #define compiler directives to simplify your script. Although this is not necessary, it will make it easier to manually change the script later.' + SNewLine2 + 'Do you want the [name] to use #define compiler directives?';
-  SWizardISPPCheck = '&Yes, use #define compiler directives';
-  SWizardFinished = 'Finished';
+  SWizardCompilerOutputDir = 'Пожалуйста, укажите папку.';
+  SWizardISPP = 'Препроцессор Inno Setup';
+  SWizardISPP2 = 'Укажите пожалуйста, должен ли использоваться препроцессор Inno Setup.';
+  SWizardISPPLabel = '[name] может использовать директивы компилятора #define, что позволит упростить ваш сценарий. Хотя в этом нет особой необходимости, позже будет легче вручную изменить сценарий.' + SNewLine2 + 'Вы хотите, чтобы Мастер использовал директивы #define?';
+  SWizardISPPCheck = 'Да, использовать директивы компилятора #define';
+  SWizardFinished = 'Завершено';
 
-  SWizardNextButton = '&Next >';
-  SWizardFinishButton = '&Finish';
-  SWizardCancelMessage = 'The [name] is not complete. If you quit now, the new script file will not be generated.'#13#13'Exit the [name]?';
+  SWizardNextButton = 'Далее >';
+  SWizardFinishButton = 'Готово';
+  SWizardCancelMessage = 'Работа Мастера создания сценариев Inno Setup не завершена.'#13'Если вы подтвердите свой выход, то сценарий создан не будет.'#13#13'Вы действительно хотите прекратить работу Мастера?';
 
-  SWizardAllFilesFilter = 'All Files|*.*';
+  SWizardAllFilesFilter = 'Все файлы|*.*';
 
-  SWizardAppNameError = 'Please specify the application name.';
-  SWizardAppVersionError = 'Please specify the application version.';
-  SWizardAppRootDirError = 'Please specify the application destination base folder.';
-  SWizardAppDirNameError = 'Please specify the application folder name.';
-  SWizardAppExeError = 'Please specify the application main executable file.';
-  SWizardAppGroupNameError = 'Please specify the application Start Menu group name.';
-  SWizardFileDestRootDirError = 'Please specify the destination base folder.';
-  SWizardFileAppDestRootDirError = 'Please specify a destination base folder other than the application folder';
-  SWizardLanguagesSelError = 'Please select at least one language.';
+  SWizardAppNameError = 'Пожалуйста, введите название приложения.';
+  SWizardAppVersionError = 'Пожалуйста, введите версию приложения.';
+  SWizardAppRootDirError = 'Пожалуйста, укажите папку установки приложения.';
+  SWizardAppDirNameError = 'Пожалуйста, введите название папки.';
+  SWizardAppExeError = 'Пожалуйста, укажите главный исполняемый файл приложения.';
+  SWizardAppGroupNameError = 'Пожалуйста, укажите папку приложения для меню ПУСК.';
+  SWizardFileDestRootDirError = 'Пожалуйста, укажите основную папку установки.';
+  SWizardFileAppDestRootDirError = 'Пожалуйста, укажите основную папку установки отличную от папки приложения.';
+  SWizardLanguagesSelError = 'Пожалуйста, выберите не менее одного языка поддержки.';
 
-  SWizardScriptHeader = '; Script generated by the [name].' + SNewLine  + '; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!';
+  SWizardScriptHeader = '; Этот сценарий создан с помощью Мастера Inno Setup.' + SNewLine  + '; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!';
 
   { Compiler-specific messages }
   SCompilerVersion = 'version %s';
@@ -96,290 +96,294 @@ const
     'compil32 /wizard "My Script Wizard" c:\temp.iss';
 
   { Status messages }
-  SCompilerStatusStarting = '*** Starting compile.  [%s]';
-  SCompilerStatusCreatingOutputDir = 'Creating output directory: %s';
-  SCompilerStatusCreatingSignedUninstallerDir = 'Creating signed uninstaller directory: %s';
-  SCompilerStatusDeletingPrevious = 'Deleting %s from output directory';
-  SCompilerStatusParsingSectionLine = 'Parsing [%s] section, line %d';
-  SCompilerStatusParsingSectionLineFile = 'Parsing [%s] section, line %d of %s';
-  SCompilerStatusFilesVerInfo = '   Reading version info: %s';
-  SCompilerStatusReadingFile = 'Reading file (%s)';
-  SCompilerStatusPreparingSetupExe = 'Preparing Setup program executable';
-  SCompilerStatusSkippingPreparingSetupExe = 'Skipping preparing Setup program executable, output is disabled';
-  SCompilerStatusSignedUninstallerNew = '   Creating new signed uninstaller file: %s';
-  SCompilerStatusSignedUninstallerExisting = '   Using existing signed uninstaller file: %s';
-  SCompilerStatusDeterminingCodePages = 'Determining language code pages';
-  SCompilerStatusConvertCodePage = '   Conversion code page: %d';
-  SCompilerStatusReadingDefaultMessages = 'Reading default messages from Default.isl';
-  SCompilerStatusParsingMessages = 'Parsing [LangOptions], [Messages], and [CustomMessages] sections';
-  SCompilerStatusReadingCode = 'Reading [Code] section';
-  SCompilerStatusCompilingCode = 'Compiling [Code] section';
-  SCompilerStatusReadingInFile = '   File: %s';
-  SCompilerStatusReadingInScriptMsgs = '   Messages in script file';
-  SCompilerStatusCreateSetupFiles = 'Creating setup files';
-  SCompilerStatusSkippingCreateSetupFiles = 'Skipping creating setup files, output is disabled';
-  SCompilerStatusCreateManifestFile = 'Creating manifest file';
-  SCompilerStatusFilesInitEncryption = '   Initializing encryption';
-  SCompilerStatusFilesCompressing = '   Compressing: %s';
-  SCompilerStatusFilesCompressingVersion = '   Compressing: %s   (%u.%u.%u.%u)';
-  SCompilerStatusFilesStoring = '   Storing: %s';
-  SCompilerStatusFilesStoringVersion = '   Storing: %s   (%u.%u.%u.%u)';
-  SCompilerStatusCompressingSetupExe = '   Compressing Setup program executable';
-  SCompilerStatusUpdatingVersionInfo = '   Updating version info (%s)';
-  SCompilerStatusUpdatingIcons = '   Updating icons (%s)';
-  SCompilerStatusCreatingDisk = '   Creating disk %d';
-  SCompilerStatusFinished = '*** Finished.  [%s, %s elapsed]';
-  SCompilerStatusError = 'ERROR:';
-  SCompilerStatusErrorAborted = '*** Compile aborted.';
-  SCompilerStatusReset = '*** Log size limit reached, list reset.';
-  SCompilerStatusWarning = 'Warning: ';
-  SCompilerStatusSigningSetup = '   Signing Setup program executable';
-  SCompilerStatusSigningSourceFile = '   Signing: %s';
-  SCompilerStatusSourceFileAlreadySigned = '   Skipping signing, already signed: %s';
-  SCompilerStatusSigning = '   Running Sign Tool %s: %s';
-  SCompilerStatusSigningWithDelay = '   Running Sign Tool %s in %d milliseconds: %s';
-  SCompilerStatusWillRetrySigning = '   Sign Tool command failed (%s). Will retry (%d tries left).';
+  SCompilerStatusStarting = '*** Запуск компиляции.  [%s]';
+  SCompilerStatusCreatingOutputDir = 'Создание папки вывода: %s';
+  SCompilerStatusCreatingSignedUninstallerDir = 'Создание цифровой подписи для деинсталлятора: %s';
+  SCompilerStatusDeletingPrevious = 'Удаление %s из папки вывода';
+  SCompilerStatusParsingSectionLine = 'Анализ секции [%s], строка %d';
+  SCompilerStatusParsingSectionLineFile = 'Анализ секции [%s], строка %d из %s';
+  SCompilerStatusFilesVerInfo = '   Чтение версии: %s';
+  SCompilerStatusReadingFile = 'Чтение файла (%s)';
+  SCompilerStatusPreparingSetupExe = 'Подготовка программы установки';
+  SCompilerStatusSkippingPreparingSetupExe = 'Пропуск подготовки исполняемого файла программы установки, вывод отключен';
+  SCompilerStatusSignedUninstallerNew = '   Создание нового подписанного файла деинсталляции: %s';
+  SCompilerStatusSignedUninstallerExisting = '   Использование существующего подписанного файла деинсталляции: %s';
+  SCompilerStatusDeterminingCodePages = 'Определение кодовых страниц языка';
+  SCompilerStatusConvertCodePage = '   Преобразование кодовой страницы: %d';
+  SCompilerStatusReadingDefaultMessages = 'Чтение сообщений из Default.isl';
+  SCompilerStatusParsingMessages = 'Анализ секций [LangOptions], [Messages] и [CustomMessages]';
+  SCompilerStatusReadingCode = 'Чтение секции [Code]';
+  SCompilerStatusCompilingCode = 'Компиляция секции [Code]';
+  SCompilerStatusReadingInFile = '   Файл: %s';
+  SCompilerStatusReadingInScriptMsgs = '   Сообщения из файла сценария';
+  SCompilerStatusCreateSetupFiles = 'Создание файлов установки';
+  SCompilerStatusSkippingCreateSetupFiles = 'Пропуск создания установочных файлов, вывод отключен';
+  SCompilerStatusCreateManifestFile = 'Создание файла манифеста';
+  SCompilerStatusFilesInitEncryption = '   Инициализация шифрования';
+  SCompilerStatusFilesCompressing = '   Сжатие: %s';
+  SCompilerStatusFilesCompressingVersion = '   Сжатие: %s   (%u.%u.%u.%u)';
+  SCompilerStatusFilesStoring = '   Сохранение: %s';
+  SCompilerStatusFilesStoringVersion = '   Сохранение: %s   (%u.%u.%u.%u)';
+  SCompilerStatusCompressingSetupExe = '   Сжатие файла установки';
+  SCompilerStatusUpdatingVersionInfo = '   Обновление версии (%s)';
+  SCompilerStatusUpdatingIcons = '   Обновление значков (%s)';
+  SCompilerStatusUpdatingStyles = '   Добавление стиля (%s)';
+  SCompilerStatusCreatingDisk = '   Создание диска %d';
+  SCompilerStatusFinished = '*** Компиляция завершена.  [%s, прошло %s]';
+  SCompilerStatusError = 'ОШИБКА:';
+  SCompilerStatusErrorAborted = '*** Компиляция прервана.';
+  SCompilerStatusReset = '*** Достигнут предельный размер отчета. Выполнена очистка.';
+  SCompilerStatusWarning = 'Внимание! ';
+  SCompilerStatusSigningSetup = '   Цифровая подпись файла установки';
+  SCompilerStatusSigningSourceFile = '   Цифровая подпись: %s';
+  SCompilerStatusSourceFileAlreadySigned = '   Цифровая подпись пропущена, уже существует: %s';
+  SCompilerStatusSigning = '   Выполнение Sign Tool %s: %s';
+  SCompilerStatusSigningWithDelay = '   Выполнение Sign Tool %s в %d (миллисекунд): %s';
+  SCompilerStatusWillRetrySigning = '   Ошибка выполнения команды Sign Tool (%s). Будет предпринята новая попытка (сделано попыток: %d).';
 
-  SCompilerSuccessfulMessage2 = 'The setup images were successfully created ' +
-    'in the output directory:' + SNewLine +
+  SCompilerSuccessfulMessage2 = 'Изображения установки были успешно созданы ' +
+    'в папке вывода:' + SNewLine +
     '%s' + SNewLine +
     SNewLine +
-    'Would you like to test the installation now?';
-  SCompilerSuccessfulTitle = 'Compile Successful';
-  SCompilerNeedCompiledExe = 'Cannot run Setup at this time. Please compile Setup successfully to completion first, with output enabled';
-  SCompilerNeedUninstExe = 'Cannot run Uninstall at this time. Please run Setup successfully to completion first';
-  SCompilerExecuteSetupError2 = 'Error executing "%s":' + SNewLine2 + '%d: %s';
+    'Вы хотите выполнить проверку установки?';
+  SCompilerSuccessfulTitle = 'Компиляция успешно завершена';
+  SCompilerNeedCompiledExe = 'Невозможно запустить установку в текущий момент. Дождитесь успешного завершения компиляции с получением файла установки.';
+  SCompilerNeedUninstExe = 'Не удается получить доступ к Деинсталляции. Пожалуйста, выполните сначала Установку.';
+  SCompilerExecuteSetupError2 = 'Ошибка выполнения "%s":' + SNewLine2 + '%d: %s';
 
-  SCompilerAborted = 'Compile aborted. Please correct the problem and try again.';
+  SCompilerAborted = 'Компиляция прервана. Пожалуйста, устраните проблему и попробуйте снова.';
 
   { Fatal errors }
-  SCompilerScriptMissing2 = 'Specified script file does not exist';
-  SCompilerOutputNotEmpty2 = 'Output directory must be empty prior to ' +
-    'compilation of any non-Setup files. Files named SETUP.* are ' +
-    'automatically deleted at the start of compilation.';
-  SCompilerUnknownFilenamePrefix = 'Unknown filename prefix "%s"';
-  SCompilerSourceFileDoesntExist = 'Source file "%s" does not exist';
-  SCompilerCopyError3 = 'Could not copy "%s" to "%s".' + SNewLine2 + 'Error %d: %s';
-  SCompilerReadError = 'Could not read "%s".' + SNewLine2 + 'Error: %s';
-  SCompilerCompressError2 = 'An internal error occurred while trying to compress "%s"';
-  SCompilerNotEnoughSpaceOnFirstDisk = 'There is not enough space on the first disk to copy all of the required files';
-  SCompilerSetup0Mismatch = 'Internal error SC1';
-  SCompilerMustUseDiskSpanning = 'Disk spanning must be enabled in order to create an installation larger than %d bytes in size';
-  SCompilerCompileCodeError = 'An error occurred while trying to compile the [Code] section:' + SNewLine2 + '%s';
-  SCompilerISCryptMissing = 'Cannot use encryption because ISCrypt.dll is missing.' + SNewLine2 +
-    'Note: This file is not installed with Inno Setup. A link to obtain it can be found on the Inno Setup web site';
-  SCompilerFunctionFailedWithCode = '%s failed. Error %d: %s';
+  SCompilerScriptMissing2 = 'Указанный файл сценария не существует';
+  SCompilerOutputNotEmpty2 = 'Выходной каталог не должен содержать каких-либо ' +
+    'установочных файлов. При запуске компиляции все файлы с именами SETUP.* ' +
+    'будут автоматически удалены.';
+  SCompilerUnknownFilenamePrefix = 'Неизвестный префикс в имени файла "%s"';
+  SCompilerSourceFileDoesntExist = 'Исходный файл "%s" не существует';
+  SCompilerCopyError3 = 'Не удается скопировать "%s" в "%s".' + SNewLine2 + 'Ошибка %d: %s';
+  SCompilerReadError = 'Не удается прочитать "%s".' + SNewLine2 + 'Ошибка: %s';
+  SCompilerCompressError2 = 'Произошла внутренняя ошибка при попытке сжатия "%s"';
+  SCompilerNotEnoughSpaceOnFirstDisk = 'На диске Недостаточно свободного места для копирования всех необходимых файлов.';
+  SCompilerSetup0Mismatch = 'Внутренняя ошибка SC1';
+  SCompilerMustUseDiskSpanning = 'Необходимо включить разбиение на диски для создания файлов установки размером более чем %d байт.';
+  SCompilerCompileCodeError = 'Произошла ошибка при компиляции секции [Code]:' + SNewLine2 + '%s';
+  SCompilerISCryptMissing = 'Шифрование невозможно, т.к. отсутствует файл ISCrypt.dll.' + SNewLine2 +
+    'Примечание: Это файл не входит в стандартную поставку Inno Setup, и может быть загружен с веб-сайта Inno Setup.';
+  SCompilerFunctionFailedWithCode = 'Не удалось %s. Ошибка %d: %s';
 
   { [Setup] }
-  SCompilerUnknownDirective = 'Unrecognized [%s] section directive "%s"';
-  SCompilerEntryObsolete = 'The [%s] section directive "%s" is obsolete and ignored in this version of Inno Setup.';
-  SCompilerEntrySuperseded2 = 'The [%s] section directive "%s" has been superseded by "%s" in this version of Inno Setup.';
-  SCompilerEntryMissing2 = 'Required [%s] section directive "%s" not specified';
-  SCompilerEntryInvalid2 = 'Value of [%s] section directive "%s" is invalid';
-  SCompilerEntryAlreadySpecified = '[%s] section directive "%s" already specified';
-  SCompilerAppVersionOrAppVerNameRequired = 'The [Setup] section must include an AppVersion or AppVerName directive';
-  SCompilerMinVersionWinMustBeZero = 'Minimum Windows version specified by MinVersion must be 0. (Windows 95/98/Me are no longer supported.)';
-  SCompilerMinVersionNTTooLow = 'Minimum NT version specified by MinVersion must be at least %s. (Windows 2000/XP/Server 2003 are no longer supported.)';
-  SCompilerDiskSliceSizeInvalid = 'DiskSliceSize must be between %d and %d, or "max"';
-  SCompilerDiskClusterSizeInvalid = 'DiskClusterSize must be between 1 and 32768';
-  SCompilerInstallModeObsolete = 'The [%s] section directive "%s" is obsolete and ignored in this version of Inno Setup. Use command line parameters instead.';
-  SCompilerMessagesFileObsolete = 'The MessagesFile directive is obsolete and no longer supported. Use the [Languages] section instead.';
-  SCompilerDirectiveIsNTOnly = 'The [%s] section directive "%s" may not be used when compiling on Windows 95/98/Me';
-  SCompilerDirectiveRequiresWindows2000 = 'The [%s] section directive "%s" may not be used when compiling on Windows 95/98/Me/NT4';
-  SCompilerMustUseDisableStartupPrompt = 'DisableStartupPrompt must be set to "yes" when AppName includes constants';
-  SCompilerMustNotUsePreviousLanguage = 'UsePreviousLanguage must be set to "no" when AppId includes constants';
-  SCompilerMustNotUsePreviousPrivileges = 'UsePreviousPrivileges must be set to "no" when AppId includes constants and PrivilegesRequiredOverridesAllowed allows "dialog"';
-  SCompilerDirectiveNotUsingDefault = 'The [Setup] section directive "%s" is not assuming a default value because %s includes constants.';
-  SCompilerDirectiveNotUsingPreferredDefault = 'The [Setup] section directive "%s" is defaulting to %s because %s includes constants.';
-  SCompilerDirectivePatternTooLong = 'The [Setup] section directive "%s" contains a pattern that is too long';
-  SCompilerOutputBaseFileNameSetup = 'Setting the [Setup] section "OutputBaseFileName" to "setup" is not recommended, all executables named "setup.exe" are shimmed by Windows application compatibility to load additional DLLs, such as version.dll.' + ' These DLLs are loaded unsafely by Windows and can be hijacked. Use a different name, for example "mysetup".';
+  SCompilerUnknownDirective = 'В секции [%s] не удалось распознать директиву "%s".';
+  SCompilerEntryObsolete = 'В секции [%s] директива "%s" является устаревшей и этой версией Inno Setup не учитывается.';
+  SCompilerEntrySuperseded2 = 'В секции [%s] директива "%s" была заменена на %s" в этой версии Inno Setup.';
+  SCompilerEntryMissing2 = 'Требуемая в секции [%s] директива "%s" не указана.';
+  SCompilerEntryInvalid2 = 'В секции [%s] значение директивы "%s" является недействительным.';
+  SCompilerEntryAlreadySpecified = 'В секции [%s] директива "%s" уже определена.';
+  SCompilerAppVersionOrAppVerNameRequired = 'Секция [Setup] должна содержать директиву AppVersion или AppVerName.';
+  SCompilerMinVersionWinMustBeZero = 'Минимальная версия Windows, определенная для MinVersion, должна быть 0. (Windows 95/98/Me больше не поддерживаются.)';
+  SCompilerMinVersionNTTooLow = 'Минимальное значение версии NT для параметра "MinVersion" должно быть не меньше %s. (Windows 2000/XP/Server 2003 больше не поддерживаются.)';
+  SCompilerDiskSliceSizeInvalid = 'Значение DiskSliceSize должно быть между %d и %d, или "max"';
+  SCompilerDiskClusterSizeInvalid = 'Значение DiskClusterSize должно быть в пределах от 1 до 32768';
+  SCompilerInstallModeObsolete = 'В секции [%s] директива "%s" является устаревшей и этой версией Inno Setup не учитывается. Вместо неё используйте параметры командной строки.';
+  SCompilerMessagesFileObsolete = 'Директива MessagesFile устарела и больше не поддерживается. Используйте вместо неё секцию [Languages].';
+  SCompilerDirectiveIsNTOnly = 'В секции [%s] директива "%s" может не использоваться, если компиляция выполняется на Windows 95/98/Me';
+  SCompilerDirectiveRequiresWindows2000 = 'В секции [%s] директива "%s" может не использоваться, если компиляция выполняется на Windows 95/98/Me/NT4';
+  SCompilerMustUseDisableStartupPrompt = 'DisableStartupPrompt должна быть установлена в "yes", если включены константы AppName.';
+  SCompilerMustNotUsePreviousLanguage = 'UsePreviousLanguage должна быть установлена в "no", если включены константы AppId.';
+  SCompilerMustNotUsePreviousPrivileges = 'UsePreviousPrivileges должна быть установлена в "no", если включены константы AppId и PrivilegesRequiredOverridesAllowed принимает "dialog"';
+  SCompilerDirectiveNotUsingDefault = 'В секции [Setup] директива "%s" отклонит значение по умолчанию, т.к. %s содержит константы.';
+  SCompilerDirectiveNotUsingPreferredDefault = 'В секции [Setup] директива "%s" по умолчанию будет установлена в %s, т.к. %s содержит константы.';
+  SCompilerDirectivePatternTooLong = 'В секции [Setup] директива "%s" содержит слишком длинное значение.';
+  SCompilerOutputBaseFileNameSetup = 'Не рекомендуется в секции [Setup] для параметра "OutputBaseFileName" указывать имя "setup", т.к. все исполняемые файлы вида "setup.exe" на системе Windows используются для обеспечения совместимости приложений ' +
+                                     'и загрузки дополнительных файлов DLL, таких как version.dll и др. Загрузка этих файлов DLL является небезопасной и система Windows может быть взломана. Попробуйте использовать другое имя, например "mysetup".';
 
   { Signing }
-  SCompilerSignatureNeeded = 'Signed uninstaller mode is enabled. Using ' +
-    'an external code-signing tool, please attach your digital signature ' +
-    'to the following executable file:' + SNewLine2 + '%s' + SNewLine2 +
-    'and compile again';
-  SCompilerSignatureInvalid = 'Digital signature appears to be invalid';
-  SCompilerSignedFileContentsMismatchRetry = 'The contents of the signed file:' +
-    SNewLine2 + '%s' + SNewLine2 + 'differ unexpectedly from the original ' +
-    'file. Try deleting the signed file and compiling again. If this error ' +
-    'persists, please report the problem';
-  SCompilerSignedFileContentsMismatch = 'The contents of the signed file:' +
-    SNewLine2 + '%s' + SNewLine2 + 'differ unexpectedly from the original ' +
-    'file';
-  SCompilerNoSetupLdrSignError = 'The SignTool and SignedUninstaller directives may not be set when UseSetupLdr is set to "no"';
-  SCompilerSignToolFileNameSequenceNotFound = 'Unable to run Sign Tool %s: $f sequence is missing.'; 
-  SCompilerSignToolCreateProcessFailed = 'Failed to execute Sign Tool command.' +
-    SNewLine2 + 'Error %d: %s'; 
-  SCompilerSignToolNonZeroExitCode = 'Sign Tool command failed with exit code 0x%x';
-  SCompilerSignToolSucceededButNoSignature = 'The Sign Tool command returned an ' +
-    'exit code of 0, but the file does not have a digital signature';
+  SCompilerSignatureNeeded = 'Включен режим подписи деинсталляции. Используя ' +
+    'внешний инструмент цифровой подписи, пожалуйста, прикрепите вашу цифровую подпись ' +
+    'к следующему исполняемому файлу:' + SNewLine2 + '%s' + SNewLine2 +
+    'и выполните компиляцию снова.';
+  SCompilerSignatureInvalid = 'Недопустимая цифровая подпись';
+  SCompilerSignedFileContentsMismatchRetry = 'Содержимое подписанного файла:' +
+    SNewLine2 + '%s' + SNewLine2 + 'коренным образом отличается от исходного файла. ' +
+    'Попробуйте удалить подписанный файл и выполнить компиляцию снова. Если эта ошибка ' +
+    'повторится, пожалуйста, сообщите нам о проблеме.';
+  SCompilerSignedFileContentsMismatch = 'Содержимое подписанного файла:' +
+    SNewLine2 + '%s' + SNewLine2 + 'коренным образом отличается от исходного ' +
+    'файла.';
+  SCompilerNoSetupLdrSignError = 'Директивы SignTool и SignedUninstaller не будут применены, если UseSetupLdr установлена в "no"';
+  SCompilerSignToolFileNameSequenceNotFound = 'Не удается запустить Sign Tool %s: отсутствует последовательность $f.'; 
+  SCompilerSignToolCreateProcessFailed = 'Не удалось выполнить команду Sign Tool.' +
+    SNewLine2 + 'Ошибка %d: %s'; 
+  SCompilerSignToolNonZeroExitCode = 'Сбой команды Sign Tool с кодом выхода 0x%x';
+  SCompilerSignToolSucceededButNoSignature = 'Команда The Sign Tool вернула ' +
+    'код выхода 0, но файл не получил цифровую подпись.';
 
   { Line parsing }
-  SCompilerLineTooLong = 'Line too long';
-  SCompilerSectionTagInvalid = 'Invalid section tag';
-  SCompilerSectionBadEndTag = 'Not inside "%s" section, but an end tag for ' +
-    'it was encountered';
-  SCompilerTextNotInSection = 'Text is not inside a section';
-  SCompilerInvalidDirective = 'Invalid compiler directive' +
-    SNewLine2 + 'To be able to use compiler directives other than ''#include'', you need Inno Setup Preprocessor (ISPP) which is currently not installed.' +
-    SNewLine2 + 'To install ISPP, reinstall Inno Setup and enable the ISPP option.';
-  SCompilerErrorOpeningIncludeFile = 'Couldn''t open include file "%s": %s';
-  SCompilerRecursiveInclude = 'Recursive include of "%s"';
-  SCompilerIllegalNullChar = 'Illegal null character on line %d';
-  SCompilerISPPMissing = 'ISPP.dll is missing';
+  SCompilerLineTooLong = 'Строка слишком длинная';
+  SCompilerSectionTagInvalid = 'Недействительный тег секции';
+  SCompilerSectionBadEndTag = 'Секция "%s" не закрыта, не найден закрывающий ' +
+    'тег.';
+  SCompilerTextNotInSection = 'Текст находится за пределами секции.';
+  SCompilerInvalidDirective = 'Недействительная директива компилятора' +
+    SNewLine2 + 'Чтобы использовать директивы компилятора кроме ''#include'', необходимо установить препроцессор Inno Setup (ISPP).' +
+    SNewLine2 + 'Для этого переустановите Inno Setup с включенной опцией установки ISPP.';
+  SCompilerErrorOpeningIncludeFile = 'Не удалось открыть подключенный файл "%s": %s';
+  SCompilerRecursiveInclude = 'Рекурсия включает "%s"';
+  SCompilerIllegalNullChar = 'Недопустимый нулевой символ в строке %d';
+  SCompilerISPPMissing = 'Не найден файл ISPP.dll';
 
   { Constant checks }
-  SCompilerTwoBraces = 'Use two consecutive "{" characters if you are trying ' +
-    'to embed a single "{" and not a constant';
-  SCompilerUnknownConst = 'Unknown constant "%s".' +
+  SCompilerTwoBraces = 'Используйте подряд два символа "{", если хотите ' +
+    'встроить единственный символ "{" вместо константы.';
+  SCompilerUnknownConst = 'Неизвестная константа "%s".' +
     SNewLine2 + SCompilerTwoBraces;
-  SCompilerUnterminatedConst = 'A "}" is missing at the end of the constant "%s".' +
+  SCompilerUnterminatedConst = 'Отсутствует закрывающая скобка "}" в объявлении константы "%s".' +
     SNewLine2 + SCompilerTwoBraces;
-  SCompilerConstCannotUse = 'The constant "%s" cannot be used here';
-  SCompilerBadEnvConst = 'Invalid environment constant "%s"';
-  SCompilerBadRegConst = 'Invalid registry constant "%s"';
-  SCompilerBadIniConst = 'Invalid INI constant "%s"';
-  SCompilerBadParamConst = 'Invalid command line parameter constant "%s"';
-  SCompilerBadCodeConst = 'Invalid code constant "%s"';
-  SCompilerBadDriveConst = 'Invalid drive constant "%s"';
-  SCompilerBadCustomMessageConst = 'Invalid custom message constant "%s"';
-  SCompilerBadBoolConst = 'Invalid boolean constant "%s"';
-  SCompilerConstantRenamed = 'Constant "%s" has been renamed. Use "%s" instead.';
-  SCompilerCommonConstantRenamed = 'Constant "%s" has been renamed. Use "%s" instead or consider using its "auto" form.';
+  SCompilerConstCannotUse = 'Использование здесь константы "%s" недопустимо.';
+  SCompilerBadEnvConst = 'Недействительная константа окружения "%s"';
+  SCompilerBadRegConst = 'Недействительная константа реестра "%s"';
+  SCompilerBadIniConst = 'Недействительная константа INI "%s"';
+  SCompilerBadParamConst = 'Недействительная константа параметров командной строки "%s"';
+  SCompilerBadCodeConst = 'Недействительная константа кода "%s"';
+  SCompilerBadDriveConst = 'Недействительная константа диска "%s"';
+  SCompilerBadCustomMessageConst = 'Недействительная константа пользовательского сообщения "%s"';
+  SCompilerBadBoolConst = 'Недействительная логическая константа "%s"';
+  SCompilerConstantRenamed = 'Константа "%s" была переименована. Вместо неё используйте "%s".';
+  SCompilerCommonConstantRenamed = 'Константа "%s" была переименована. Вместо неё используйте "%s" или рассмотрите применение её формы "auto".';
 
   { Area checks }
-  SCompilerUsedUserAreasWarning = 'The [%s] section directive "%s" is set to "%s" but per-user areas (%s) are used by the script. ' +
-    'Regardless of the version of Windows, if the installation is running in administrative install mode then you should be careful about making any per-user area changes: such changes may not achieve what you are intending. ' +
-    'See the "UsedUserAreasWarning" topic in help file for more information.';
+  SCompilerUsedUserAreasWarning = 'В секции [%s] для директивы "%s" установлено значение "%s", ' + SNewLine +
+    'но в сценарии используется пользовательская область (%s). При административном ' + SNewLine +
+    'режиме установки, независимо от версии Windows, требуется соблюдать осторожность, выполняя ' + SNewLine +
+    'изменения в пользовательской области: они могут привести к другим, неожиданным результатам. ' + SNewLine +
+    'Для получения дополнительной информации обратитесь к справке, главе "UsedUserAreasWarning".';
 
   { Directive parsing }
-  SCompilerDirectiveNameMissing = 'Missing directive name';
-  SCompilerDirectiveHasNoValue = 'Directive "%s" has no value';
+  SCompilerDirectiveNameMissing = 'Отсутствует имя директивы';
+  SCompilerDirectiveHasNoValue = 'Директива "%s" не содержит значение';
 
   { Parameter parsing }
-  SCompilerParamHasNoValue = 'Specified parameter "%s" has no value';
-  SCompilerParamQuoteError = 'Mismatched or misplaced quotes on parameter "%s"';
-  SCompilerParamMissingClosingQuote = 'Missing closing quote on parameter "%s"';
-  SCompilerParamDataTooLong = 'Data on parameter "%s" is too long';
-  SCompilerParamUnknownParam = 'Unrecognized parameter name "%s"';
-  SCompilerParamDuplicated = 'Cannot have multiple "%s" parameters';
-  SCompilerParamEmpty2 = 'Parameter "%s" is empty';
-  SCompilerParamNotSpecified = 'Required parameter "%s" not specified';
-  SCompilerParamNoQuotes2 = 'Parameter "%s" cannot include quotes (")';
-  SCompilerParamNoBackslash = 'Parameter "%s" cannot include backslashes (\)';
-  SCompilerParamNoPrecedingBackslash = 'Parameter "%s" cannot begin with a backslash (\)';
-  SCompilerParamInvalid2 = 'Parameter "%s" is not a valid value';
+  SCompilerParamHasNoValue = 'Указанный параметр "%s" не содержит значение';
+  SCompilerParamQuoteError = 'Неуместные кавычки или их несоответствие для параметра "%s"';
+  SCompilerParamMissingClosingQuote = 'Отсутствует закрывающая кавычка для параметра "%s"';
+  SCompilerParamDataTooLong = 'Данные параметра "%s" слишком велики';
+  SCompilerParamUnknownParam = 'Не распознанное имя параметра "%s"';
+  SCompilerParamDuplicated = 'Не может содержать несколько параметров "%s"';
+  SCompilerParamEmpty2 = 'Параметр "%s" пустой';
+  SCompilerParamNotSpecified = 'Требуемый параметр "%s" не указан';
+  SCompilerParamNoQuotes2 = 'Параметр "%s" не может содержать кавычки (")';
+  SCompilerParamNoBackslash = 'Параметр "%s" не может содержать обратную косую черту  (\)';
+  SCompilerParamNoPrecedingBackslash = 'Параметр "%s" не может начинаться с обратной косой черты (\)';
+  SCompilerParamInvalid2 = 'Параметр "%s" содержит недопустимое значение';
 
   { Flags }
-  SCompilerParamUnknownFlag2 = 'Parameter "%s" includes an unknown flag';
-  SCompilerParamErrorBadCombo2 = 'Parameter "%s" cannot have both the "%s" and "%s" flags';
-  SCompilerParamUnsupportedFlag = 'Parameter "%s" includes a flag that is not supported in this section';
-  SCompilerParamFlagMissing = 'Flag "%s" must be used if flag "%s" is used';
-  SCompilerParamFlagMissing2 = 'Flag "%s" must be used if parameter "%s" is used';
+  SCompilerParamUnknownFlag2 = 'Параметр "%s" содержит неизвестный флаг';
+  SCompilerParamErrorBadCombo2 = 'Параметр "%s" не может содержать оба флага: "%s" и "%s"';
+  SCompilerParamUnsupportedFlag = 'Параметр "%s" содержит флаг, который не поддерживается в этой секции';
+  SCompilerParamFlagMissing = 'Флаг "%s" должен использоваться совместно с флагом "%s"';
+  SCompilerParamFlagMissing2 = 'Флаг "%s" должен использоваться совместно с параметром "%s"';
 
   { Types, components, tasks, check, beforeinstall, afterinstall }
-  SCompilerParamUnknownType = 'Parameter "%s" includes an unknown type';
-  SCompilerParamUnknownComponent = 'Parameter "%s" includes an unknown component';
-  SCompilerParamUnknownTask = 'Parameter "%s" includes an unknown task';
-  SCompilerExpressionError = 'Directive or parameter "%s" expression error: %s';
-  SCompilerBadCheckOrInstall = 'Invalid Check, BeforeInstall or AfterInstall parameter "%s"';
+  SCompilerParamUnknownType = 'Параметр "%s" содержит неизвестный тип';
+  SCompilerParamUnknownComponent = 'Параметр "%s" содержит неизвестный компонент';
+  SCompilerParamUnknownTask = 'Параметр "%s" содержит неизвестную задачу';
+  SCompilerExpressionError = 'Ошибка выражения в директиве или параметре "%s": %s';
+  SCompilerBadCheckOrInstall = 'Недействительный параметр "%s" для Check, BeforeInstall или AfterInstall';
 
   { Permissions }
-  SCompilerPermissionsInvalidValue = 'Parameter "Permissions" includes a malformed value: "%s"';
-  SCompilerPermissionsUnknownSid = 'Parameter "Permissions" includes an unknown SID: "%s"';
-  SCompilerPermissionsUnknownMask = 'Parameter "Permissions" includes an unknown access type: "%s"';
-  SCompilerPermissionsValueLimitExceeded = 'Parameter "Permissions" cannot include more than %d values';
-  SCompilerPermissionsTooMany = 'Too many unique "Permissions" parameter values';
+  SCompilerPermissionsInvalidValue = 'Параметр "Permissions" содержит искаженное значение: "%s"';
+  SCompilerPermissionsUnknownSid = 'Параметр "Permissions" содержит неизвестный SID: "%s"';
+  SCompilerPermissionsUnknownMask = 'Параметр "Permissions" содержит неизвестный тип доступа: "%s"';
+  SCompilerPermissionsValueLimitExceeded = 'Параметр "Permissions" не может содержать более чем %d значений';
+  SCompilerPermissionsTooMany = 'Слишком много уникальных значений в параметре "Permissions"';
 
   { [Code] }
-  SCompilerCodeUnsupportedEventFunction = 'Event function named "%s" is no longer supported. Create a "%s" function instead';
-  SCompilerCodeFunctionRenamed = 'Support function "%s" has been renamed. Use "%s" instead.';
-  SCompilerCodeFunctionRenamedWithAlternative = 'Support function "%s" has been renamed. Use "%s" instead or consider using "%s".';
+  SCompilerCodeUnsupportedEventFunction = 'Событие именованной функции "%s" больше не поддерживается. Создайте функцию "%s" вместо нёе';
+  SCompilerCodeFunctionRenamed = 'Функция "%s" была переименована. Вместо неё используйте "%s".';
+  SCompilerCodeFunctionRenamedWithAlternative = 'Функция "%s" была переименована. Вместо неё используйте "%s" или рассмотрите применение "%s".';
 
   { [Types] }
-  SCompilerTypesCustomTypeAlreadyDefined = 'A custom type has already been defined';
+  SCompilerTypesCustomTypeAlreadyDefined = 'Пользовательский тип уже был объявлен';
 
   { [Components], [Tasks], [Languages] }
-  SCompilerComponentsOrTasksBadName = 'Parameter "Name" includes invalid characters.' + SNewLine2 +
-    'It may only include alphanumeric characters, underscores, slashes (/), and/or backslashes (\), may not start with a number and may not start or end with a slash or a backslash. Names ''not'', ''and'' and ''or'' are reserved';
-  SCompilerComponentsInvalidLevel = 'Component cannot be more than one level below the preceding component';
-  SCompilerTasksInvalidLevel = 'Task cannot be more than one level below the preceding task'; 
-  SCompilerLanguagesBadName = 'Parameter "Name" includes invalid characters.' + SNewLine2 + 'It may only include alphanumeric characters and/or underscores, and may not start with a number. Names ''not'', ''and'' and ''or'' are reserved';
+  SCompilerComponentsOrTasksBadName = 'Параметр "Name" содержит недопустимые символы.' + SNewLine2 +
+    'Разрешается использовать только алфавитно-цифровые символы, знак подчеркивания и наклонные (/) или (\), причем цифры не должны быть первыми, а наклонные первыми и последними. Имена ''not'', ''and'' и ''or'' зарезервированы приложением.';
+  SCompilerComponentsInvalidLevel = 'Компонент не может содержать более одного вложения.';
+  SCompilerTasksInvalidLevel = 'Задача не может содержать более одного вложения.'; 
+  SCompilerLanguagesBadName = 'Параметр "Name" содержит недопустимые символы.' + SNewLine2 + 'Разрешается использовать только алфавитно-цифровые символы и знак подчеркивания. Имена ''not'', ''and'' и ''or'' зарезервированы приложением.';
 
   { [Languages] }
-  SCompilerParamUnknownLanguage = 'Parameter "%s" includes an unknown language';
+  SCompilerParamUnknownLanguage = 'Параметр "%s" содержит неизвестный язык';
 
   { [Messages] }
-  SCompilerMessagesMissingEquals = 'Missing "=" separator between message name and text';
-  SCompilerMessagesNotRecognizedDefault = 'Message name "%s" in Default.isl is not recognized by this version of Inno Setup';
-  SCompilerMessagesNotRecognizedWarning = 'Message name "%s" is not recognized by this version of Inno Setup. Ignoring.';
-  SCompilerMessagesNotRecognizedInFileWarning = 'Message name "%s" in "%s" is not recognized by this version of Inno Setup. Ignoring.';
-  SCompilerMessagesMissingDefaultMessage = 'A message named "%s" has not been defined in Default.isl. It is required by this version of Inno Setup';
-  SCompilerMessagesMissingMessageWarning = 'A message named "%s" has not been defined for the "%s" language. Will use the English message from Default.isl.';
+  SCompilerMessagesMissingEquals = 'Отсутствует разделитель "=" между именем и текстом сообщения.';
+  SCompilerMessagesNotRecognizedDefault = 'Имя сообщения "%s" в Default.isl для этой версии Inno Setup является недействительным.';
+  SCompilerMessagesNotRecognizedWarning = 'Имя сообщения "%s" для этой версии Inno Setup является недействительным. Пропущено.';
+  SCompilerMessagesNotRecognizedInFileWarning = 'Имя сообщения "%s" в "%s" для этой версии Inno Setup является недействительным. Пропущено.';
+  SCompilerMessagesMissingDefaultMessage = 'Сообщение с именем "%s" в файле Default.isl не объявлено. Это необходимо для этой версии Inno Setup.';
+  SCompilerMessagesMissingMessageWarning = 'Сообщение с именем "%s" для языка "%s" не объявлено. Будет использовано сообщение на английском языке из Default.isl.';
 
   { [CustomMessages] }
-  SCompilerCustomMessageBadName = 'Custom message name may only include alphanumeric characters and/or underscores, and cannot begin with a number';
-  SCompilerCustomMessagesMissingLangWarning = 'Custom message "%s" has not been defined for the "%s" language. Will use the custom message from the first language in which it was defined: "%s".';
-  SCompilerCustomMessagesMissingName = 'A custom message named "%s" has not been defined';
+  SCompilerCustomMessageBadName = 'Имя пользовательского сообщения может состоять только алфавитно-цифровых символов и знака подчеркивания, причем цифры не должны быть первыми.';
+  SCompilerCustomMessagesMissingLangWarning = 'Пользовательское сообщение "%s" для языка "%s" не объявлено. Будет использовано сообщение из начального языка, где оно было объявлено: "%s".';
+  SCompilerCustomMessagesMissingName = 'Имя пользовательского сообщения "%s" не объявлено.';
 
   { [Messages] & [LangOptions] }
-  SCompilerUnknownLanguage = 'Unknown language name "%s"';
-  SCompilerCantSpecifyLanguage = 'A language name may not be specified in a messages file';
-  SCompilerCantSpecifyLangOption = 'Language option "%s" cannot be applied to all languages';
+  SCompilerUnknownLanguage = 'Неизвестное имя языка "%s".';
+  SCompilerCantSpecifyLanguage = 'Возможно имя языка не объявлено в файле сообщений.';
+  SCompilerCantSpecifyLangOption = 'Параметр "%s" не может быть применён ко всем языкам.';
 
   { [Files] }
-  SCompilerFilesTmpBadFlag = 'Parameter "Flags" cannot have the "%s" flag on ' +
-    'a file copied to the {tmp} directory, or when the "deleteafterinstall" or ' +
-    '"dontcopy" flag is used';
-  SCompilerFilesWildcardNotMatched = 'No files found matching "%s"';
-  SCompilerFilesDestNameCantBeSpecified = 'Parameter "DestName" cannot be specified if ' +
-    'the "Source" parameter contains wildcards';
-  SCompilerFilesStrongAssemblyNameMustBeSpecified = 'Parameter "StrongAssemblyName" must be specified if ' +
-    'the flag "gacinstall" is used';
-  SCompilerFilesCantHaveExternalExclude = 'Parameter "Excludes" may not be used when ' +
-    'the "external" flag is used';
-  SCompilerFilesCantHaveNonExternalExternalSize = 'Parameter "ExternalSize" may only be used when ' +
-    'the "external" flag is used';
-  SCompilerFilesExcludeTooLong = 'Parameter "Excludes" contains a pattern that is too long';
-  SCompilerFilesCantReadVersionInfoOn64BitImage = 'In order for it to be able to read version info on 64-bit images, ' +
-    'the compiler must be run under Windows 2000 or later';
-  SCompilerFilesUnsafeFile = 'Unsafe file detected: %s.' + SNewLine2 +
-    'See the "Unsafe Files" topic in the help file for more information';
-  SCompilerFilesSystemDirUsed = 'Attempt to deploy DLL file from own Windows System directory.' + SNewLine2 +
-    'See the "Unsafe Files" topic in the help file for more information on why this is dangerous and should be avoided';
-  SCompilerFilesSystemDirNotUsed = 'Attempt to deploy registered file %s to a location other than {sys}.' + SNewLine2 +
-    'See the "Unsafe Files" topic in the help file for more information on why this is dangerous and should be avoided';
+  SCompilerFilesTmpBadFlag = 'Параметр "Flags" не может иметь флаг "%s" для ' +
+    'копирования файла в каталог {tmp}, или когда используется флаг ' +
+    '"deleteafterinstall" или "dontcopy".';
+  SCompilerFilesWildcardNotMatched = 'Файлы, соответствующие "%s", не найдены.';
+  SCompilerFilesDestNameCantBeSpecified = 'Нельзя указывать параметр "DestName", если ' +
+    'параметр "Source" содержит специальные символы.';
+  SCompilerFilesStrongAssemblyNameMustBeSpecified = 'Должен быть указан параметр "StrongAssemblyName", если ' +
+    'используется флаг "gacinstall".';
+  SCompilerFilesCantHaveExternalExclude = 'Можно не указывать параметр "Excludes", если ' +
+    'используется флаг "external".';
+  SCompilerFilesCantHaveNonExternalExternalSize = 'Параметр "ExternalSize" может применён только тогда, когда ' +
+    'используется флаг "external".';
+  SCompilerFilesExcludeTooLong = 'Параметр "Excludes" содержит слишком длинное значение.';
+  SCompilerFilesCantReadVersionInfoOn64BitImage = 'Чтобы иметь возможность получать информацию из 64-бит данных, ' +
+    'компилятор должен быть запущен на системе Windows 2000 или выше.';
+  SCompilerFilesUnsafeFile = 'Обнаружен небезопасный файл: %s.' + SNewLine2 +
+    'Ознакомьтесь с разделом "Небезопасные файлы" в справке Inno Setup.';
+  SCompilerFilesSystemDirUsed = 'Попытка использования файла DLL из системного каталога Windows.' + SNewLine2 +
+    'Смотрите раздел "Небезопасные файлы" в справке Inno Setup, почему это опасно и следует избегать.';
+  SCompilerFilesSystemDirNotUsed = 'Попытка регистрации файла %s в каталоге отличном от {sys}.' + SNewLine2 +
+    'Смотрите раздел "Небезопасные файлы" в справке Inno Setup, почему это опасно и следует избегать.';
   SCompilerFilesIgnoreVersionUsedUnsafely =
-    'Unsafe flag usage on file "%s": The "ignoreversion" flag should not be ' +
-    'used on files installed to the Windows System directory ("{sys}").';
-  SCompilerFilesWarningCopyMode = '"CopyMode: %s" has been superseded by "Flags: %s" in ' +
-    'this version of Inno Setup. Behaving as if "Flags: %s" were specified.';
-  SCompilerFilesWarningASISOO = '"CopyMode: alwaysskipifsameorolder" is deprecated and ' +
-    'ignored in this version of Inno Setup. It is now the default behavior.';
-  SCompilerFilesWarningSharedFileSysWow64 = 'DestDir should not be set to ' +
-    '"{syswow64}" when the "sharedfile" flag is used. See the "sharedfile" ' +
-    'documentation in the help file for details.';
+    'Небезопасное использование флага для файла "%s": Флаг "ignoreversion" нельзя использовать ' +
+    'при установке файлов в системный каталог Windows ("{sys}").';
+  SCompilerFilesWarningCopyMode = 'В этой версии Inno Setup "CopyMode: %s" был ' +
+    'заменён на "Flags: %s". Работает так, как будто "Flags: %s" был указан.';
+  SCompilerFilesWarningASISOO = '"CopyMode: alwaysskipifsameorolder" устарел и в этой версии ' +
+    'Inno Setup не учитывается. Теперь такое поведение используется по умолчанию.';
+  SCompilerFilesWarningSharedFileSysWow64 = 'DestDir не может быть установлен в ' +
+    '"{syswow64}", если используется флаг "sharedfile". Смотрите справочную ' +
+    'документацию по использованию "sharedfile".';
 
   { [Icons] }
-  SCompilerIconsNamePathNotSpecified = 'Parameter "Name" must include a path for the icon, ' +
-    'for example, "{group}\My Icon"';
-  SCompilerIconsIconIndexInvalid = 'Parameter "IconIndex" is not a valid integer';
+  SCompilerIconsNamePathNotSpecified = 'Параметр "Name" должен содержать путь к значку, ' +
+    'например, "{group}\My Icon".';
+  SCompilerIconsIconIndexInvalid = 'Параметр "IconIndex" не является действительным целым числом.';
 
   { [Registry] }
-  SCompilerRegistryDeleteKeyProhibited = 'The "uninsdeletekey" and ' +
-    '"deletekey" flags are prohibited on the specified key because the ' +
-    'results would be disastrous. (You probably mean to delete a value instead.)';
+  SCompilerRegistryDeleteKeyProhibited = 'Использование флагов "uninsdeletekey" и ' +
+    '"deletekey" для указанного ключа запрещены, т.к. приводили к негативным последствиям. ' +
+    '(Возможно вы хотите удалить только значение ключа.)';
 
   { [Run] }
-  SCompilerRunCantUseRunOnceId = 'Parameter "RunOnceId" can only be used in ' +
-    'an [UninstallRun] section';
-  SCompilerRunFlagObsolete = 'Flag "%s" is obsolete. Use "%s" instead.';
-  SCompilerRunMultipleWaitFlags = 'Parameter "Flags" cannot include multiple "wait" flags';
+  SCompilerRunCantUseRunOnceId = 'Параметр "RunOnceId" может использоваться только ' +
+    'в секции [UninstallRun].';
+  SCompilerRunFlagObsolete = 'Флаг "%s" является устаревшим. Вместо него используйте флаг "%s".';
+  SCompilerRunMultipleWaitFlags = 'Параметр "Flags" не может содержать несколько флагов "wait".';
 
   { [UninstallRun] }
-  SCompilerUninstallRunCantUseDescription = 'Parameter "Description" can only be used in ' +
-    'a [Run] section';
+  SCompilerUninstallRunCantUseDescription = 'Параметр "Description" может использоваться только ' +
+    'в секции [Run].';
 
 implementation
 

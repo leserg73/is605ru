@@ -3,37 +3,37 @@ object OptionsForm: TOptionsForm
   Top = 173
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Options'
-  ClientHeight = 349
-  ClientWidth = 589
+  Caption = 'Настройки'
+  ClientHeight = 359
+  ClientWidth = 595
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    589
-    349)
+    595
+    359)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 8
     Top = 8
-    Width = 281
-    Height = 233
+    Width = 286
+    Height = 243
     Anchors = [akLeft, akTop, akBottom]
-    Caption = ' Miscellaneous '
+    Caption = ' Разное '
     TabOrder = 0
     object StartupCheck: TCheckBox
       Left = 8
       Top = 16
       Width = 265
       Height = 17
-      Caption = 'Show &Welcome dialog at startup'
+      Caption = 'Показывать окно приветствия при запуске'
       TabOrder = 0
     end
     object WizardCheck: TCheckBox
@@ -41,15 +41,15 @@ object OptionsForm: TOptionsForm
       Top = 36
       Width = 265
       Height = 17
-      Caption = 'Use the Inno Setup &Script Wizard'
+      Caption = 'Использовать Мастер сценариев Inno Setup'
       TabOrder = 1
     end
     object AutosaveCheck: TCheckBox
       Left = 8
       Top = 56
-      Width = 265
+      Width = 272
       Height = 17
-      Caption = 'Automatically sa&ve before compiling'
+      Caption = 'Автосохранение сценария перед компиляцией'
       TabOrder = 2
     end
     object BackupCheck: TCheckBox
@@ -57,15 +57,15 @@ object OptionsForm: TOptionsForm
       Top = 76
       Width = 265
       Height = 17
-      Caption = 'Create &backups when saving'
+      Caption = 'Создавать резервные копии при сохранении'
       TabOrder = 3
     end
     object UndoAfterSaveCheck: TCheckBox
       Left = 8
       Top = 96
-      Width = 265
+      Width = 272
       Height = 17
-      Caption = 'Allow &Undo after save'
+      Caption = 'Разрешить операцию "Отменить" после записи'
       TabOrder = 4
     end
     object FullPathCheck: TCheckBox
@@ -73,7 +73,7 @@ object OptionsForm: TOptionsForm
       Top = 116
       Width = 265
       Height = 17
-      Caption = 'Display &full path in title bar'
+      Caption = 'Показывать полный путь в заголовке'
       TabOrder = 5
     end
     object PauseOnDebuggerExceptionsCheck: TCheckBox
@@ -81,7 +81,7 @@ object OptionsForm: TOptionsForm
       Top = 136
       Width = 265
       Height = 17
-      Caption = '&Pause on exceptions'
+      Caption = 'Приостанавливать отладку на исключениях'
       TabOrder = 6
     end
     object RunAsDifferentUserCheck: TCheckBox
@@ -97,28 +97,28 @@ object OptionsForm: TOptionsForm
       Top = 176
       Width = 265
       Height = 17
-      Caption = 'Colori&ze "Compiler Output" view'
+      Caption = 'Использовать подсветку строк компилятора'
       TabOrder = 8
     end
   end
   object GroupBox2: TGroupBox
     Left = 8
-    Top = 248
-    Width = 281
+    Top = 258
+    Width = 286
     Height = 57
     Anchors = [akLeft, akBottom]
-    Caption = ' File Associations '
+    Caption = ' Ассоциации файлов '
     TabOrder = 1
     DesignSize = (
-      281
+      286
       57)
     object AssocButton: TButton
-      Left = 40
+      Left = 18
       Top = 20
-      Width = 201
+      Width = 252
       Height = 23
       Anchors = [akLeft, akBottom]
-      Caption = '&Associate .iss files with this compiler'
+      Caption = 'Связать файлы *.iss с этим компилятором'
       TabOrder = 0
       OnClick = AssocButtonClick
     end
@@ -126,17 +126,17 @@ object OptionsForm: TOptionsForm
   object GroupBox3: TGroupBox
     Left = 300
     Top = 8
-    Width = 281
-    Height = 297
+    Width = 286
+    Height = 307
     Anchors = [akLeft, akTop, akBottom]
-    Caption = ' Editor '
+    Caption = ' Редактор '
     TabOrder = 2
     object AutoCompleteCheck: TCheckBox
       Left = 8
       Top = 16
       Width = 265
       Height = 17
-      Caption = 'Invoke autoco&mplete automatically'
+      Caption = 'Использовать функцию автозавершения'
       TabOrder = 0
     end
     object UseSynHighCheck: TCheckBox
@@ -144,7 +144,7 @@ object OptionsForm: TOptionsForm
       Top = 36
       Width = 265
       Height = 17
-      Caption = 'Use syntax &highlighting'
+      Caption = 'Использовать синтаксическую подсветку'
       TabOrder = 1
     end
     object UnderlineErrorsCheck: TCheckBox
@@ -152,7 +152,7 @@ object OptionsForm: TOptionsForm
       Top = 56
       Width = 265
       Height = 17
-      Caption = 'U&nderline syntax errors'
+      Caption = 'Подчеркивать ошибки в сценарии'
       TabOrder = 2
     end
     object CursorPastEOLCheck: TCheckBox
@@ -160,7 +160,7 @@ object OptionsForm: TOptionsForm
       Top = 76
       Width = 265
       Height = 17
-      Caption = 'Allow cursor to move beyond &end of lines'
+      Caption = 'Перемещать каретку за пределы конца строк'
       TabOrder = 3
     end
     object WordWrapCheck: TCheckBox
@@ -168,7 +168,7 @@ object OptionsForm: TOptionsForm
       Top = 96
       Width = 265
       Height = 17
-      Caption = 'W&ord wrap'
+      Caption = 'Перенос длинных строк'
       TabOrder = 4
     end
     object UseTabCharacterCheck: TCheckBox
@@ -176,7 +176,7 @@ object OptionsForm: TOptionsForm
       Top = 116
       Width = 265
       Height = 17
-      Caption = 'Use tab cha&racter'
+      Caption = 'Использовать символ табуляции'
       TabOrder = 5
     end
     object AutoIndentCheck: TCheckBox
@@ -184,7 +184,7 @@ object OptionsForm: TOptionsForm
       Top = 136
       Width = 265
       Height = 17
-      Caption = 'Auto &indent mode'
+      Caption = 'Режим автоматического отступа'
       TabOrder = 6
     end
     object IndentationGuidesCheck: TCheckBox
@@ -192,51 +192,51 @@ object OptionsForm: TOptionsForm
       Top = 156
       Width = 265
       Height = 17
-      Caption = 'Show indentation &guides'
+      Caption = 'Показывать границы табуляции'
       TabOrder = 7
     end
     object Label1: TNewStaticText
       Left = 8
-      Top = 237
-      Width = 25
+      Top = 253
+      Width = 41
       Height = 14
-      Caption = 'Font:'
-      TabOrder = 11
+      Caption = 'Шрифт:'
+      TabOrder = 13
     end
     object FontPanel: TPanel
       Left = 72
-      Top = 228
+      Top = 248
       Width = 121
-      Height = 32
+      Height = 25
       BevelKind = bkFlat
       BevelOuter = bvNone
       Caption = 'AaBbXxZz'
-      TabOrder = 12
+      TabOrder = 14
     end
     object ChangeFontButton: TButton
       Left = 200
-      Top = 233
+      Top = 249
       Width = 73
       Height = 23
-      Caption = '&Change...'
-      TabOrder = 13
+      Caption = 'Изменить...'
+      TabOrder = 15
       OnClick = ChangeFontButtonClick
     end
     object Label2: TNewStaticText
       Left = 8
-      Top = 271
-      Width = 54
+      Top = 282
+      Width = 97
       Height = 14
-      Caption = '&Tab Width:'
+      Caption = 'Размер табуляции:'
       FocusControl = TabWidthEdit
-      TabOrder = 14
+      TabOrder = 16
     end
     object TabWidthEdit: TEdit
-      Left = 72
-      Top = 268
+      Left = 114
+      Top = 279
       Width = 41
       Height = 21
-      TabOrder = 15
+      TabOrder = 17
       OnChange = TabWidthEditChange
     end
     object GutterLineNumbersCheck: TCheckBox
@@ -244,57 +244,74 @@ object OptionsForm: TOptionsForm
       Top = 176
       Width = 265
       Height = 17
-      Caption = 'Show &line numbers in gutter'
+      Caption = 'Показывать нумерацию строк'
       TabOrder = 8
     end
     object Label3: TNewStaticText
       Left = 8
-      Top = 202
-      Width = 37
-      Height = 14
-      Caption = 'T&heme:'
+      Top = 224
+      Width = 29
+      Height = 18
+      Caption = 'Тема:'
       FocusControl = ThemeComboBox
-      TabOrder = 9
+      TabOrder = 11
     end
     object ThemeComboBox: TComboBox
       Left = 72
-      Top = 199
+      Top = 221
       Width = 201
       Height = 21
       Style = csDropDownList
+      TabOrder = 12
+    end
+    object BorderLineEndCheck: TCheckBox
+      Left = 8
+      Top = 196
+      Width = 217
+      Height = 17
+      Caption = 'Показывать границу справа, столбец:'
+      TabOrder = 9
+      OnClick = BorderLineEndCheckClick
+    end
+    object LineColonEdit: TEdit
+      Left = 231
+      Top = 194
+      Width = 42
+      Height = 21
       TabOrder = 10
+      OnChange = LineColonEditChange
     end
   end
   object OKButton: TButton
-    Left = 428
-    Top = 317
+    Left = 433
+    Top = 327
     Width = 73
     Height = 23
     Anchors = [akLeft, akBottom]
-    Caption = 'OK'
+    Caption = 'ОК'
     Default = True
     ModalResult = 1
     TabOrder = 3
   end
   object CancelButton: TButton
-    Left = 508
-    Top = 317
+    Left = 513
+    Top = 327
     Width = 73
     Height = 23
     Anchors = [akLeft, akBottom]
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Отмена'
     ModalResult = 2
     TabOrder = 4
   end
   object FontDialog: TFontDialog
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = RUSSIAN_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Name = 'Tahoma'
     Font.Style = []
     Options = [fdForceFontExist]
-    Left = 8
-    Top = 284
+    Left = 24
+    Top = 316
   end
 end

@@ -27,7 +27,7 @@ uses
   Struct, ScriptDlg, Main, PathFunc, CmnFunc, CmnFunc2, FileClass, RedirFunc,
   Install, InstFunc, InstFnc2, Msgs, MsgIDs, NewDisk, BrowseFunc, Wizard, VerInfo,
   SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper,
-  SpawnClient, UninstProgressForm, ASMInline, DotNet;
+  SpawnClient, UninstProgressForm, ASMInline, DotNet, TaskbarProgressFunc;
 
 var
   ScaleBaseUnitsInitialized: Boolean;
@@ -748,6 +748,14 @@ begin
 
   if Proc.Name = 'EXTRACTTEMPORARYFILE' then begin
     ExtractTemporaryFile(Stack.GetString(PStart));
+  {$IFNDEF PS_MINIVCL}
+  end else if Proc.Name = 'EXTRACTTEMPORARYFILEEX' then begin
+    ExtractTemporaryFileEx(Stack.GetString(PStart), Stack.GetString(PStart-1));
+  end else if Proc.Name = 'EXTRACTTEMPORARYFILETOSTREAM' then begin
+    ExtractTemporaryFileToStream(Stack.GetString(PStart), TStream(Stack.GetClass(PStart-1)));
+  end else if Proc.Name = 'EXTRACTTEMPORARYFILESIZE' then begin
+    Stack.SetUInt(PStart, ExtractTemporaryFileSize(Stack.GetString(PStart-1)));
+  {$ENDIF}
   end else if Proc.Name = 'EXTRACTTEMPORARYFILES' then begin
     Stack.SetInt(PStart, ExtractTemporaryFiles(Stack.GetString(PStart-1)));
   end else
@@ -1134,6 +1142,26 @@ begin
     except
       Stack.SetBool(PStart, False);
     end;
+  {$IFNDEF PS_MINIVCL}
+  end else if Proc.Name = 'RANDOMIZE' then begin
+    Randomize;
+  end else if Proc.Name = 'HINSTANCE' then begin
+    Stack.SetUInt(PStart, HInstance);
+  end else if Proc.Name = 'FINDRESOURCE' then begin
+    Stack.SetUInt(PStart, FindResource(Stack.GetUInt(PStart-1), PChar(Stack.GetString(PStart-2)), PChar(StrToInt(Stack.GetString(PStart-3)))));
+  end else if Proc.Name = 'LOADRESOURCE' then begin
+    Stack.SetUInt(PStart, LoadResource(Stack.GetUInt(PStart-1), Stack.GetUInt(PStart-2)));
+  end else if Proc.Name = 'SIZEOFRESOURCE' then begin
+    Stack.SetInt(PStart, SizeofResource(Stack.GetUInt(PStart-1), Stack.GetUInt(PStart-2)));
+  end else if Proc.Name = 'LOCKRESOURCE' then begin
+    Stack.SetUInt(PStart, Longint(LockResource(Stack.GetUInt(PStart-1))));
+  end else if Proc.Name = 'UNLOCKRESOURCE' then begin
+    Stack.SetBool(PStart, UnlockResource(Stack.GetUInt(PStart-1)));
+  end else if Proc.Name = 'FREERESOURCE' then begin
+    Stack.SetBool(PStart, FreeResource(Stack.GetUInt(PStart-1)));
+  end else if Proc.Name = 'LOADCURSORFROMFILE' then begin
+    Stack.SetUInt(PStart, LoadCursorFromFile(PChar(Stack.GetString(PStart-1))));
+  {$ENDIF}
   end else if Proc.Name = 'SET8087CW' then begin
     Set8087CW(Stack.GetInt(PStart));
   end else if Proc.Name = 'GET8087CW' then begin
@@ -1277,6 +1305,10 @@ begin
     Stack.SetString(PStart, TrimRight(Stack.GetString(PStart-1)));
   end else if Proc.Name = 'GETCURRENTDIR' then begin
     Stack.SetString(PStart, GetCurrentDir());
+  {$IFNDEF PS_MINIVCL}
+  end else if Proc.Name = 'FORMATFLOAT' then begin
+    Stack.SetString(PStart, FormatFloat(Stack.GetString(PStart-1), Stack.GetReal(PStart-2)));
+  {$ENDIF}
   end else if Proc.Name = 'SETCURRENTDIR' then begin
     Stack.SetBool(PStart, SetCurrentDir(Stack.GetString(PStart-1)));
   end else if Proc.Name = 'EXPANDFILENAME' then begin
@@ -1503,6 +1535,36 @@ begin
       Stack.SetBool(PStart, False);
   end else if Proc.Name = 'FREEDLL' then begin
     Stack.SetBool(PStart, FreeLibrary(Stack.GetInt(PStart-1)));
+
+  {$IFNDEF PS_MINIVCL}
+    { 'function LoadImage(hInst: LongInt; ImageName: String; ImageType: LongWord; X, Y: Integer; Flags: LongWord): LongInt;', }
+    end else if Proc.Name = 'LOADIMAGE' then begin
+      Stack.SetUInt(PStart, LoadImage(Stack.GetUInt(PStart-1), PChar(Stack.GetString(PStart-2)), Stack.GetUInt(PStart-3), Stack.GetInt(PStart-4), Stack.GetInt(PStart-5), Stack.GetUInt(PStart-6)));
+    { 'function DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: Integer; cxWidth, cyWidth: Integer; istepIfAniCur: LongWord; hbrFlickerFreeDraw: LongWord; diFlags: LongWord): Boolean;', }
+    end else if Proc.Name = 'DRAWICONEX' then begin
+      Stack.SetBool(PStart, DrawIconEx(Stack.GetUInt(PStart-1), Stack.GetInt(PStart-2), Stack.GetInt(PStart-3), Stack.GetInt(PStart-4), Stack.GetInt(PStart-5), Stack.GetInt(PStart-6), Stack.GetUInt(PStart-7), Stack.GetUInt(PStart-8), Stack.GetUInt(PStart-9)));
+    { 'function DestroyIcon(hIcon: Integer): Boolean;', }
+    end else if Proc.Name = 'DESTROYICON' then begin
+      Stack.SetBool(PStart, DestroyIcon(Stack.GetInt(PStart-1)));
+    end else if Proc.Name = 'SETWINDOWTEXT' then begin
+      Stack.SetBool(PStart, SetWindowText(Stack.GetUInt(PStart-1), Stack.GetString(PStart-2)));
+    { 'procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);' }
+    end else if Proc.Name = 'SETAPPTASKBAROVERLAYICONFILE' then begin
+      SetAppTaskbarOverlayIconFile(Stack.GetString(PStart));
+    { 'procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);' }
+    end else if Proc.Name = 'SETAPPTASKBAROVERLAYICONRES' then begin
+      SetAppTaskbarOverlayIconRes(Stack.GetString(PStart));
+    { 'procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);' }
+    end else if Proc.Name = 'SETAPPTASKBARTHUMBNAILTOOLTIP' then begin
+      SetAppTaskbarThumbnailTooltip(Stack.GetString(PStart));
+    { 'procedure SetAppTaskbarProgressState(const State: TTaskbarProgressState);' }
+    end else if Proc.Name = 'SETAPPTASKBARPROGRESSSTATE' then begin
+      SetAppTaskbarProgressState(TTaskbarProgressState(Stack.GetUInt(PStart)));
+    { 'procedure SetAppTaskbarProgressValue(const Completed: Cardinal);' }
+    end else if Proc.Name = 'SETAPPTASKBARPROGRESSVALUE' then begin
+      SetAppTaskbarProgressValue(Stack.GetUInt(PStart), 100);
+  {$ENDIF}
+
   end else if Proc.Name = 'CREATEMUTEX' then begin
     Windows.CreateMutex(nil, False, PChar(Stack.GetString(PStart)));
   end else if Proc.Name = 'OEMTOCHARBUFF' then begin

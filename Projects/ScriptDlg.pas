@@ -825,7 +825,7 @@ procedure OutputProgressWizardPageMessageBoxCallback(const Flags: LongInt; const
   const Param: LongInt);
 const
   States: array [TNewProgressBarState] of TTaskbarProgressState =
-    (tpsNormal, tpsError, tpsPaused);
+    (tpsNormal, tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
 var
   OutputProgressWizardPage: TOutputProgressWizardPage;
   NewState: TNewProgressBarState;

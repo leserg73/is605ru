@@ -22,7 +22,7 @@ uses
   Windows, SysUtils, Messages, Forms, PathFunc, CmnFunc, CmnFunc2, Undo, Msgs,
   MsgIDs, InstFunc, Struct, SetupEnt, UninstProgressForm, UninstSharedFileForm,
   FileClass, ScriptRunner, DebugClient, SetupTypes, Logging, Main, Helper,
-  SpawnServer;
+  SpawnServer, Vcl.Themes, Vcl.Styles;
 
 type
   TExtUninstallLog = class(TUninstallLog)
@@ -94,6 +94,7 @@ end;
 
 procedure InitializeUninstallProgressForm;
 begin
+  ASetupStyle := ufSetupStyle in UninstLog.Flags;
   UninstallProgressForm := TUninstallProgressForm.Create(nil);
   UninstallProgressForm.Initialize(Title, UninstLog.AppName, ufModernStyle in UninstLog.Flags);
   if CodeRunner <> nil then begin
@@ -756,6 +757,17 @@ begin
   end;
 end;
 
+procedure LoadStyles;
+var
+  VCLName: String;
+begin
+  VCLName := TStyleManager.StyleNames[1];
+  if VCLName <> '' then
+    TStyleManager.SetStyle(VCLName)
+  else
+    TStyleManager.SetStyle('Windows');
+end;
+
 procedure RunUninstaller;
 var
   F: TFile;
@@ -768,6 +780,7 @@ begin
   ShowWindow(Application.Handle, SW_SHOW);
 
   try
+    LoadStyles;
     InitializeCommonVars;
 
     SetCurrentDir(GetSystemDir);

@@ -36,7 +36,7 @@ function RegisterISSFileAssociation(const AllowInteractive: Boolean; var AllUser
     procedure Check(const Res: Longint);
     begin
       if Res <> ERROR_SUCCESS then
-        raise Exception.CreateFmt('Error creating file association:'#13#10'%d - %s',
+        raise Exception.CreateFmt('Ошибка создания ассоциации файлов:'#13#10'%d - %s',
           [Res, Win32ErrorString(Res)]);
     end;
 
@@ -61,8 +61,8 @@ begin
   AllUsers := Rootkey = HKEY_LOCAL_MACHINE;
   
   Result := AllUsers or not AllowInteractive or
-            (MsgBox('Unable to associate for all users without administrative privileges. Do you want to associate only for yourself instead?',
-              'Associate', mbConfirmation, MB_YESNO) = IDYES);
+            (MsgBox('Невозможно выполнить ассоциацию файлов для всех пользователей без прав администратора. Вы хотите связать файлы только для текущего пользователя?',
+              'Ассоциация файлов', mbConfirmation, MB_YESNO) = IDYES);
   if not Result then
     Exit;
 
@@ -76,10 +76,10 @@ begin
   SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\open\command', nil,
     '"' + SelfName + '" "%1"');
   SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\OpenWithInnoSetup', nil,
-    'Open with &Inno Setup');
+    'Открыть в Inno Setup');
   SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\OpenWithInnoSetup\command', nil,
     '"' + SelfName + '" "%1"');
-  SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\Compile', nil, 'Compi&le');
+  SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\Compile', nil, 'Компилировать');
   SetKeyValue(Rootkey, 'Software\Classes\InnoSetupScriptFile\shell\Compile\command', nil,
     '"' + SelfName + '" /cc "%1"');
 

@@ -26,7 +26,7 @@
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Alignment>1</DCC_Alignment>
-			<DCC_Define>PS_MINIVCL;PS_NOWIDESTRING;PS_NOINT64;PS_NOGRAPHCONST;$(DCC_Define)</DCC_Define>
+			<DCC_Define>PS_MINIVCL;PS_NOWIDESTRING;IS_WINXP;PS_NOINT64;PS_NOGRAPHCONST;$(DCC_Define)</DCC_Define>
 			<DCC_Platform>x86</DCC_Platform>
 			<DCC_UsePackage>VCL30;vclx30;VclSmp30;vcldb30;vcldbx30</DCC_UsePackage>
 			<DCC_K>false</DCC_K>

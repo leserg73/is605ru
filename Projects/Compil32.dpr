@@ -9,10 +9,17 @@ program Compil32;
   Compiler
 }
 
-{$SetPEFlags 1} 
-{$SETPEOSVERSION 6.0}
-{$SETPESUBSYSVERSION 6.0}
-{$WEAKLINKRTTI ON}
+{$SetPEFlags 1}
+{$IFNDEF IS_WINXP}
+  {$SETPEOSVERSION 6.0}
+  {$SETPESUBSYSVERSION 6.0}
+{$ELSE}
+  {$SETPEOSVERSION 5.1}
+  {$SETPESUBSYSVERSION 5.1}
+{$ENDIF}
+{$IFNDEF VER200}
+  {$WEAKLINKRTTI ON}
+{$ENDIF}
 
 uses
   SafeDLLPath in 'SafeDLLPath.pas',
@@ -38,7 +45,8 @@ uses
   ScintInt in '..\Components\ScintInt.pas',
   ScintEdit in '..\Components\ScintEdit.pas',
   ScintStylerInnoSetup in '..\Components\ScintStylerInnoSetup.pas',
-  ModernColors in '..\Components\ModernColors.pas';
+  ModernColors in '..\Components\ModernColors.pas',
+  MessageBoxInsert in 'MessageBoxInsert.pas' {MBDForm};
 
 {$R *.res}
 {$R Compil32.manifest.res}

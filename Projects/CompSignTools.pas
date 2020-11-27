@@ -107,22 +107,22 @@ var
 begin
   Result := False;
 
-  if InputQuery(Caption, 'Name of the Sign Tool:', SignToolName) then begin
+  if InputQuery(Caption, 'Введите имя:', SignToolName) then begin
     if (SignToolName = '') or (Pos('=', SignToolName) <> 0) then begin
-      AppMessageBox(PChar('Invalid name.'), PChar(Caption), MB_OK or MB_ICONSTOP);
+      AppMessageBox(PChar('Неверный формат имени или оно не указано.'), PChar(Caption), MB_OK or MB_ICONSTOP);
       Exit;
     end;
 
     for I := 0 to FSignTools.Count-1 do begin
       if (I <> ExistingIndex) and (Pos(SignToolName + '=', FSignTools[I]) = 1) then begin
-        AppMessageBox(PChar('Duplicate name.'), PChar(Caption), MB_OK or MB_ICONSTOP);
+        AppMessageBox(PChar('Это имя уже используется. Введите другое.'), PChar(Caption), MB_OK or MB_ICONSTOP);
         Exit;
       end;
     end;
 
-    if InputQuery(Caption, 'Command of the Sign Tool:', SignToolCommand) then begin
+    if InputQuery(Caption, 'Введите команду:', SignToolCommand) then begin
       if SignToolCommand = '' then begin
-        AppMessageBox(PChar('Invalid command.'), PChar(Caption), MB_OK or MB_ICONSTOP);
+        AppMessageBox(PChar('Неверный формат команды или она не указана.'), PChar(Caption), MB_OK or MB_ICONSTOP);
         Exit;
       end;
     end;
@@ -153,7 +153,7 @@ begin
   I := SignToolsListBox.ItemIndex;
   P := Pos('=', FSignTools[I]);
   if P = 0 then
-    raise Exception.Create('Internal error: ''='' not found in SignTool');
+    raise Exception.Create('Внутренняя ошибка: не удалось найти символ ''='' в SignTool.');
   SignToolName := Copy(FSignTools[I], 1, P-1);
   SignToolCommand := Copy(FSignTools[I], P+1, MaxInt);
 

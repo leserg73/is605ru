@@ -7,10 +7,10 @@ object WizardForm: TWizardForm
   ClientHeight = 358
   ClientWidth = 495
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'MS Sans Serif'
+  Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
@@ -27,27 +27,33 @@ object WizardForm: TWizardForm
     Left = 0
     Top = 314
     Width = 503
-    Height = 1
+    Height = 2
     Anchors = [akLeft, akRight, akBottom]
     Shape = bsTopLine
   end
   object RequiredLabel1: TNewStaticText
     Left = 8
     Top = 332
-    Width = 21
-    Height = 14
+    Width = 9
+    Height = 15
     Anchors = [akLeft, akBottom]
-    Caption = 'bold'
+    Caption = '*'
     Enabled = False
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 4
   end
   object RequiredLabel2: TNewStaticText
-    Left = 33
+    Left = 18
     Top = 332
-    Width = 51
+    Width = 135
     Height = 14
     Anchors = [akLeft, akBottom]
-    Caption = ' = required'
+    Caption = '= требуется ввод данных'
     Enabled = False
     TabOrder = 5
   end
@@ -912,11 +918,11 @@ object WizardForm: TWizardForm
         Height = 53
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
-        Caption = 'Welcome to the [name]'
-        Font.Charset = DEFAULT_CHARSET
+        Caption = 'Добро пожаловать в [name]'
+        Font.Charset = RUSSIAN_CHARSET
         Font.Color = clWindowText
         Font.Height = -16
-        Font.Name = 'MS Sans Serif'
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
         ShowAccelChar = False
@@ -931,10 +937,10 @@ object WizardForm: TWizardForm
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
-          'This wizard will guide you through the process of creating a new' +
-          ' Inno Setup script file. The results will be used to generate a ' +
-          'new script file which can be compiled directly or saved on disk ' +
-          'for later use.'
+          'Этот Мастер поможет вам создать простейший сценарий Inno Setup д' +
+          'ля вашего приложения. Полученный результат вы можете использоват' +
+          'ь для сборки проекта, или сохранить на диск для последующего исп' +
+          'ользования.'
         ShowAccelChar = False
         TabOrder = 1
         WordWrap = True
@@ -943,23 +949,23 @@ object WizardForm: TWizardForm
         Left = 176
         Top = 140
         Width = 301
-        Height = 77
+        Height = 80
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
-          'Not all features of Inno Setup are covered by this wizard. See t' +
-          'he documentation for details on creating Inno Setup script files' +
-          '.'#13#13'Click Next to continue, or Cancel to exit this wizard.'
+          'Чтобы задействовать всю мощь программы Inno Setup, пожалуйста, о' +
+          'братитесь к справочной документации, в которой описаны все её во' +
+          'зможности.'#13#13'Нажмите "Далее", чтобы продолжить работу Мастера, или "Отмена", чтобы завершить его работу.'
         TabOrder = 2
         WordWrap = True
       end
       object EmptyCheck: TCheckBox
         Left = 176
         Top = 288
-        Width = 189
+        Width = 285
         Height = 17
         Anchors = [akLeft, akRight, akBottom]
-        Caption = 'Create a new &empty script file'
+        Caption = 'Создать пустой файл сценария'
         TabOrder = 3
       end
     end
@@ -970,10 +976,10 @@ object WizardForm: TWizardForm
       object Bevel1: TBevel
         Left = 0
         Top = 58
-        Width = 499
-        Height = 1
+        Width = 503
+        Height = 3
+        Anchors = [akLeft, akRight, akBottom]
         Shape = bsTopLine
-        Visible = False
       end
       object InnerNotebook: TNewNotebook
         Left = 4
@@ -994,7 +1000,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application na&me:'
+            Caption = '*Название приложения:'
             FocusControl = AppNameEdit
             TabOrder = 0
             WordWrap = True
@@ -1006,7 +1012,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &version:'
+            Caption = '*Версия приложения:'
             FocusControl = AppVersionEdit
             TabOrder = 2
             WordWrap = True
@@ -1018,7 +1024,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &publisher:'
+            Caption = 'Издатель приложения:'
             FocusControl = AppPublisherEdit
             TabOrder = 4
             WordWrap = True
@@ -1030,7 +1036,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &website:'
+            Caption = 'Сайт приложения:'
             FocusControl = AppURLEdit
             TabOrder = 6
             WordWrap = True
@@ -1079,7 +1085,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application folder na&me:'
+            Caption = '*Название папки для установки приложения:'
             FocusControl = AppDirNameEdit
             TabOrder = 3
             WordWrap = True
@@ -1091,7 +1097,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &destination base folder:'
+            Caption = '*Основной путь установки приложения:'
             FocusControl = AppRootDirComboBox
             TabOrder = 0
             WordWrap = True
@@ -1103,7 +1109,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Other:'
+            Caption = 'Другие параметры:'
             FocusControl = AppDirNameEdit
             TabOrder = 6
             WordWrap = True
@@ -1141,16 +1147,16 @@ object WizardForm: TWizardForm
             Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow user to &change the application folder'
+            Caption = 'Разрешить пользователю менять место установки приложения'
             TabOrder = 5
           end
           object NotCreateAppDirCheck: TCheckBox
             Left = 36
             Top = 176
-            Width = 257
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'The application doe&sn'#39't need a folder'
+            Caption = 'Приложение не нуждается в каталоге установки'
             TabOrder = 7
             OnClick = NotCreateAppDirCheckClick
           end
@@ -1166,7 +1172,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Other application &files:'
+            Caption = 'Другие файлы приложения:'
             FocusControl = AppFilesListBox
             TabOrder = 5
             WordWrap = True
@@ -1178,7 +1184,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &main executable file:'
+            Caption = '*Главный исполняемый файл приложения:'
             FocusControl = AppExeEdit
             TabOrder = 0
             WordWrap = True
@@ -1201,7 +1207,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = '&Add file(s)...'
+            Caption = 'Доб. файл(ы)...'
             TabOrder = 7
             OnClick = AppFilesAddButtonClick
           end
@@ -1211,7 +1217,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = '&Edit...'
+            Caption = 'Изменить...'
             TabOrder = 9
             OnClick = AppFilesEditButtonClick
           end
@@ -1221,7 +1227,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'Remo&ve'
+            Caption = 'Удалить'
             TabOrder = 10
             OnClick = AppFilesRemoveButtonClick
           end
@@ -1239,7 +1245,7 @@ object WizardForm: TWizardForm
             Width = 413
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow &user to start the application after Setup has finished'
+            Caption = 'Разрешить запуск приложения после завершения установки'
             TabOrder = 3
           end
           object AppExeButton: TButton
@@ -1248,7 +1254,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'B&rowse...'
+            Caption = 'Выбрать...'
             TabOrder = 2
             OnClick = AppExeButtonClick
           end
@@ -1258,7 +1264,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'Add fol&der...'
+            Caption = 'Доб. папку...'
             TabOrder = 8
             OnClick = AppFilesAddDirButtonClick
           end
@@ -1268,7 +1274,7 @@ object WizardForm: TWizardForm
             Width = 413
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'The application doe&sn'#39't have a main executable file'
+            Caption = 'Приложение не имеет главного исполняемого файла'
             TabOrder = 4
             OnClick = NoAppExeCheckClick
           end
@@ -1280,11 +1286,11 @@ object WizardForm: TWizardForm
           object AppGroupNameLabel: TNewStaticText
             Left = 36
             Top = 28
-            Width = 413
+            Width = 425
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Application &Start Menu folder name:'
+            Caption = 'Название папки приложения в меню ПУСК:'
             FocusControl = AppGroupNameEdit
             TabOrder = 1
             WordWrap = True
@@ -1292,11 +1298,11 @@ object WizardForm: TWizardForm
           object AppExeIconsLabel: TNewStaticText
             Left = 36
             Top = 160
-            Width = 413
+            Width = 425
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Other shortcuts to the main executable:'
+            Caption = 'Дополнительные иконки для главного файла приложения:'
             FocusControl = AppDirNameEdit
             TabOrder = 7
             WordWrap = True
@@ -1315,7 +1321,7 @@ object WizardForm: TWizardForm
             Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow user to &change the Start Menu folder name'
+            Caption = 'Разрешить пользователю изменять название папки в меню ПУСК'
             TabOrder = 3
             OnClick = NotDisableProgramGroupPageCheckClick
           end
@@ -1325,47 +1331,47 @@ object WizardForm: TWizardForm
             Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow user to &disable Start Menu folder creation'
+            Caption = 'Разрешить пользователю отменить создание папки в меню ПУСК'
             TabOrder = 4
           end
           object DesktopIconCheck: TCheckBox
             Left = 36
             Top = 180
-            Width = 257
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow user to create a deskto&p shortcut'
+            Caption = 'Разрешить пользователю создание иконки на Рабочем столе'
             TabOrder = 8
             OnClick = NotCreateAppDirCheckClick
           end
           object QuickLaunchIconCheck: TCheckBox
             Left = 36
             Top = 200
-            Width = 421
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
             Caption = 
-              'Allow user to create a &Quick Launch shortcut on older versions ' +
-              'of Windows'
+              'Разрешить пользователю создание иконки на Панели быстрого запуск' +
+              'а'
             TabOrder = 9
             OnClick = NotCreateAppDirCheckClick
           end
           object CreateUninstallIconCheck: TCheckBox
             Left = 36
             Top = 136
-            Width = 301
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Create an &Uninstall shortcut in the Start Menu folder'
+            Caption = 'Создать в меню ПУСК иконку деинсталляции приложения'
             TabOrder = 6
           end
           object CreateURLIconCheck: TCheckBox
             Left = 36
             Top = 116
-            Width = 301
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Create an &Internet shortcut in the Start Menu folder'
+            Caption = 'Создать в меню ПУСК ярлык на сайт приложения'
             TabOrder = 5
           end
           object UseCommonProgramsCheck: TCheckBox
@@ -1375,8 +1381,8 @@ object WizardForm: TWizardForm
             Height = 17
             Anchors = [akLeft, akTop, akRight]
             Caption = 
-              '&Create a shortcut to the main executable in the common Start Me' +
-              'nu Programs folder'
+              'Создать в меню ПУСК иконку для запуска исполняемого файла прилож' +
+              'ения'
             TabOrder = 0
             OnClick = UseCommonProgramsCheckClick
           end
@@ -1392,7 +1398,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = '&License file:'
+            Caption = 'Файл лицензии:'
             FocusControl = AppLicenseFileEdit
             TabOrder = 0
             WordWrap = True
@@ -1404,7 +1410,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = '&Information file shown before installation:'
+            Caption = 'Файл с информацией, отображаемой перед установкой:'
             FocusControl = AppInfoBeforeFileEdit
             TabOrder = 3
             WordWrap = True
@@ -1416,7 +1422,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Information file shown &after installation:'
+            Caption = 'Файл с информацией, отображаемой после установки:'
             FocusControl = AppInfoAfterFileEdit
             TabOrder = 6
             WordWrap = True
@@ -1435,7 +1441,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'B&rowse...'
+            Caption = 'Выбрать...'
             TabOrder = 2
             OnClick = FileButtonClick
           end
@@ -1453,7 +1459,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'Br&owse...'
+            Caption = 'Выбрать...'
             TabOrder = 5
             OnClick = FileButtonClick
           end
@@ -1471,7 +1477,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'Bro&wse...'
+            Caption = 'Выбрать...'
             TabOrder = 8
             OnClick = FileButtonClick
           end
@@ -1487,7 +1493,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Install mode:'
+            Caption = 'Режим установки:'
             FocusControl = AppLicenseFileEdit
             TabOrder = 0
             WordWrap = True
@@ -1495,37 +1501,37 @@ object WizardForm: TWizardForm
           object PrivilegesRequiredAdminRadioButton: TRadioButton
             Left = 36
             Top = 28
-            Width = 413
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = '&Administrative install mode (install for all users)'
+            Caption = 'С правами администратора (для всех пользователей)'
             TabOrder = 1
           end
           object PrivilegesRequiredLowestRadioButton: TRadioButton
             Left = 36
             Top = 48
-            Width = 413
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = '&Non administrative install mode (install for current user only)'
+            Caption = 'Без прав администратора (только для текущего пользователя)'
             TabOrder = 2
           end
           object PrivilegesRequiredOverridesAllowedCommandLineCheckbox: TCheckBox
             Left = 36
-            Top = 65
-            Width = 413
+            Top = 68
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Allow user to &override the install mode via the command line'
+            Caption = 'Разрешить переопределять режим установки в командной строке'
             TabOrder = 3
           end
           object PrivilegesRequiredOverridesAllowedDialogCheckbox: TCheckBox
             Left = 36
             Top = 88
-            Width = 413
+            Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Ask the user to &choose the install mode at startup'
+            Caption = 'Предлагать пользователю выбор режима установки при запуске'
             TabOrder = 4
             OnClick = PrivilegesRequiredOverridesAllowedDialogCheckboxClick
           end
@@ -1541,7 +1547,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = '&Languages:'
+            Caption = '*Языки установки:'
             FocusControl = LanguagesList
             TabOrder = 0
             WordWrap = True
@@ -1561,7 +1567,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = '&Select all'
+            Caption = 'Выбрать все'
             TabOrder = 2
             OnClick = AllLanguagesButtonClick
           end
@@ -1571,7 +1577,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = '&Deselect all'
+            Caption = 'Отменить все'
             TabOrder = 3
             OnClick = NoLanguagesButtonClick
           end
@@ -1587,7 +1593,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Custom compiler output fol&der:'
+            Caption = 'Папка записи готового файла установки:'
             FocusControl = OutputDirEdit
             TabOrder = 0
             WordWrap = True
@@ -1607,7 +1613,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Compiler output base &file name:'
+            Caption = 'Название файла установки:'
             FocusControl = OutputBaseFileNameEdit
             TabOrder = 3
             WordWrap = True
@@ -1627,7 +1633,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Custom Setup &icon file:'
+            Caption = 'Файл значка установки:'
             FocusControl = SetupIconFileEdit
             TabOrder = 5
             WordWrap = True
@@ -1647,7 +1653,7 @@ object WizardForm: TWizardForm
             Height = 16
             Anchors = [akLeft, akTop, akRight]
             AutoSize = False
-            Caption = 'Setup &password:'
+            Caption = 'Пароль для установки:'
             FocusControl = PasswordEdit
             TabOrder = 8
             WordWrap = True
@@ -1667,7 +1673,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'Bro&wse...'
+            Caption = 'Выбрать...'
             TabOrder = 7
             OnClick = FileButtonClick
           end
@@ -1677,7 +1683,7 @@ object WizardForm: TWizardForm
             Width = 425
             Height = 17
             Anchors = [akLeft, akTop, akRight]
-            Caption = 'Use the password to &encrypt the application files'
+            Caption = 'Использовать пароль для шифрования файлов приложения'
             TabOrder = 10
             OnClick = NotDisableProgramGroupPageCheckClick
           end
@@ -1687,7 +1693,7 @@ object WizardForm: TWizardForm
             Width = 89
             Height = 23
             Anchors = [akTop, akRight]
-            Caption = 'B&rowse...'
+            Caption = 'Выбрать...'
             TabOrder = 2
             OnClick = OutputDirButtonClick
           end
@@ -1838,8 +1844,8 @@ object WizardForm: TWizardForm
         Anchors = [akLeft, akTop, akRight]
         AutoSize = False
         Caption = 
-          'You have successfully completed the [name].'#13#13'To close this wizar' +
-          'd and generate the new script file, click Finish.'
+          '[name] успешно создал файл сценария.'#13#13'Чтобы завершить работу Мас' +
+          'тера, нажмите кнопку "Готово".'
         ShowAccelChar = False
         TabOrder = 0
         WordWrap = True
@@ -1852,7 +1858,7 @@ object WizardForm: TWizardForm
     Width = 75
     Height = 23
     Anchors = [akRight, akBottom]
-    Caption = '< &Back'
+    Caption = '< Назад'
     TabOrder = 0
     OnClick = BackButtonClick
   end
@@ -1874,7 +1880,7 @@ object WizardForm: TWizardForm
     Height = 23
     Anchors = [akRight, akBottom]
     Cancel = True
-    Caption = 'Cancel'
+    Caption = 'Отмена'
     ModalResult = 2
     TabOrder = 2
   end

@@ -120,9 +120,18 @@ const
   );
 
   { Install }
+{$IFNDEF PS_MINIVCL}
+  InstallTable: array [0..4] of AnsiString =
+{$ELSE}
   InstallTable: array [0..1] of AnsiString =
+{$ENDIF}
   (
     'procedure ExtractTemporaryFile(const FileName: String);',
+    {$IFNDEF PS_MINIVCL}
+      'procedure ExtractTemporaryFileEx(const FileName: String; const DestDir: String);',
+      'procedure ExtractTemporaryFileToStream(const FileName: String; const Stream: TStream);',
+      'function ExtractTemporaryFileSize(const FileName: String): Cardinal;',
+    {$ENDIF}
     'function ExtractTemporaryFiles(const Pattern: String): Integer;'
   );
 
@@ -224,22 +233,44 @@ const
   );
 
   { System }
+{$IFNDEF PS_MINIVCL}
+  SystemTable: array [0..12] of AnsiString =
+{$ELSE}
   SystemTable: array [0..3] of AnsiString =
+{$ENDIF}
   (
     'function Random(const Range: Integer): Integer;',
+     {$IFNDEF PS_MINIVCL}
+       'procedure Randomize',
+       'function HInstance: LongWord;',
+       'function FindResource(ModuleHandle: Longint; ResourceName, ResourceType: PAnsiChar): Longint;',
+       'function LoadResource(ModuleHandle: Longint; ResHandle: Longint): Longint;',
+       'function SizeofResource(ModuleHandle: Longint; ResHandle: Longint): Integer;',
+       'function LockResource(ResData: Longint): Longint;',
+       'function UnlockResource(ResData: Longint): Boolean;',
+       'function FreeResource(ResData: Longint): Boolean;',
+       'function LoadCursorFromFile(lpFileName: string): Cardinal;',
+     {$ENDIF}
     'function FileSize(const Name: String; var Size: Integer): Boolean;',
     'procedure Set8087CW(NewCW: Word);',
     'function Get8087CW: Word;'
   );
 
   { SysUtils }
+{$IFNDEF PS_MINIVCL}
+  SysUtilsTable: array [0..26] of AnsiString =
+{$ELSE}
   SysUtilsTable: array [0..25] of AnsiString =
+{$ENDIF}
   (
     'procedure Beep;',
     'function Trim(const S: string): string;',
     'function TrimLeft(const S: string): string;',
     'function TrimRight(const S: string): string;',
     'function GetCurrentDir: string;',
+     {$IFNDEF PS_MINIVCL}
+       'function FormatFloat(const Format: string; Value: Extended): string;',
+     {$ENDIF}
     'function SetCurrentDir(const Dir: string): Boolean;',
     'function ExpandFileName(const FileName: string): string;',
     'function ExpandUNCFileName(const FileName: string): string;',
@@ -262,6 +293,7 @@ const
     'function GetDateTimeString(const DateTimeFormat: String; const DateSeparator, TimeSeparator: Char): String;',
     'function SysErrorMessage(ErrorCode: Integer): String;'
   );
+
   SysUtilsDelphiTable: array [0..3] of AnsiString =
   (
     'function FindFirst(const FileName: String; var FindRec: TFindRec): Boolean;',
@@ -278,7 +310,11 @@ const
   );
 
   { Windows }
+{$IFNDEF PS_MINIVCL}
+  WindowsTable: array [0..24] of AnsiString =
+{$ELSE}
   WindowsTable: array [0..15] of AnsiString =
+{$ENDIF}
   (
     'procedure Sleep(const Milliseconds: LongInt);',
     'function FindWindowByClassName(const ClassName: String): HWND;',
@@ -293,6 +329,17 @@ const
     'function LoadDLL(const DLLName: String; var ErrorCode: Integer): Longint;',
     'function CallDLLProc(const DLLHandle: Longint; const ProcName: String; const Param1, Param2: Longint; var Result: Longint): Boolean;',
     'function FreeDLL(const DLLHandle: Longint): Boolean;',
+     {$IFNDEF PS_MINIVCL}
+       'function LoadImage(hInst: LongInt; ImageName: String; ImageType: LongWord; X, Y: Integer; Flags: LongWord): LongInt;',
+       'function DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: Integer; cxWidth, cyWidth: Integer; istepIfAniCur: LongWord; hbrFlickerFreeDraw: LongWord; diFlags: LongWord): Boolean;',
+       'function DestroyIcon(hIcon: Integer): Boolean;',
+       'function SetWindowText(hWnd: HWND; const lpString: String): Boolean;',
+       'procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);',
+       'procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);',
+       'procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);',
+       'procedure SetAppTaskbarProgressState(const State: TTaskbarProgressState);',
+       'procedure SetAppTaskbarProgressValue(const Completed: Cardinal);',
+     {$ENDIF}
     'procedure CreateMutex(const Name: String);',
     'procedure OemToCharBuff(var S: AnsiString);',
     'procedure CharToOemBuff(var S: AnsiString);'

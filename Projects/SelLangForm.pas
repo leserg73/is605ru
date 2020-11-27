@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls;
+  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls, Vcl.Themes, Vcl.Styles;
 
 type
   TSelectLanguageForm = class(TSetupForm)
@@ -155,20 +155,26 @@ begin
 {$ENDIF}
 
   InitializeFont;
-
+  KeepSizeY := True;
   Caption := SetupMessages[msgSelectLanguageTitle];
   SelectLabel.Caption := SetupMessages[msgSelectLanguageLabel];
   OKButton.Caption := SetupMessages[msgButtonOK];
   CancelButton.Caption := SetupMessages[msgButtonCancel];
-
-  IconBitmapImage.Bitmap.Canvas.Brush.Color := MainPanel.Color;
+  if SetupHeader.SetupStyle then begin
+     IconBitmapImage.Bitmap.Canvas.Brush.Color := StyleServices.GetStyleColor(scPanel){clBtnFace};
+     IconBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
+  end
+  else
+     IconBitmapImage.Bitmap.Canvas.Brush.Color := MainPanel.Color;
   IconBitmapImage.Bitmap.Width := Application.Icon.Width;
   IconBitmapImage.Bitmap.Height := Application.Icon.Height;
   IconBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
   IconBitmapImage.Width := IconBitmapImage.Bitmap.Width;
   IconBitmapImage.Height := IconBitmapImage.Bitmap.Height;
 
-  KeepSizeY := True;
+  MainPanel.Width := ClientWidth;
+  CancelButton.Left := {ClientWidth} LangCombo.Left + LangCombo.Width - CancelButton.Width;
+  OKButton.Left := LangCombo.Left + LangCombo.Width - CancelButton.Width * 2 - 6; 
 end;
 
 end.

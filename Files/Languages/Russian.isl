@@ -137,6 +137,7 @@ WizardSelectDir=Выбор папки установки
 SelectDirDesc=В какую папку вы хотите установить [name]?
 SelectDirLabel3=Программа установит [name] в следующую папку.
 SelectDirBrowseLabel=Нажмите «Далее», чтобы продолжить. Если вы хотите выбрать другую папку, нажмите «Обзор».
+DiskSpaceGBLabel=Требуется как минимум [gb] Гб свободного дискового пространства.
 DiskSpaceMBLabel=Требуется как минимум [mb] Мб свободного дискового пространства.
 CannotInstallToNetworkDrive=Установка не может производиться на сетевой диск.
 CannotInstallToUNCPath=Установка не может производиться в папку по UNC-пути.
@@ -164,6 +165,7 @@ NoUninstallWarningTitle=Установленные компоненты
 NoUninstallWarning=Программа установки обнаружила, что следующие компоненты уже установлены на вашем компьютере:%n%n%1%n%nОтмена выбора этих компонент не удалит их.%n%nПродолжить?
 ComponentSize1=%1 Кб
 ComponentSize2=%1 Мб
+ComponentsDiskSpaceGBLabel=Текущий выбор требует не менее [gb] Гб на диске.
 ComponentsDiskSpaceMBLabel=Текущий выбор требует не менее [mb] Мб на диске.
 
 ; *** "Select Additional Tasks" wizard page

@@ -18,7 +18,7 @@ uses
   Forms, Dialogs, StdCtrls, ExtCtrls,
   SetupForm, Struct, Int64Em, NewCheckListBox, RichEditViewer, NewStaticText,
   SetupTypes, NewProgressBar, MsgIDs, PasswordEdit, FolderTreeView, BitmapImage,
-  NewNotebook, BidiCtrls;
+  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles, Vcl.Styles.NewCheckListBox;
 
 type
   TWizardForm = class;
@@ -233,6 +233,7 @@ type
     function PageFromID(const ID: Integer): TWizardPage;
     function PageIndexFromID(const ID: Integer): Integer;
     procedure UpdateCurPageButtonVisibility;
+    procedure UpdateComponentsList;
     procedure SetCurPage(const NewPageID: Integer);
     procedure SelectComponents(const SelectComponents, DeselectComponents: TStringList; const KeepFixedComponents: Boolean);
     procedure SelectTasks(const SelectTasks, DeselectTasks: TStringList);
@@ -340,7 +341,7 @@ function ValidateCustomDirEdit(const AEdit: TEdit;
 implementation
 
 uses
-  ShellApi, ShlObj, Types, Msgs, Main, PathFunc, CmnFunc, CmnFunc2,
+  ShellApi, ShlObj, Types, Msgs, Main, PathFunc, CmnFunc, CmnFunc2, TaskbarProgressFunc,
   MD5, InstFunc, SelFolderForm, Extract, Logging, RestartManager, ScriptRunner;
 
 {$R *.DFM}
@@ -624,6 +625,22 @@ begin
   end;
 end;
 
+procedure TWizardForm.UpdateComponentsList();
+begin
+  // Fix remove VCL style from TNewCheckListBox
+  if SetupHeader.SetupStyle then
+      begin
+          WizardForm.ComponentsList.BorderStyle := bsNone;
+          WizardForm.ComponentsList.BorderStyle := bsSingle;
+
+          WizardForm.TasksList.BorderStyle := bsSingle;
+          WizardForm.TasksList.BorderStyle := bsNone;
+
+          WizardForm.RunList.BorderStyle := bsSingle;
+          WizardForm.RunList.BorderStyle := bsNone;
+      end;
+end;
+
 { TWizardPage }
 
 constructor TWizardPage.Create(AOwner: TComponent);
@@ -717,7 +734,7 @@ end;
 constructor TWizardForm.Create(AOwner: TComponent);
 { Do all initialization of the wizard form. We're overriding Create instead of
   using the FormCreate event, because if an exception is raised in FormCreate
-  it's not propogated out. }
+  it's not propagated out. }
 
   procedure LoadSelectDirAndGroupImages;
 
@@ -813,12 +830,50 @@ var
 begin
   inherited;
 
+//  if SetupHeader.TaskBarOn then begin
+    { Set TitleApp on TaskBar }
+    //SetWindowText(Application.Handle, 'Proba Title');
+
+    { Set ThumbnailAppSetup on TaskBar }
+    //SetAppTaskbarRegisterTab(MainForm.Handle, Application.Handle);
+    //SetAppTaskbarTabActive(MainForm.Handle, Application.Handle);
+    //SetAppTaskbarTabOrder(MainForm.Handle, Application.Handle);
+    //SetAppTaskbarUnregisterTab(MainForm.Handle);
+
+    { Set ProgressState on TaskBar }
+    //SetAppTaskbarProgressState(tpsPaused); // tpsIndeterminate  tpsPaused // статус прогрессбара
+
+    { Set ProgressState on TaskBar }
+    //SetAppTaskbarProgressValue(10,100);  // передавать начальное значение прогрессбара
+
+    { Set OverlayIcon on TaskBar }
+    //SetAppTaskbarOverlayIconRes('_IS_OVICON'); // передавать имя ресурса
+
+    { Set ThumbnailTooltip on TaskBar }
+    //SetAppTaskbarThumbnailTooltip('Application');
+    //SetAppTaskbarThumbnailTooltip('MainForm');
+
+//  end;
+  // DoubleBuffered := False;
+
   FPageList := TList.Create;
   InitialSelectedComponents := TStringList.Create();
   PrevSelectedComponents := TStringList.Create();
   PrevDeselectedComponents := TStringList.Create();
   PrevSelectedTasks := TStringList.Create();
   PrevDeselectedTasks := TStringList.Create();
+
+  { Not sure why the following is needed but various things related to
+    positioning and anchoring don't work without this (you get positions of
+    page controls back as if there was no anchoring until the page handle
+    is automatically created. Cause might be related to the comment in
+    TNewNotebook.AlignControls. }
+  for I := 0 to OuterNotebook.PageCount-1 do
+    OuterNotebook.Pages[I].HandleNeeded;
+  for I := 0 to InnerNotebook.PageCount-1 do
+    InnerNotebook.Pages[I].HandleNeeded;
+
+  InitializeFont;
 
 {$IFDEF IS_D7}
   MainPanel.ParentBackground := False;
@@ -840,17 +895,6 @@ begin
     end;
   end;
 
-  { Not sure why the following is needed but various things related to
-    positioning and anchoring don't work without this (you get positions of
-    page controls back as if there was no anchoring until the page handle
-    is automatically created. Cause might be related to the comment in
-    TNewNotebook.AlignControls. }
-  for I := 0 to OuterNotebook.PageCount-1 do
-    OuterNotebook.Pages[I].HandleNeeded;
-  for I := 0 to InnerNotebook.PageCount-1 do
-    InnerNotebook.Pages[I].HandleNeeded;
-
-  InitializeFont;
   SetFontNameSize(WelcomeLabel1.Font, LangOptions.WelcomeFontName,
     LangOptions.WelcomeFontSize, '', 12);
   WelcomeLabel1.Font.Style := [fsBold];
@@ -910,8 +954,12 @@ begin
 
   { Initialize wizard style }
   if SetupHeader.WizardStyle = wsModern then begin
-    OuterNotebook.Color := clWindow;
-    Bevel1.Visible := False;
+    if SetupHeader.SetupStyle then
+       OuterNotebook.Color := clBtnFace
+    else begin
+       OuterNotebook.Color := clWindow;
+       Bevel1.Visible := False;
+    end;
   end;
 
   { Initialize images }
@@ -923,6 +971,14 @@ begin
   WizardBitmapImage2.Stretch := (shWizardImageStretch in SetupHeader.Options);
   WizardSmallBitmapImage.Bitmap := SelectBestImage(WizardSmallImages, WizardSmallBitmapImage.Width, WizardSmallBitmapImage.Height);
   WizardSmallBitmapImage.Stretch := (shWizardImageStretch in SetupHeader.Options);
+
+  if SetupHeader.SetupStyle then begin
+     WizardSmallBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
+     {$IFNDEF IS_WINXP}
+       WizardSmallBitmapImage.Left := MainPanel.Width - WizardSmallBitmapImage.Width;
+     {$ENDIF}
+  end;
+
   PreparingErrorBitmapImage.Bitmap.Handle := LoadBitmap(HInstance, 'STOPIMAGE');
   PreparingErrorBitmapImage.ReplaceColor := RGB(255, 0, 255);
   PreparingErrorBitmapImage.ReplaceWithColor := PreparingPage.Color;
@@ -945,6 +1001,13 @@ begin
   IncTopDecHeight(LicenseMemo, I);
   LicenseAcceptedRadio.Caption := SetupMessages[msgLicenseAccepted];
   LicenseNotAcceptedRadio.Caption := SetupMessages[msgLicenseNotAccepted];
+  // Fix border style for LicenseMemo
+  if SetupHeader.SetupStyle then begin
+     LicenseMemo.BevelKind := bkNone;
+     LicenseMemo.BorderStyle := bsSingle;
+  end
+  else
+     LicenseMemo.BevelKind := bkFlat;
 
   { Initialize wpPassword page }
   RegisterExistingPage(wpPassword, InnerPage, PasswordPage,
@@ -962,6 +1025,13 @@ begin
   InfoBeforeClickLabel.Caption := SetupMessages[msgInfoBeforeClickLabel];
   I := AdjustLabelHeight(InfoBeforeClickLabel);
   IncTopDecHeight(InfoBeforeMemo, I);
+  // Fix border style for InfoBeforeMemo
+  if SetupHeader.SetupStyle then begin
+     InfoBeforeMemo.BevelKind := bkNone;
+     InfoBeforeMemo.BorderStyle := bsSingle;
+  end
+  else
+     InfoBeforeMemo.BevelKind := bkFlat;
 
   { Initialize wpUserInfo page }
   RegisterExistingPage(wpUserInfo, InnerPage, UserInfoPage,
@@ -1085,6 +1155,13 @@ begin
   InfoAfterClickLabel.Caption := SetupMessages[msgInfoAfterClickLabel];
   I := AdjustLabelHeight(InfoAfterClickLabel);
   IncTopDecHeight(InfoAfterMemo, I);
+  // Fix border style for InfoAfterMemo
+  if SetupHeader.SetupStyle then begin
+     InfoAfterMemo.BevelKind := bkNone;
+     InfoAfterMemo.BorderStyle := bsSingle;
+  end
+  else
+     InfoAfterMemo.BevelKind := bkFlat;
 
   { Initialize wpFinished page }
   RegisterExistingPage(wpFinished, FinishedPage, nil, '', '');
@@ -1100,8 +1177,10 @@ begin
   RunList.MinItemHeight := ScalePixelsY(22);
 
   { Initialize BeveledLabel }
-  if SetupMessages[msgBeveledLabel] <> '' then
-    BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' '
+  if SetupMessages[msgBeveledLabel] <> '' then begin
+    BeveledLabel.Transparent := False;
+    BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' ';
+  end
   else
     BeveledLabel.Caption := '';
 
@@ -1248,8 +1327,8 @@ begin
     end;
   end;
 
-  UpdateComponentSizes();
-  CalcCurrentComponentsSpace();
+  UpdateComponentSizes;
+  CalcCurrentComponentsSpace;
 
   //Show or hide the components list based on the selected type
   if HasCustomType then begin
@@ -1362,7 +1441,12 @@ begin
   inherited;
   { Ensure the form is *always* on top of MainForm by making MainForm
     the "parent" of the form. }
-  Params.WndParent := MainForm.Handle;
+  if SetupHeader.TaskBarOn then
+    // Show Thumbnail Wizard on TaskBar
+    Params.WndParent := Application.Handle
+  else
+    // Hide Thumbnail Wizard on TaskBar
+    Params.WndParent := MainForm.Handle;
 end;
 
 function TWizardForm.PageIndexFromID(const ID: Integer): Integer;
@@ -2456,7 +2540,11 @@ procedure TWizardForm.NextButtonClick(Sender: TObject);
 
         if (S <> '') and (LoggedMsgBox(FmtSetupMessage1(msgNoUninstallWarning, S),
            SetupMessages[msgNoUninstallWarningTitle], mbConfirmation, MB_YESNO, True, IDYES) <> IDYES) then
+        begin
+          // Fix remove VCL style from TNewCheckListBox on msgNoUninstallWarningTitle
+          UpdateComponentsList();
           Exit;
+        end;
       end;
     end;
 
@@ -2530,6 +2618,11 @@ begin
     UpdatePage(NewPageID);
 
     case NewPageID of
+      // Fix remove VCL style from TNewCheckListBox on NextButtonClick
+      wpSelectComponents: UpdateComponentsList;
+      wpSelectTasks: UpdateComponentsList;
+      wpFinished: UpdateComponentsList;
+
       wpPreparing: begin
           WizardComponents := nil;
           WizardTasks := nil;
@@ -2602,12 +2695,23 @@ begin
   PrevPageID := GetPreviousPageID;
   if PrevPageID <> -1 then
     SetCurPage(PrevPageID);
+
+   // Fix remove VCL style from TNewCheckListBox on BackButtonClick
+  if PrevPageID = wpSelectComponents then
+    UpdateComponentsList;
+  if PrevPageID = wpSelectTasks then
+    UpdateComponentsList;
 end;
 
 procedure TWizardForm.CancelButtonClick(Sender: TObject);
 begin
   { Clicking Cancel will do the same thing as the Close button }
   Close;
+  // Fix remove VCL style from TNewCheckListBox on CancelButtonClick
+  if CurPageID = wpSelectComponents then
+    UpdateComponentsList;
+  if CurPageID = wpSelectTasks then
+    UpdateComponentsList;
 end;
 
 procedure TWizardForm.CallCancelButtonClick(var ACancel, AConfirm: Boolean);
@@ -2626,6 +2730,11 @@ begin
   { Redirect an attempt to close this form to MainForm }
   MainForm.Close;
   Action := caNone;
+  // Fix remove VCL style from TNewCheckListBox on CloseButtonClick
+  if CurPageID = wpSelectComponents then
+    UpdateComponentsList;
+  if CurPageID = wpSelectTasks then
+    UpdateComponentsList;
 end;
 
 procedure TWizardForm.TypesComboChange(Sender: TObject);
@@ -2650,8 +2759,11 @@ begin
     end;
   end;
 
-  UpdateComponentSizes();
-  CalcCurrentComponentsSpace();
+  // Fix remove VCL style from TNewCheckListBox on TypesComboChange
+//  UpdateComponentsList();
+
+  UpdateComponentSizes;
+  CalcCurrentComponentsSpace;
 end;
 
 procedure TWizardForm.ComponentsListClickCheck(Sender: TObject);
@@ -2683,8 +2795,11 @@ begin
     end
   end;
 
-  UpdateComponentSizes();
-  CalcCurrentComponentsSpace();
+  // Fix remove VCL style from TNewCheckListBox on ComponentsListClickCheck
+//  UpdateComponentsList();
+
+  UpdateComponentSizes;
+  CalcCurrentComponentsSpace;
 end;
 
 procedure TWizardForm.NoIconsCheckClick(Sender: TObject);
@@ -2994,7 +3109,7 @@ begin
     if (CurPageID = wpPreparing) and (PrepareToInstallFailureMessage <> '') and not (PrepareToInstallNeedsRestart and not InitNoRestart) then begin
       { Special handling needed for wpPreparing since it displays its error
         message inline on the wizard. Since the wizard isn't currently visible,
-        we have to display the messsage in a message box if it won't be displayed
+        we have to display the message in a message box if it won't be displayed
         by a reboot confirmation message box later on. }
       LoggedMsgBox(PrepareToInstallFailureMessage, '',
         mbCriticalError, MB_OK, True, IDOK);
@@ -3017,7 +3132,7 @@ begin
       if NextButton.CanFocus then
         NextButton.Click;
     except
-      { Mustn't propogate post-install exceptions }
+      { Mustn't propagate post-install exceptions }
       if MainForm.CurStep <= ssInstall then
         raise
       else
@@ -3052,6 +3167,12 @@ begin
 end;
 
 initialization
+ TStyleManager.Engine.RegisterStyleHook(TNewCheckListBox, TEditStyleHookColor);
+
   SHPathPrepareForWriteFunc := GetProcAddress(SafeLoadLibrary(AddBackslash(GetSystemDir) + shell32,
     SEM_NOOPENFILEERRORBOX), {$IFDEF UNICODE}'SHPathPrepareForWriteW'{$ELSE}'SHPathPrepareForWriteA'{$ENDIF});
+
+finalization
+ TStyleManager.Engine.UnRegisterStyleHook(TNewCheckListBox, TEditStyleHookColor);
+
 end.

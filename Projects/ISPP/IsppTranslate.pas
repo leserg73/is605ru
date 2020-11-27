@@ -1407,11 +1407,17 @@ end;
 function LookupAlwaysDefined(const Name: string): Boolean;
 const
 {$IFDEF UNICODE}
-  AlwaysDefined: array[0..3] of string =
-    ('ISPP_INVOKED', 'WINDOWS', '__WIN32__', 'UNICODE');
+  {$IFDEF PS_MINIVCL}
+    AlwaysDefined: array[0..3] of string = ('ISPP_INVOKED', 'WINDOWS', '__WIN32__', 'UNICODE');
+  {$ELSE}
+    AlwaysDefined: array[0..4] of string = ('ISPP_INVOKED', 'WINDOWS', '__WIN32__', 'UNICODE', 'IS_ENHANCED');
+  {$ENDIF}
 {$ELSE}
-  AlwaysDefined: array[0..2] of string =
-    ('ISPP_INVOKED', 'WINDOWS', '__WIN32__');
+  {$IFDEF PS_MINIVCL}
+    AlwaysDefined: array[0..2] of string = ('ISPP_INVOKED', 'WINDOWS', '__WIN32__');
+  {$ELSE}
+    AlwaysDefined: array[0..3] of string = ('ISPP_INVOKED', 'WINDOWS', '__WIN32__', 'IS_ENHANCED');
+  {$ENDIF}
 {$ENDIF}
 var
   I: Integer;

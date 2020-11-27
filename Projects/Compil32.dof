@@ -42,7 +42,7 @@ OutputDir=
 UnitOutputDir=
 SearchPath=..\components;..\components\ps\source
 Packages=VCL30;vclx30;VclSmp30;vcldb30;vcldbx30
-Conditionals=PS_MINIVCL;PS_NOWIDESTRING;PS_NOINT64;PS_NOGRAPHCONST
+Conditionals=PS_MINIVCL;PS_NOWIDESTRING;PS_NOINT64;PS_NOGRAPHCONST;IS_WINXP
 DebugSourceDirs=
 UsePackages=0
 [Parameters]

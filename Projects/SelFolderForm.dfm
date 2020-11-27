@@ -20,7 +20,7 @@ object SelectFolderForm: TSelectFolderForm
   PixelsPerInch = 96
   TextHeight = 13
   object CancelButton: TNewButton
-    Left = 320
+    Left = 317
     Top = 305
     Width = 17
     Height = 23
@@ -31,9 +31,9 @@ object SelectFolderForm: TSelectFolderForm
     TabOrder = 4
   end
   object OKButton: TNewButton
-    Left = 304
+    Left = 300
     Top = 305
-    Width = 16
+    Width = 17
     Height = 23
     Anchors = [akRight, akBottom]
     Caption = '*'

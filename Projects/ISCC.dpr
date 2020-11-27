@@ -10,10 +10,17 @@ program ISCC;
   Command-line compiler
 }
 
-{$SetPEFlags 1} 
-{$SETPEOSVERSION 6.0}
-{$SETPESUBSYSVERSION 6.0}
-{$WEAKLINKRTTI ON}
+{$SetPEFlags 1}
+{$IFNDEF IS_WINXP}
+  {$SETPEOSVERSION 6.0}
+  {$SETPESUBSYSVERSION 6.0}
+{$ELSE}
+  {$SETPEOSVERSION 5.1}
+  {$SETPESUBSYSVERSION 5.1}
+{$ENDIF}
+{$IFNDEF VER200}
+  {$WEAKLINKRTTI ON}
+{$ENDIF}
 
 {x$DEFINE STATICCOMPILER}
 { For debugging purposes, remove the 'x' to have it link the compiler code
@@ -63,6 +70,7 @@ var
   LastProgress: String;
   IsppOptions: TIsppOptions;
   IsppMode: Boolean;
+  CurrentConsoleOutputCodePage: Integer;
 
 procedure WriteToStdHandle(const H: THandle; S: AnsiString);
 var
@@ -145,7 +153,7 @@ begin
     try
       L.LineText := F.ReadLine;
       if Pos(#0, L.LineText) <> 0 then
-        raise Exception.CreateFmt('Illegal null character on line %d', [LineNumber]);
+        raise Exception.CreateFmt('Недопустимый нулевой символ в строке %d', [LineNumber]);
       L.Next := nil;
     except
       Dispose(L);
@@ -230,39 +238,39 @@ begin
         if not Quiet then begin
           WriteStdOut('');
           if Data.OutputExeFilename <> '' then begin
-            WriteStdOut(Format('Successful compile (%.3f sec). ' +
-              'Resulting Setup program filename is:',
+            WriteStdOut(Format('Компиляция завершена (%.3f сек). ' +
+              'Результирующее имя программы установки:',
               [(EndTime - StartTime) / 1000]));
             WriteStdOut(Data.OutputExeFilename);
           end else
-            WriteStdOut(Format('Successful compile (%.3f sec). ' +
-              'Output was disabled.',
+            WriteStdOut(Format('Компиляция завершена (%.3f сек). ' +
+              'Вывод был отключен.',
               [(EndTime - StartTime) / 1000]));
         end;
       end;
     iscbNotifyError:
       if Assigned(Data.ErrorMsg) then begin
-        S := 'Error';
+        S := 'Ошибка';
         if Data.ErrorLine <> 0 then
-          S := S + Format(' on line %d', [Data.ErrorLine]);
+          S := S + Format(' в строке %d', [Data.ErrorLine]);
         if Assigned(Data.ErrorFilename) then
-          S := S + ' in ' + Data.ErrorFilename
+          S := S + ' в ' + Data.ErrorFilename
         else if ScriptFilename <> '' then
-          S := S + ' in ' + ScriptFilename;
+          S := S + ' в ' + ScriptFilename;
         S := S + ': ' + Data.ErrorMsg;
         WriteStdErr(S);
       end;
     iscbNotifyIdle:
       if ShowProgress and (Data.CompressProgress <> 0) then begin
         if Data.BytesCompressedPerSecond <> 0 then
-          BytesCompressedPerSecond := Format(' at %.2f kb/s', [Data.BytesCompressedPerSecond / 1024])
+          BytesCompressedPerSecond := Format(' со скоростью %.2f кбит/с', [Data.BytesCompressedPerSecond / 1024])
         else
           BytesCompressedPerSecond := '';
         if Data.SecondsRemaining <> -1 then
-          SecondsRemaining := Format(', %d seconds remaining', [Data.SecondsRemaining])
+          SecondsRemaining := Format(', осталось %d сек.', [Data.SecondsRemaining])
         else
           SecondsRemaining := '';
-        PrintProgress(Format('Compressing: %.2f%% done%s%s', [Data.CompressProgress / Data.CompressProgressMax * 100, BytesCompressedPerSecond, SecondsRemaining]));
+        PrintProgress(Format('Сжатие: %.2f%% сделано%s%s', [Data.CompressProgress / Data.CompressProgressMax * 100, BytesCompressedPerSecond, SecondsRemaining]));
       end;
   end;
 end;
@@ -307,7 +315,7 @@ procedure ProcessCommandLine;
             '-': SetOption(Options, S[3], False);
             '+': SetOption(Options, S[3], True)
           else
-            raise Exception.CreateFmt('Invalid command line option: %s', [S]);
+            raise Exception.CreateFmt('Неверный параметр командной строки: %s', [S]);
           end;
     end;
   end;
@@ -346,39 +354,40 @@ procedure ProcessCommandLine;
 
   procedure ShowBanner;
   begin
-    WriteStdOut('Inno Setup 6 Command-Line Compiler');
-    WriteStdOut('Copyright (C) 1997-2020 Jordan Russell. All rights reserved.');
-    WriteStdOut('Portions Copyright (C) 2000-2020 Martijn Laan. All rights reserved.');
+    WriteStdOut('Консольный компилятор Inno Setup 6');
+    WriteStdOut('Авторские права (C) 1997-2020 Jordan Russell. Все права защищены.');
+    WriteStdOut('Смежные авторские права (C) 2000-2020 Martijn Laan.');
+    WriteStdOut('Автор перевода - Leserg (C) 2020.');
     if IsppMode then
-      WriteStdOut('Portions Copyright (C) 2001-2004 Alex Yackimoff. All rights reserved.');
+      WriteStdOut('Авторские права (C) 2001-2004 Alex Yackimoff. Все права защищены.');
     WriteStdOut('');
   end;
 
   procedure ShowUsage;
   begin
-    WriteStdErr('Usage:  iscc [options] scriptfile.iss');
-    WriteStdErr('or to read from standard input:  iscc [options] -');
+    WriteStdErr('Использование:  iscc [параметры] scriptfile.iss');
+    WriteStdErr('или чтение посредством стандартного ввода:  iscc [параметры] -');
     WriteStdErr('Options:');
-    WriteStdErr('  /O(+|-)            Enable or disable output (overrides Output)');
-    WriteStdErr('  /O<path>           Output files to specified path (overrides OutputDir)');
-    WriteStdErr('  /F<filename>       Overrides OutputBaseFilename with the specified filename');
-    WriteStdErr('  /S<name>=<command> Sets a SignTool with the specified name and command');
-    WriteStdErr('  /Q                 Quiet compile (print error messages only)');
-    WriteStdErr('  /Qp                Enable quiet compile while still displaying progress');
+    WriteStdErr('  /O(+|-)            Включение/Отключение вывода (переопределяет Output)');
+    WriteStdErr('  /O<path>           Установка пути вывода файлов (переопределяет OutputDir)');
+    WriteStdErr('  /F<filename>       Переопределение OutputBaseFilename указанным именем файла');
+    WriteStdErr('  /S<name>=<command> Установка SignTool с указанным именем и командой');
+    WriteStdErr('  /Q                 Тихая компиляция (будут показаны только ошибки)');
+    WriteStdErr('  /Qp                Тихая компиляция с прогрессом выполнения');
     if IsppMode then begin
-      WriteStdErr('  /D<name>[=<value>] Emulate #define public <name> <value>');
-      WriteStdErr('  /$<letter>(+|-)    Emulate #pragma option -<letter>(+|-)');
-      WriteStdErr('  /P<letter>(+|-)    Emulate #pragma parseroption -<letter>(+|-)');
-      WriteStdErr('  /I<paths>          Emulate #pragma include <paths>');
-      WriteStdErr('  /J<filename>       Emulate #include <filename>');
-      WriteStdErr('  /{#<string>        Emulate #pragma inlinestart <string>');
-      WriteStdErr('  /}<string>         Emulate #pragma inlineend <string>');
-      WriteStdErr('  /V<number>         Emulate #pragma verboselevel <number>');
+      WriteStdErr('  /D<name>[=<value>] Эмуляция #define public <name> <value>');
+      WriteStdErr('  /$<letter>(+|-)    Эмуляция #pragma option -<letter>(+|-)');
+      WriteStdErr('  /P<letter>(+|-)    Эмуляция #pragma parseroption -<letter>(+|-)');
+      WriteStdErr('  /I<paths>          Эмуляция #pragma include <paths>');
+      WriteStdErr('  /J<filename>       Эмуляция #include <filename>');
+      WriteStdErr('  /{#<string>        Эмуляция #pragma inlinestart <string>');
+      WriteStdErr('  /}<string>         Эмуляция #pragma inlineend <string>');
+      WriteStdErr('  /V<number>         Эмуляция #pragma verboselevel <number>');
     end;
-    WriteStdErr('  /?                 Show this help screen');
+    WriteStdErr('  /?                 Отображение этой справки');
     if IsppMode then begin
       WriteStdErr('');
-      WriteStdErr('Example: iscc /$c- /Pu+ "/DLic=Trial Lic.txt" /IC:\INC;D:\INC scriptfile.iss');
+      WriteStdErr('Пример: iscc /$c- /Pu+ "/DLic=Trial Lic.txt" /IC:\INC;D:\INC scriptfile.iss');
       WriteStdErr('');
     end;
   end;
@@ -411,7 +420,7 @@ begin
       else if GetParam(S, 'S') then begin
         if Pos('=', S) = 0 then begin
           ShowBanner;
-          WriteStdErr('Invalid option: ' + S);
+          WriteStdErr('Неверный параметр: ' + S);
           Halt(1);
         end;
         SignTools.Add(S);
@@ -443,7 +452,7 @@ begin
       end
       else begin
         ShowBanner;
-        WriteStdErr('Unknown option: ' + S);
+        WriteStdErr('Неивестный параметр: ' + S);
         Halt(1);
       end;
     end
@@ -451,7 +460,7 @@ begin
       { Not a switch; must be the script filename }
       if ScriptFilename <> '' then begin
         ShowBanner;
-        WriteStdErr('You may not specify more than one script filename.');
+        WriteStdErr('Можно указывать только один файл сценария.');
         Halt(1);
       end;
       ScriptFilename := S;
@@ -528,7 +537,7 @@ begin
   {$ENDIF}
   if Ver.BinVersion < $05000500 then begin
     { 5.0.5 or later is required since we use TCompileScriptParamsEx }
-    WriteStdErr('Incompatible compiler engine version.');
+    WriteStdErr('Несовместимая версия компилятора.');
     Halt(1);
   end;
 
@@ -546,7 +555,7 @@ begin
     end;
 
     if not Quiet then begin
-      WriteStdOut('Compiler engine version: ' + String(Ver.Title) + ' ' + String(Ver.Version));
+      WriteStdOut('Версия комилятора: ' + String(Ver.Title) + ' ' + String(Ver.Version));
       WriteStdOut('');
     end;
 
@@ -592,12 +601,12 @@ begin
       isceNoError: ;
       isceCompileFailure: begin
           ExitCode := 2;
-          WriteStdErr('Compile aborted.');
+          WriteStdErr('Компиляция прервана.');
         end;
     else
       ExitCode := 1;
-      WriteStdErr(Format('Internal error: ISDllCompileScript returned ' +
-        'unexpected result (%d).', [Res]));
+      WriteStdErr(Format('Внутренняя ошибка: ISDllCompileScript вернула ' +
+        'неожиданный результат (%d).', [Res]));
     end;
   finally
     FreeScriptLines;
@@ -607,6 +616,8 @@ begin
 end;
 
 begin
+  CurrentConsoleOutputCodePage := GetConsoleOutputCP;
+  SetConsoleOutputCP(1251);
   SignTools := TStringList.Create;
   try
     StdOutHandle := GetStdHandle(STD_OUTPUT_HANDLE);
@@ -625,4 +636,5 @@ begin
   finally
     SignTools.Free;
   end;
+  SetConsoleOutputCP(CurrentConsoleOutputCodePage);
 end.

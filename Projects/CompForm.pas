@@ -82,7 +82,7 @@ type
     HDoc: TMenuItem;
     N6: TMenuItem;
     HAbout: TMenuItem;
-    FMRUSep: TMenuItem;
+    FMRUMainFilesSep: TMenuItem;
     VCompilerOutput: TMenuItem;
     FindDialog: TFindDialog;
     ReplaceDialog: TReplaceDialog;
@@ -171,12 +171,41 @@ type
     Bevel1: TBevel;
     BuildImageList: TImageList;
     TerminateButton: TToolButton;
-    LightToolBarImageCollection: TImageCollection;
-    DarkToolBarImageCollection: TImageCollection;
+    ToolBarImageCollection: TImageCollection;
     ToolBarVirtualImageList: TVirtualImageList;
+    UndoButton: TToolButton;
+    RedoButton: TToolButton;
+    ToolButton1: TToolButton;
+    CutButton: TToolButton;
+    CopyButton: TToolButton;
+    PasteButton: TToolButton;
+    DeleteButton: TToolButton;
+    ToolButton2: TToolButton;
+    FindButton: TToolButton;
+    FindNextButton: TToolButton;
+    ReplaceButton: TToolButton;
+    GoToLineButton: TToolButton;
+    WordWrapButton: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton5: TToolButton;
+    BOpenScriptFolder: TMenuItem;
+    ColorDialog1: TColorDialog;
+    TInsertColor: TMenuItem;
+    FRecent: TMenuItem;
+    FClear: TMenuItem;
+    N20: TMenuItem;
     PListSelectAll: TMenuItem;
     DebugCallStackList: TListBox;
     VDebugCallStack: TMenuItem;
+    ECaseModed: TMenuItem;
+    EUpperCase: TMenuItem;
+    ELowerCase: TMenuItem;
+    TInsertMsgBox: TMenuItem;
+    N21: TMenuItem;
+    VEOLString: TMenuItem;
+    VWCCString: TMenuItem;
+    VWordWrapString: TMenuItem;
+    VCaretLine: TMenuItem;
     ToolBarPanel: TPanel;
     HMailingList: TMenuItem;
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -264,6 +293,17 @@ type
       State: TOwnerDrawState);
     procedure VDebugCallStackClick(Sender: TObject);
     procedure HMailingListClick(Sender: TObject);
+    procedure WordWrapButtonClick(Sender: TObject);
+    procedure BOpenScriptFolderClick(Sender: TObject);
+    procedure TInsertColorClick(Sender: TObject);
+    procedure FClearClick(Sender: TObject);
+    procedure EUpperCaseClick(Sender: TObject);
+    procedure ELowerCaseClick(Sender: TObject);
+    procedure TInsertMsgBoxClick(Sender: TObject);
+    procedure VEOLStringClick(Sender: TObject);
+    procedure VWCCStringClick(Sender: TObject);
+    procedure VWordWrapStringClick(Sender: TObject);
+    procedure VCaretLineClick(Sender: TObject);
   private
     { Private declarations }
     FCompilerVersion: PCompilerVersionInfo;
@@ -286,6 +326,8 @@ type
       ColorizeCompilerOutput: Boolean;
       UnderlineErrors: Boolean;
       CursorPastEOL: Boolean;
+      BorderLineEnd: Boolean;
+      LineEndColon: Integer;
       TabWidth: Integer;
       UseTabCharacter: Boolean;
       WordWrap: Boolean;
@@ -452,7 +494,7 @@ type
 
 var
   CompileForm: TCompileForm;
-
+  MSGTextInsert: TStringList;
   CommandLineFilename, CommandLineWizardName: String;
   CommandLineCompile: Boolean;
   CommandLineWizard: Boolean;
@@ -469,7 +511,7 @@ uses
   PathFunc, CmnFunc, CmnFunc2, FileClass, CompMsgs, TmSchema, BrowseFunc,
   HtmlHelpFunc, TaskbarProgressFunc,
   {$IFDEF STATICCOMPILER} Compile, {$ENDIF}
-  CompOptions, CompStartup, CompWizard, CompSignTools, CompTypes;
+  CompOptions, CompStartup, CompWizard, CompSignTools, CompTypes, MessageBoxInsert;
 
 {$R *.DFM}
 
@@ -698,6 +740,7 @@ begin
   Call(SCI_AUTOCSETDROPRESTOFWORD, 1, 0);
   Call(SCI_AUTOCSETIGNORECASE, 1, 0);
   Call(SCI_AUTOCSETMAXHEIGHT, 7, 0);
+  Call(SCI_SETWHITESPACESIZE, 1, 0);   { size of point for space char }
 
   Call(SCI_ASSIGNCMDKEY, Ord('Z') or ((SCMOD_SHIFT or SCMOD_CTRL) shl 16), SCI_REDO);
 
@@ -739,6 +782,9 @@ begin
     Color := FTheme.Colors[tcBack];
     Call(SCI_SETSELBACK, 1, FTheme.Colors[tcSelBack]);
     Call(SCI_INDICSETFORE, inSquiggly, FTheme.Colors[tcRed]);
+    Call(SCI_SETCARETLINEBACK, FTheme.Colors[tcCaretLineBack], 0);
+    Call(SCI_SETEDGECOLOUR, FTheme.Colors[tcBorderLineEnd], 0);
+    Call(SCI_SETWHITESPACEFORE, 1, FTheme.Colors[tcBackWCCTabWrap]);
   end;
 end;
 
@@ -781,6 +827,12 @@ constructor TCompileForm.Create(AOwner: TComponent);
       StatusBar.Visible := Ini.ReadBool('Options', 'ShowStatusBar', True);
       FOptions.LowPriorityDuringCompile := Ini.ReadBool('Options', 'LowPriorityDuringCompile', False);
 
+      { Menu check boxes state  for nonvisual character  }
+      VEOLString.Checked := Ini.ReadBool('Options', 'ShowEOLStr', False);
+      VWCCString.Checked := Ini.ReadBool('Options', 'ShowWCCStr', False);
+      VWordWrapString.Checked := Ini.ReadBool('Options', 'ShowWWpStr', False);
+      VCaretLine.Checked := Ini.ReadBool('Options', 'ShowCrtLine', False);
+
       { Configuration options }
       FOptions.ShowStartupForm := Ini.ReadBool('Options', 'ShowStartupForm', True);
       FOptions.UseWizard := Ini.ReadBool('Options', 'UseWizard', True);
@@ -801,6 +853,8 @@ constructor TCompileForm.Create(AOwner: TComponent);
       FOptions.AutoIndent := Ini.ReadBool('Options', 'AutoIndent', True);
       FOptions.IndentationGuides := Ini.ReadBool('Options', 'IndentationGuides', True);
       FOptions.GutterLineNumbers := Ini.ReadBool('Options', 'GutterLineNumbers', False);
+      FOptions.BorderLineEnd := Ini.ReadBool('Options', 'BorderLineEnd', False);
+      FOptions.LineEndColon := Ini.ReadInteger('Options', 'LineEndColon', 80);
       I := Ini.ReadInteger('Options', 'ThemeType', Ord(GetDefaultThemeType));
       if (I >= 0) and (I <= Ord(High(TThemeType))) then
         FOptions.ThemeType := TThemeType(I);
@@ -862,6 +916,7 @@ constructor TCompileForm.Create(AOwner: TComponent);
   procedure SetFakeShortCutText(const MenuItem: TMenuItem; const S: String);
   begin
     MenuItem.Caption := MenuItem.Caption + #9 + S;
+    //MenuItem.ShortCut := TextToShortCut(S);
   end;
 
   procedure SetFakeShortCut(const MenuItem: TMenuItem; const Key: Word;
@@ -961,11 +1016,13 @@ begin
   Application.OnActivate := AppOnActivate;
   Application.OnIdle := AppOnIdle;
 
+  FClear.Enabled := False;
+
   FMRUList := TStringList.Create;
-  for I := 0 to High(FMRUMenuItems) do begin
+  for I := High(FMRUMenuItems) downto 0 do begin
     NewItem := TMenuItem.Create(Self);
     NewItem.OnClick := FMRUClick;
-    FMenu.Insert(FMenu.IndexOf(FMRUSep), NewItem);
+    FRecent.Insert(FRecent.IndexOf(FMRUMainFilesSep) + 1, NewItem);
     FMRUMenuItems[I] := NewItem;
   end;
 
@@ -1009,6 +1066,12 @@ destructor TCompileForm.Destroy;
       Ini.WriteBool('Options', 'ShowToolbar', Toolbar.Visible);
       Ini.WriteBool('Options', 'ShowStatusBar', StatusBar.Visible);
       Ini.WriteBool('Options', 'LowPriorityDuringCompile', FOptions.LowPriorityDuringCompile);
+
+      { Menu check boxes state  for nonvisual character  }
+      Ini.WriteBool('Options', 'ShowEOLStr', VEOLString.Checked);
+      Ini.WriteBool('Options', 'ShowWCCStr', VWCCString.Checked);
+      Ini.WriteBool('Options', 'ShowWWpStr', VWordWrapString.Checked);
+      Ini.WriteBool('Options', 'ShowCrtLine', VCaretLine.Checked);
 
       { Window state }
       WindowPlacement.length := SizeOf(WindowPlacement);
@@ -1146,12 +1209,12 @@ begin
   NewCaption := NewCaption + ' - ' + SCompilerFormCaption + ' ' +
     String(FCompilerVersion.Version);
   if FCompiling then
-    NewCaption := NewCaption + '  [Compiling]'
+    NewCaption := NewCaption + '  [Компиляция]'
   else if FDebugging then begin
     if not FPaused then
-      NewCaption := NewCaption + '  [Running]'
+      NewCaption := NewCaption + '  [Выполнение]'
     else
-      NewCaption := NewCaption + '  [Paused]';
+      NewCaption := NewCaption + '  [Пауза]';
   end;
   Caption := NewCaption;
   if not CommandLineWizard then
@@ -1217,7 +1280,7 @@ begin
       Memo.ClearUndo;
       if WizardForm.Result = wrComplete then begin
         Memo.ForceModifiedState;
-        if MsgBox('Would you like to compile the new script now?', SCompilerFormCaption, mbConfirmation, MB_YESNO) = IDYES then
+        if MsgBox('Выполнить компиляцию нового сценария сейчас?', SCompilerFormCaption, mbConfirmation, MB_YESNO) = IDYES then
           BCompileClick(Self);
       end;
     end;
@@ -1270,10 +1333,21 @@ begin
     OpenFile(AFilename, True);
   except
     Application.HandleException(Self);
-    if MsgBoxFmt('There was an error opening the file. Remove it from the list?',
+    if MsgBoxFmt('При открытии файла произошла ошибка. Удалить его из списка?',
        [AFilename], SCompilerFormCaption, mbError, MB_YESNO) = IDYES then
       ModifyMRUList(AFilename, False);
   end;
+end;
+
+procedure TCompileForm.BOpenScriptFolderClick(Sender: TObject);
+var
+  SourceScriptPath: String;
+begin
+      if FFilename <> '' then
+       begin
+         SourceScriptPath := PathExtractPath(FFilename);
+         ShellExecute(Application.Handle, 'open', PChar(SourceScriptPath), nil, nil, SW_SHOW);
+       end;
 end;
 
 class procedure TCompileForm.SaveTextToFile(const Filename: String;
@@ -1318,7 +1392,7 @@ function TCompileForm.SaveFile(const SaveAs: Boolean): Boolean;
       way, if the system crashes or the disk runs out of space during the save,
       the existing file will still be intact. }
     if GetTempFileName(PChar(PathExtractDir(FN)), 'iss', 0, Buf) = 0 then
-      raise Exception.CreateFmt('Error creating file (code %d). Could not save file',
+      raise Exception.CreateFmt('Ошибка создания файла (код %d). Файл не записан.',
         [GetLastError]);
     TempFN := Buf;
     try
@@ -1329,12 +1403,12 @@ function TCompileForm.SaveFile(const SaveAs: Boolean): Boolean;
         BackupFN := PathChangeExt(FN, '.~is');
         DeleteFile(BackupFN);
         if not RenameFile(FN, BackupFN) then
-          raise Exception.Create('Error creating backup file. Could not save file');
+          raise Exception.Create('Ошибка создания резервной копии. Файл не записан.');
       end;
 
       { Delete existing file }
       if not DeleteFile(FN) and (GetLastError <> ERROR_FILE_NOT_FOUND) then
-        raise Exception.CreateFmt('Error removing existing file (code %d). Could not save file',
+        raise Exception.CreateFmt('Ошибка удаления файла (код %d). Файл не записан.',
           [GetLastError]);
     except
       DeleteFile(TempFN);
@@ -1345,7 +1419,7 @@ function TCompileForm.SaveFile(const SaveAs: Boolean): Boolean;
       existing file, and don't want the temp file also deleted in the unlikely
       event that the rename fails. }
     if not RenameFile(TempFN, FN) then
-      raise Exception.CreateFmt('Error renaming temporary file (code %d). Could not save file',
+      raise Exception.CreateFmt('Ошибка переименования временного файла (код %d). Файл не записан.',
         [GetLastError]);
     GetLastWriteTimeOfFile(FN, FFileLastWriteTime);
   end;
@@ -1377,7 +1451,7 @@ var
 begin
   Result := True;
   if FCompiling then begin
-    MsgBox('Please stop the compile process before performing this command.',
+    MsgBox('Перед тем как выполнить эту команду, пожалуйста, остановите компиляцию.',
       SCompilerFormCaption, mbError, MB_OK);
     Result := False;
     Exit;
@@ -1389,8 +1463,8 @@ begin
   if PromptToSave and Memo.Modified then begin
     FileTitle := FFilename;
     if FileTitle = '' then FileTitle := 'Untitled';
-    case MsgBox('The text in the ' + FileTitle + ' file has changed.'#13#10#13#10 +
-       'Do you want to save the changes?', SCompilerFormCaption, mbError,
+    case MsgBox('Текст в файле ' + FileTitle + ' был изменён.'#13#10#13#10 +
+       'Вы хотите сохранить изменения?', SCompilerFormCaption, mbError,
        MB_YESNOCANCEL) of
       IDYES: Result := SaveFile(False);
       IDNO: ;
@@ -1413,7 +1487,10 @@ begin
       FMRUList.Clear;
       for I := 0 to High(FMRUMenuItems) do begin
         S := Ini.ReadString('ScriptFileHistoryNew', 'History' + IntToStr(I), '');
-        if S <> '' then FMRUList.Add(S);
+        if S <> '' then begin
+           FMRUList.Add(S);
+           FClear.Enabled := True;
+        end;
       end;
     finally
       Ini.Free;
@@ -1437,8 +1514,10 @@ begin
 
     I := 0;
     while I < FMRUList.Count do begin
-      if PathCompare(FMRUList[I], AFilename) = 0 then
-        FMRUList.Delete(I)
+      if PathCompare(FMRUList[I], AFilename) = 0 then begin
+         FMRUList.Delete(I);
+         FClear.Enabled := False;
+      end
       else
         Inc(I);
     end;
@@ -1561,7 +1640,7 @@ end;
 
 procedure TCompileForm.StatusMessage(const Kind: TStatusMessageKind; const S: String);
 begin
-  AddLines(CompilerOutputList, S, TObject(Kind), False, alpNone, 0);
+  AddLines(CompilerOutputList, S, TObject(Kind), True, alpNone, 0);
   CompilerOutputList.Update;
 end;
 
@@ -1712,7 +1791,7 @@ var
 begin
   if FCompiling then begin
     { Shouldn't get here, but just in case... }
-    MsgBox('A compile is already in progress.', SCompilerFormCaption, mbError, MB_OK);
+    MsgBox('Процесс компиляции уже запущен.', SCompilerFormCaption, mbError, MB_OK);
     Abort;
   end;
 
@@ -1720,9 +1799,9 @@ begin
     if FOptions.Autosave and Memo.Modified then begin
       if not SaveFile(False) then Abort;
     end else if FFilename = '' then begin
-      case MsgBox('Would you like to save the script before compiling?' +
-         SNewLine2 + 'If you answer No, the compiled installation will be ' +
-         'placed under your My Documents folder by default.',
+      case MsgBox('Вы хотите сохранить файл сценария перед началом компиляции?' +
+         SNewLine2 + 'Если вы ответите "Нет", то файл установки будет ' +
+         'создан в папке "Мои документы".',
          SCompilerFormCaption, mbConfirmation, MB_YESNOCANCEL) of
         IDYES: if not SaveFile(False) then Abort;
         IDNO: ;
@@ -1807,7 +1886,7 @@ begin
         if AppData.ErrorLine > 0 then
           S := S + Format('Line %d:' + SNewLine, [AppData.ErrorLine]);
         S := S + AppData.ErrorMsg;
-        SetAppTaskbarProgressState(tpsError);
+        SetAppTaskbarProgressState(tpsErrog); // tpsError >> tpsErrog for TaskBar
         MsgBox(S, 'Compiler Error', mbCriticalError, MB_OK)
       end;
       Abort;
@@ -1880,6 +1959,38 @@ begin
 
   Memo.WordWrap := FOptions.WordWrap;
 
+  if FOptions.WordWrap then
+     WordWrapButton.Down := True
+  else
+     WordWrapButton.Down := False;
+
+  if VEOLString.Checked then
+     Memo.Call(SCI_SETVIEWEOL, 1, 0)
+  else 
+     Memo.Call(SCI_SETVIEWEOL, 0, 0);
+
+  if VCaretLine.Checked then
+     Memo.Call(SCI_SETCARETLINEVISIBLE, 1, 0)
+  else
+     Memo.Call(SCI_SETCARETLINEVISIBLE, 0, 0);
+
+  if VWCCString.Checked then
+     Memo.Call(SCI_SETVIEWWS, 1, 0)
+  else
+     Memo.Call(SCI_SETVIEWWS, 0, 0);
+
+  if VWordWrapString.Checked then
+     Memo.Call(SCI_SETWRAPVISUALFLAGS, 1, 0)
+  else
+     Memo.Call(SCI_SETWRAPVISUALFLAGS, 0, 0);
+
+  if FOptions.BorderLineEnd then
+     Memo.Call(SCI_SETEDGEMODE, 1, 0)
+  else
+     Memo.Call(SCI_SETEDGEMODE, 0, 0);
+
+  Memo.Call(SCI_SETEDGECOLUMN, FOptions.LineEndColon, 0);
+
   if FOptions.IndentationGuides then
     Memo.IndentationGuides := sigLookBoth
   else
@@ -1922,7 +2033,7 @@ begin
   FSaveEncodingAuto.Checked := not FSaveInUTF8Encoding;
   FSaveEncodingUTF8.Checked := FSaveInUTF8Encoding;
   ReadMRUList;
-  FMRUSep.Visible := FMRUList.Count <> 0;
+  FMRUMainFilesSep.Visible := FMRUList.Count <> 0;
   for I := 0 to High(FMRUMenuItems) do
     with FMRUMenuItems[I] do begin
       if I < FMRUList.Count then begin
@@ -1983,6 +2094,42 @@ begin
   FSaveInUTF8Encoding := (Sender = FSaveEncodingUTF8);
 end;
 
+procedure TCompileForm.FClearClick(Sender: TObject);
+var
+  I: Integer;
+  Ini: TConfigIniFile;
+  S: String;
+begin
+  try
+    { Load most recent items first, just in case they've changed }
+    ReadMRUList;
+
+    I := 0;
+    while I < FMRUList.Count do begin
+        FMRUList.Delete(I);
+     //   FRecent.Delete(I+2);
+    end;
+
+    FClear.Enabled := False;
+
+    { Remove MRU items }
+    Ini := TConfigIniFile.Create;
+    try
+      { MRU list }
+      for I := 0 to High(FMRUMenuItems) do begin
+        if I < FMRUList.Count then S := '';
+        Ini.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S);
+      end;
+    finally
+      Ini.Free;
+    end;
+  except
+    { Handle exceptions locally; failure to save the MRU list should not be
+      a fatal error. }
+    Application.HandleException(Self);
+  end;
+end;
+
 procedure TCompileForm.FMRUClick(Sender: TObject);
 var
   I: Integer;
@@ -2022,6 +2169,24 @@ end;
 procedure TCompileForm.EUndoClick(Sender: TObject);
 begin
   Memo.Undo;
+end;
+
+procedure TCompileForm.EUpperCaseClick(Sender: TObject);
+var
+   S: String;
+begin
+   S := Memo.SelText;
+   if S <> '' then
+      Memo.Call(SCI_UPPERCASE, 0 ,0);
+end;
+
+procedure TCompileForm.ELowerCaseClick(Sender: TObject);
+var
+   S: String;
+begin
+   S := Memo.SelText;
+   if S <> '' then
+      Memo.Call(SCI_LOWERCASE, 0, 0);
 end;
 
 procedure TCompileForm.ERedoClick(Sender: TObject);
@@ -2145,10 +2310,35 @@ begin
   SetStatusPanelVisible(True);
 end;
 
+procedure TCompileForm.VCaretLineClick(Sender: TObject);
+begin
+   VCaretLine.Checked := not VCaretLine.Checked;
+   SyncEditorOptions;
+end;
+
+procedure TCompileForm.VEOLStringClick(Sender: TObject);
+begin
+   VEOLString.Checked := not VEOLString.Checked;
+   SyncEditorOptions;
+end;
+
+procedure TCompileForm.VWCCStringClick(Sender: TObject);
+begin
+   VWCCString.Checked := not VWCCString.Checked;
+   SyncEditorOptions;
+end;
+
+procedure TCompileForm.VWordWrapStringClick(Sender: TObject);
+begin
+   VWordWrapString.Checked := not VWordWrapString.Checked;
+   SyncEditorOptions;
+end;
+
 procedure TCompileForm.BMenuClick(Sender: TObject);
 begin
   BLowPriority.Checked := FOptions.LowPriorityDuringCompile;
   BOpenOutputFolder.Enabled := (FCompiledExe <> '');
+  BOpenScriptFolder.Enabled := (FFilename <> '');
 end;
 
 procedure TCompileForm.BCompileClick(Sender: TObject);
@@ -2160,7 +2350,7 @@ procedure TCompileForm.BStopCompileClick(Sender: TObject);
 begin
   SetAppTaskbarProgressState(tpsPaused);
   try
-    if MsgBox('Are you sure you want to abort the compile?', SCompilerFormCaption,
+    if MsgBox('Вы действительно хотите прервать компиляцию?', SCompilerFormCaption,
        mbConfirmation, MB_YESNO or MB_DEFBUTTON2) <> IDNO then
       FCompileWantAbort := True;
   finally
@@ -2301,13 +2491,13 @@ begin
     S := S + (SNewLine + 'Based on Inno Setup' + SNewLine);
   S := S + ('Copyright (C) 1997-2020 Jordan Russell' + SNewLine +
     'Portions Copyright (C) 2000-2020 Martijn Laan' + SNewLine +
-    'All rights reserved.' + SNewLine2 +
-    'Inno Setup home page:' + SNewLine +
-    'http://www.innosetup.com/' + SNewLine2 +
-    'RemObjects Pascal Script home page:' + SNewLine +
-    'http://www.remobjects.com/ps' + SNewLine2 +
-    'Refer to LICENSE.TXT for conditions of distribution and use.');
-  MsgBox(S, 'About ' + FCompilerVersion.Title, mbInformation, MB_OK);
+    'Все права защищены.' + SNewLine2 +
+    'Домашняя страница Inno Setup:' + SNewLine +
+    'https://www.innosetup.com/' + SNewLine2 +
+    'Домашняя страница RemObjects Pascal Script' + SNewLine +
+    'https://www.remobjects.com/ps' + SNewLine2 +
+    'Условия использования читайте в LICENSE.TXT.');
+  MsgBox(S, 'О программе ' + FCompilerVersion.Title, mbInformation, MB_OK);
 end;
 
 procedure TCompileForm.WMStartCommandLineCompile(var Message: TMessage);
@@ -2447,7 +2637,7 @@ begin
      FindOptionsToSearchOptions(FLastFindOptions), Range) then
     Memo.Selection := Range
   else
-    MsgBoxFmt('Cannot find "%s"', [FLastFindText], SCompilerFormCaption,
+    MsgBoxFmt('Не удается найти "%s"', [FLastFindText], SCompilerFormCaption,
       mbInformation, MB_OK);
 end;
 
@@ -2497,10 +2687,10 @@ begin
       Memo.EndUndoAction;
     end;
     if ReplaceCount = 0 then
-      MsgBoxFmt('Cannot find "%s"', [FLastFindText], SCompilerFormCaption,
+      MsgBoxFmt('Не удается найти "%s"', [FLastFindText], SCompilerFormCaption,
         mbInformation, MB_OK)
     else
-      MsgBoxFmt('%d occurrence(s) replaced.', [ReplaceCount], SCompilerFormCaption,
+      MsgBoxFmt('Выполнено замен: %d.', [ReplaceCount], SCompilerFormCaption,
         mbInformation, MB_OK);
   end
   else begin
@@ -2585,9 +2775,33 @@ end;
 
 procedure TCompileForm.TGenerateGUIDClick(Sender: TObject);
 begin
-  if MsgBox('The generated GUID will be inserted into the editor at the cursor position. Continue?',
+  if MsgBox('Созданный GUID будет вставлен в сценарий в текущей позиции курсора.' + SNewLine2 + 'Вы хотите продолжить?',
      SCompilerFormCaption, mbConfirmation, MB_YESNO) = IDYES then
     Memo.SelText := GenerateGuid;
+end;
+
+procedure TCompileForm.TInsertColorClick(Sender: TObject);
+begin
+  if not ColorDialog1.Execute then exit;
+//  if MsgBox('Выбранный цвет будет вставлен в сценарий в текущей позиции курсора.' + SNewLine2 + 'Вы хотите продолжить?',
+//     SCompilerFormCaption, mbConfirmation, MB_YESNO) = IDYES then
+     Memo.SelText := ColorToString(ColorDialog1.Color);
+end;
+
+procedure TCompileForm.TInsertMsgBoxClick(Sender: TObject);
+var
+  MsgBoxForm: TMBDForm;
+begin
+  MsgBoxForm := TMBDForm.Create(Application);
+  MSGTextInsert := TStringList.Create;
+  try
+    if MsgBoxForm.ShowModal <> mrOK then
+      Exit;
+    Memo.SelText := MSGTextInsert.GetText;
+  finally
+    MsgBoxForm.Free;
+    MSGTextInsert.Free;
+  end;
 end;
 
 procedure TCompileForm.TSignToolsClick(Sender: TObject);
@@ -2649,6 +2863,9 @@ begin
     OptionsForm.FontPanel.Font.Assign(Memo.Font);
     OptionsForm.FontPanel.ParentBackground := False;
     OptionsForm.FontPanel.Color := Memo.Color;
+    OptionsForm.BorderLineEndCheck.Checked := FOptions.BorderLineEnd;
+    OptionsForm.LineColonEdit.Enabled := FOptions.BorderLineEnd;
+    OptionsForm.LineColonEdit.Text := IntToStr(FOptions.LineEndColon);
 
     if OptionsForm.ShowModal <> mrOK then
       Exit;
@@ -2673,6 +2890,8 @@ begin
     FOptions.IndentationGuides := OptionsForm.IndentationGuidesCheck.Checked;
     FOptions.GutterLineNumbers := OptionsForm.GutterLineNumbersCheck.Checked;
     FOptions.ThemeType := TThemeType(OptionsForm.ThemeComboBox.ItemIndex);
+    FOptions.BorderLineEnd := OptionsForm.BorderLineEndCheck.Checked;
+    FOptions.LineEndColon := StrToInt(OptionsForm.LineColonEdit.Text);
     UpdateCaption;
     { Move caret to start of line to ensure it doesn't end up in the middle
       of a double-byte character if the code page changes from SBCS to DBCS }
@@ -2708,6 +2927,8 @@ begin
       Ini.WriteString('Options', 'EditorFontName', Memo.Font.Name);
       Ini.WriteInteger('Options', 'EditorFontSize', Memo.Font.Size);
       Ini.WriteInteger('Options', 'EditorFontCharset', Memo.Font.Charset);
+      Ini.WriteBool('Options', 'BorderLineEnd', FOptions.BorderLineEnd);
+      Ini.WriteInteger('Options', 'LineEndColon', FOptions.LineEndColon);
     finally
       Ini.Free;
     end;
@@ -2774,10 +2995,10 @@ end;
 
 procedure TCompileForm.UpdateEditModePanel;
 const
-  InsertText: array[Boolean] of String = ('Overwrite', 'Insert');
+  InsertText: array[Boolean] of String = ('Замена', 'Вставка');
 begin
   if Memo.ReadOnly then
-    StatusBar.Panels[spInsertMode].Text := 'Read only'
+    StatusBar.Panels[spInsertMode].Text := 'Чтение'
   else
     StatusBar.Panels[spInsertMode].Text := InsertText[Memo.InsertMode];
 end;
@@ -2843,7 +3064,25 @@ procedure TCompileForm.MemoUpdateUI(Sender: TObject);
     Memo.SetBraceHighlighting(-1, -1);
   end;
 
+var
+  MemoHasFocus: Boolean;
 begin
+  MemoHasFocus := Memo.Focused;
+  UndoButton.Enabled := MemoHasFocus and Memo.CanUndo;
+  RedoButton.Enabled := MemoHasFocus and Memo.CanRedo;
+  if  Memo.SelAvail then begin
+    CutButton.Enabled := True;
+    CopyButton.Enabled := True;
+    DeleteButton.Enabled := True;
+    EUpperCase.Enabled := True;
+    ELowerCase.Enabled := True;
+  end else begin
+    CutButton.Enabled := False;
+    CopyButton.Enabled := False;
+    DeleteButton.Enabled := False;
+    EUpperCase.Enabled := False;
+    ELowerCase.Enabled := False;
+  end;
   if (FErrorLine < 0) or (Memo.CaretPosition <> FErrorCaretPosition) then
     HideError;
   StatusBar.Panels[spCaretPos].Text := Format('%4d:%4d', [Memo.CaretLine + 1,
@@ -2851,14 +3090,31 @@ begin
   UpdatePendingSquiggly;
   UpdateBraceHighlighting;
   UpdateEditModePanel;
+
+  if (FBreakPoints.IndexOf(Pointer(Memo.CaretLine)) <> -1) or (FErrorLine <> -1) or (FStepLine <> -1) then
+//     MsgBox(IntToStr(Memo.Call(SCI_MARKERGET, Memo.CaretLine, 0)), SCompilerFormCaption, mbConfirmation, MB_OK)
+      case Memo.Call(SCI_MARKERGET, Memo.CaretLine, 0) of
+        2052: Memo.Call(SCI_SETCARETLINEBACK, clRed, 0);
+        4112: Memo.Call(SCI_SETCARETLINEBACK, clOlive, 0);
+        2056: Memo.Call(SCI_SETCARETLINEBACK, clRed, 0);
+        1028,1024,1026: Memo.Call(SCI_SETCARETLINEBACK, clMaroon, 0);
+        8200,8194: Memo.Call(SCI_SETCARETLINEBACK, clBlue, 0);
+      else Memo.Call(SCI_SETCARETLINEBACK, FTheme.Colors[tcCaretLineBack], 0);
+      end
+  else Memo.Call(SCI_SETCARETLINEBACK, FTheme.Colors[tcCaretLineBack], 0);
 end;
 
 procedure TCompileForm.MemoModifiedChange(Sender: TObject);
 begin
-  if Memo.Modified then
-    StatusBar.Panels[spModified].Text := 'Modified'
-  else
+  if Memo.Modified then begin
+    StatusBar.Panels[spModified].Text := 'Изменён';
+    SaveButton.Enabled := True;
+    FSave.Enabled := True;
+  end else begin
     StatusBar.Panels[spModified].Text := '';
+    SaveButton.Enabled := False;
+    FSave.Enabled := False;
+  end
 end;
 
 procedure TCompileForm.MemoChange(Sender: TObject; const Info: TScintEditChangeInfo);
@@ -2901,6 +3157,7 @@ begin
   { The change should trigger restyling. Allow the styler to see the current
     caret position in case it wants to set a pending squiggly indicator. }
   Memo.ReportCaretPositionToStyler := True;
+  PasteButton.Enabled := Clipboard.HasFormat(CF_TEXT);
 end;
 
 procedure TCompileForm.InitiateAutoComplete(const Key: AnsiChar);
@@ -3583,10 +3840,10 @@ end;
 function TCompileForm.AskToDetachDebugger: Boolean;
 begin
   if FDebugClientWnd = 0 then begin
-    MsgBox('Please stop the running ' + DebugTargetStrings[FDebugTarget] +  ' process before performing this command.',
+    MsgBox('Перед тем как выполнить эту команду, пожалуйста, остановите процесс ' + DebugTargetStrings[FDebugTarget] +  '.',
       SCompilerFormCaption, mbError, MB_OK);
     Result := False;
-  end else if MsgBox('This command will detach the debugger from the running ' + DebugTargetStrings[FDebugTarget] + ' process. Continue?',
+  end else if MsgBox('Эта команда отсоединит отладчик от запущенного процесса ' + DebugTargetStrings[FDebugTarget] + '.' + SNewLine2 + 'Вы хотите продолжить?',
      SCompilerFormCaption, mbError, MB_OKCANCEL) = IDOK then begin
     DetachDebugger;
     Result := True;
@@ -3643,10 +3900,6 @@ begin
   SetControlTheme(Memo);
   ToolBarPanel.ParentBackground := False;
   ToolBarPanel.Color := FTheme.Colors[tcToolBack];
-  if FTheme.Dark then
-    ToolBarVirtualImageList.ImageCollection := DarkToolBarImageCollection
-  else
-    ToolBarVirtualImageList.ImageCollection := LightToolBarImageCollection;
   Bevel1.Visible := FTheme.Colors[tcMarginBack] = ToolBarPanel.Color;
   SplitPanel.ParentBackground := False;
   SplitPanel.Color := FTheme.Colors[tcSplitterBack];
@@ -3719,7 +3972,7 @@ begin
   DebugCallStackList.Clear;
   SendMessage(DebugCallStackList.Handle, LB_SETHORIZONTALEXTENT, 0, 0);
   if not (TabSet.TabIndex in [tiDebugOutput, tiDebugCallStack]) then
-    TabSet.TabIndex := tiDebugOutput;
+  TabSet.TabIndex := tiDebugOutput;
   SetStatusPanelVisible(True);
 
   FillChar(Info, SizeOf(Info), 0);
@@ -3780,8 +4033,8 @@ begin
 
   { Display warning if the user modified the script while running }
   if FDebugging and FModifiedSinceLastCompileAndGo then begin
-    if MsgBox('The changes you made will not take effect until you ' +
-       're-compile.' + SNewLine2 + 'Continue running anyway?',
+    if MsgBox('Сделанные изменения вступят в силу после ' +
+       'перекомпиляции проекта.' + SNewLine2 + 'Вы действительно хотите продолжить?',
        SCompilerFormCaption, mbError, MB_YESNO) <> IDYES then
       Abort;
     FModifiedSinceLastCompileAndGo := False;
@@ -3846,8 +4099,8 @@ end;
 
 procedure TCompileForm.RParametersClick(Sender: TObject);
 begin
-  InputQuery('Run Parameters', 'Command line parameters for ' + DebugTargetStrings[dtSetup] +
-    ' and ' + DebugTargetStrings[dtUninstall] + ':', FRunParameters);
+  InputQuery('Параметры командной строки', 'Параметры запуска для ' + DebugTargetStrings[dtSetup] +
+    ' и ' + DebugTargetStrings[dtUninstall] + ':', FRunParameters);
 end;
 
 procedure TCompileForm.RPauseClick(Sender: TObject);
@@ -3858,7 +4111,7 @@ begin
       UpdateCaption;
     end
     else
-      MsgBox('A pause is already pending.', SCompilerFormCaption, mbError,
+      MsgBox('Процесс выполнения уже приостановлен.', SCompilerFormCaption, mbError,
         MB_OK);
   end;
 end;
@@ -3883,7 +4136,7 @@ procedure TCompileForm.RRunToCursorClick(Sender: TObject);
 begin
   CompileIfNecessary;
   if not GetDebugEntryFromLineNumber(Memo.CaretLine, FRunToCursorPoint) then begin
-    MsgBox('No code was generated for the current line.', SCompilerFormCaption,
+    MsgBox('В текущей строке код не создан.', SCompilerFormCaption,
       mbError, MB_OK);
     Exit;
   end;
@@ -3904,30 +4157,30 @@ procedure TCompileForm.RTerminateClick(Sender: TObject);
 var
   S, Dir: String;
 begin
-  S := 'This will unconditionally terminate the running ' +
-       DebugTargetStrings[FDebugTarget] + ' process. Continue?';
+  S := 'Вы действительно хотите прервать выполнение процесса ' +
+       DebugTargetStrings[FDebugTarget] + '?';
 
   if FDebugTarget = dtSetup then
-    S := S + #13#10#13#10'Note that if ' + DebugTargetStrings[FDebugTarget] + ' ' +
-         'is currently in the installation phase, any changes made to the ' +
-         'system thus far will not be undone, nor will uninstall data be written.';
+    S := S + #13#10#13#10'Заметьте, если ' + DebugTargetStrings[FDebugTarget] + ' ' +
+         'находится в процессе установки, то любые изменения сделанные в системе, ' +
+         'не будут уничтожены, а данные деинсталляции не записаны.';
 
-  if MsgBox(S, 'Terminate', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) <> IDYES then
+  if MsgBox(S, 'Завершение', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) <> IDYES then
     Exit;
   CheckIfTerminated;
   if FDebugging then begin
-    DebugLogMessage('*** Terminating process');
+    DebugLogMessage('*** Завершение процесса');
     Win32Check(TerminateProcess(FDebugClientProcessHandle, 6));
     if (WaitForSingleObject(FDebugClientProcessHandle, 5000) <> WAIT_TIMEOUT) and
        (FTempDir <> '') then begin
       Dir := FTempDir;
       FTempDir := '';
-      DebugLogMessage('*** Removing left-over temporary directory: ' + Dir);
+      DebugLogMessage('*** Очистка временной папки: ' + Dir);
       { Sleep for a bit to allow files to be unlocked by Windows,
         otherwise it fails intermittently (with Hyper-Threading, at least) }
       Sleep(50);
       if not DeleteDirTree(Dir) and DirExists(Dir) then
-        DebugLogMessage('*** Failed to remove temporary directory');
+        DebugLogMessage('*** Ошибка удаления временной папки');
     end;
     DebuggingStopped(True);
   end;
@@ -3937,13 +4190,13 @@ procedure TCompileForm.REvaluateClick(Sender: TObject);
 var
   Output: String;
 begin
-  if InputQuery('Evaluate', 'Constant to evaluate (e.g., "{app}"):',
+  if InputQuery('Значение константы', 'Имя константы (например, "{app}"):',
      FLastEvaluateConstantText) then begin
     case EvaluateConstant(FLastEvaluateConstantText, Output) of
-      1: MsgBox(Output, 'Evaluate Result', mbInformation, MB_OK);
-      2: MsgBox(Output, 'Evaluate Error', mbError, MB_OK);
+      1: MsgBox(Output, 'Результат', mbInformation, MB_OK);
+      2: MsgBox(Output, 'Ошибка', mbError, MB_OK);
     else
-      MsgBox('An unknown error occurred.', 'Evaluate Error', mbError, MB_OK);
+      MsgBox('Произошла неизвестная ошибка.', 'Ошибка', mbError, MB_OK);
     end;
   end;
 end;
@@ -4016,7 +4269,7 @@ var
   L: Integer;
 begin
   S := IntToStr(Memo.CaretLine + 1);
-  if InputQuery('Go to Line', 'Line number:', S) then begin
+  if InputQuery('Переход к строке', 'Введите номер строки:', S) then begin
     L := StrToIntDef(S, Low(L));
     if L <> Low(L) then
       Memo.CaretLine := L - 1;
@@ -4091,7 +4344,7 @@ begin
     { Also update the status text twice a second }
     if ASecondsRemaining >= 0 then
       StatusBar.Panels[spExtraStatus].Text := Format(
-        ' Estimated time remaining: %.2d%s%.2d%s%.2d     Average KB/sec: %.0n',
+        ' Осталось времени: %.2d%s%.2d%s%.2d     Скорость Kб/сек: %.0n',
         [(ASecondsRemaining div 60) div 60, {$IFDEF IS_DXE}FormatSettings.{$ENDIF}TimeSeparator,
          (ASecondsRemaining div 60) mod 60, {$IFDEF IS_DXE}FormatSettings.{$ENDIF}TimeSeparator,
          ASecondsRemaining mod 60, ABytesCompressedPerSecond / 1024])
@@ -4124,6 +4377,16 @@ begin
   inherited;
 end;
 
+procedure TCompileForm.WordWrapButtonClick(Sender: TObject);
+begin
+  if FOptions.WordWrap then begin
+    FOptions.WordWrap := False;
+  end else begin
+    FOptions.WordWrap := True;
+  end;
+  SyncEditorOptions;
+end;
+
 procedure TCompileForm.RTargetClick(Sender: TObject);
 var
   NewTarget: TDebugTarget;
@@ -4142,11 +4405,11 @@ end;
 procedure TCompileForm.AppOnActivate(Sender: TObject);
 const
   ReloadMessages: array[Boolean] of String = (
-    'The file has been modified outside of the source editor.' + SNewLine2 +
-      'Do you want to reload the file?',
-    'The file has been modified outside of the source editor. Changes have ' +
-      'also been made in the source editor.' + SNewLine2 + 'Do you want to ' +
-      'reload the file and lose the changes made in the source editor?');
+    'Этот файл был изменён в другом редакторе.' + SNewLine2 +
+      'Вы хотите открыть его заново?',
+    'Этот файл был изменён в другом редакторе. Изменения также были ' +
+      'сделаны в текущем редакторе.' + SNewLine2 + 'Вы хотите заново ' +
+      'открыть файл с потерей всех изменений, сделанных в текущем редакторе?');
 var
   NewTime: TFileTime;
   Changed: Boolean;
@@ -4174,8 +4437,8 @@ begin
     else begin
       { When a modal dialog is up, don't offer to reload the file. Probably
         not a good idea since the dialog might be manipulating the file. }
-      MsgBox(FFilename + SNewLine2 + 'The file has been modified outside ' +
-        'of the source editor. You might want to reload it.',
+      MsgBox(FFilename + SNewLine2 + 'Этот файл был изменён в другом ' +
+        'редакторе. Вы хотите открыть его заново?',
         SCompilerFormCaption, mbInformation, MB_OK);
     end;
   end;

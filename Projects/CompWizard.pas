@@ -209,7 +209,7 @@ const
 
   AppRootDirs: array[0..0] of TConstant =
   (
-    ( Constant: '{autopf}'; Description: 'Program Files folder')
+    ( Constant: '{autopf}'; Description: 'Папка "Program Files"')
   );
 
   LanguagesDefaultIsl = 'Default.isl';
@@ -300,7 +300,7 @@ begin
     WelcomeLabel1.Font.Name := 'Verdana';
 
   TNotebookAccess(OuterNotebook).ParentBackground := False;
-  OuterNotebook.Color := clWindow;
+  PnlMain.ParentBackground := False;
 
   MakeBold(PageNameLabel);
   MakeBold(RequiredLabel1);
@@ -321,12 +321,12 @@ begin
   AppNameEdit.Text := 'My Program';
   AppVersionEdit.Text := '1.5';
   AppPublisherEdit.Text := 'My Company, Inc.';
-  AppURLEdit.Text := 'http://www.example.com/';
+  AppURLEdit.Text := 'http://msilab.net/';
 
   { AppDir }
   for I := Low(AppRootDirs) to High(AppRootDirs) do
     AppRootDirComboBox.Items.Add(AppRootDirs[I].Description);
-  AppRootDirComboBox.Items.Add('(Custom)');
+  AppRootDirComboBox.Items.Add('(По выбору пользователя)');
   AppRootDirComboBox.ItemIndex := 0;
   AppRootDirEdit.Enabled := False;
   AppRootDirEdit.Color := clBtnFace;
@@ -414,6 +414,10 @@ begin
   { Set the Caption to match the current page's title }
   PageNameLabel.Caption := PageCaptions[CurPage];
   PageDescriptionLabel.Caption := PageDescriptions[CurPage];
+  if CurPage in [wpWelcome, wpFinished] then
+    OuterNotebook.Color := clWindow
+  else
+    OuterNotebook.Color := clBtnFace;
 
   { Adjust focus }
   case CurPage of
@@ -944,8 +948,9 @@ begin
 
   if not EmptyCheck.Checked then begin
     Setup := Setup + (
-      '; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.' + SNewLine +
-      '; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)' + SNewLine);
+      '; Примечание: Значение AppId является уникальным идентификатором для этого приложения.' + SNewLine +
+      '; Не используйте одно и тоже значение AppId для разных приложений.' + SNewLine +
+      '; (Для создания нового значения GUID, выберите в меню "Инструменты" пункт "Создать GUID".)' + SNewLine);
     Setup := Setup + 'AppId={' + GenerateGuid + SNewLine;
     { AppInfo }
     Setup := Setup + 'AppName=' + AppNameEdit.Text + SNewLine;
@@ -1015,7 +1020,7 @@ begin
         Icons := Icons + 'Name: "{autodesktop}\' + AppNameEdit.Text + '"; Filename: "{app}\' + AppExeName + '"; Tasks: desktopicon' + SNewLine;
       end;
       if QuickLaunchIconCheck.Enabled and QuickLaunchIconCheck.Checked then begin
-        Setup := Setup + '; The [Icons] "quicklaunchicon" entry uses {userappdata} but its [Tasks] entry has a proper IsAdminInstallMode Check.' + SNewLine +
+        Setup := Setup + '; Запись "quicklaunchicon" в секции [Icons] содержит {userappdata}, но та же запись в секции [Tasks] имеет флаг IsAdminInstallMode.' + SNewLine +
                          'UsedUserAreasWarning=no' + SNewLine;
         Tasks := Tasks + 'Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode' + SNewLine;
         Icons := Icons + 'Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\' + AppNameEdit.Text + '"; Filename: "{app}\' + AppExeName + '"; Tasks: quicklaunchicon' + SNewLine;
@@ -1032,9 +1037,9 @@ begin
 
     { PrivilegesRequired }
     if PrivilegesRequiredAdminRadioButton.Checked then
-      Setup := Setup + '; Uncomment the following line to run in non administrative install mode (install for current user only.)' + SNewLine + ';'
+      Setup := Setup + '; Раскомментируйте следующую строку для запуска установки в режиме без прав администратора (только для текущего пользователя).' + SNewLine + ';'
     else
-      Setup := Setup + '; Remove the following line to run in administrative install mode (install for all users.)' + SNewLine;
+      Setup := Setup + '; Удалите следующую строку для запуска установки в режиме с правами администратора (для всех пользователей).' + SNewLine;
     Setup := Setup + 'PrivilegesRequired=lowest' + SNewLine; { Note how previous made sure this is outputted as comment if needed. }
     if PrivilegesRequiredOverridesAllowedDialogCheckbox.Checked then
       Setup := Setup + 'PrivilegesRequiredOverridesAllowed=dialog' + SNewLine
@@ -1086,7 +1091,7 @@ begin
       Script := Script + Tasks + SNewLine;
     if Length(Files) > Length('[Files]')+2 then
       Script := Script + Files +
-        '; NOTE: Don''t use "Flags: ignoreversion" on any shared system files' +
+        '; Примечание: Не используйте флаги "ignoreversion" для общих системных файлов.' +
         SNewLine2;
     if Length(INI) > Length('[INI]')+2 then
       Script := Script + INI + SNewLine;

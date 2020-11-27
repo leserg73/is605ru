@@ -74,7 +74,7 @@ procedure TStartupForm.UpdateImages;
 
   function GetBitmap(const Button: TToolButton; const WH: Integer): TBitmap;
   begin
-    Result := CompileForm.LightToolBarImageCollection.GetBitmap(Button.ImageIndex, WH, WH)
+    Result := CompileForm.ToolBarImageCollection.GetBitmap(Button.ImageIndex, WH, WH)
   end;
 
 var
@@ -84,6 +84,13 @@ begin
   WH := MulDiv(16, CurrentPPI, 96);
   NewImage.Picture.Bitmap := GetBitmap(CompileForm.NewButton, WH);
   OpenImage.Picture.Bitmap := GetBitmap(CompileForm.OpenButton, WH);
+  // Trick loads image with transparent
+  //NewImage.Picture.Bitmap.Transparent := True;
+  NewImage.Picture.Bitmap.AlphaFormat := afDefined;
+  //NewImage.Picture.Bitmap.TransparentMode := tmAuto;
+  //OpenImage.Picture.Bitmap.Transparent := True;
+  OpenImage.Picture.Bitmap.AlphaFormat := afDefined;
+  //OpenImage.Picture.Bitmap.TransparentMode := tmAuto;
 end;
 
 procedure TStartupForm.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,

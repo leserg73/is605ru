@@ -49,10 +49,14 @@ type
     ColorizeCompilerOutputCheck: TCheckBox;
     Label3: TNewStaticText;
     ThemeComboBox: TComboBox;
+    BorderLineEndCheck: TCheckBox;
+    LineColonEdit: TEdit;
     procedure AssocButtonClick(Sender: TObject);
     procedure ChangeFontButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TabWidthEditChange(Sender: TObject);
+    procedure LineColonEditChange(Sender: TObject);
+    procedure BorderLineEndCheckClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -75,9 +79,9 @@ begin
     versions of Windows don't support "Run as" at all, so disable the check
     box there. }
   if Win32MajorVersion >= 6 then
-    RunAsDifferentUserCheck.Caption := 'Always &launch Setup/Uninstall as administrator'
+    RunAsDifferentUserCheck.Caption := 'Выполнять запуск от имени администратора'
   else
-    RunAsDifferentUserCheck.Caption := 'Always &launch Setup/Uninstall as different user';
+    RunAsDifferentUserCheck.Caption := 'Выполнять запуск от имени пользователя';
   RunAsDifferentUserCheck.Enabled := (Win32MajorVersion >= 5);
 
   { Order must match TThemeType. }
@@ -86,15 +90,28 @@ begin
   ThemeComboBox.Items.Add('Classic');
 end;
 
+procedure TOptionsForm.LineColonEditChange(Sender: TObject);
+begin
+  OKButton.Enabled := StrToIntDef(LineColonEdit.Text, 0) > 0;
+end;
+
 procedure TOptionsForm.AssocButtonClick(Sender: TObject);
 const
-  UserStrings: array [Boolean] of String = ('the current user', 'all users');
+  UserStrings: array [Boolean] of String = ('текущего пользователя', 'всех пользователей');
 var
   AllUsers: Boolean;
 begin
   if RegisterISSFileAssociation(True, AllUsers) then
-    MsgBox('The .iss extension was successfully associated for ' + UserStrings[AllUsers] + ' with:'#13#10 + NewParamStr(0),
-      'Associate', mbInformation, MB_OK);
+    MsgBox('Расширение .iss было успешно связано для ' + UserStrings[AllUsers] + ' с программой:'#13#10 + NewParamStr(0),
+      'Ассоциация', mbInformation, MB_OK);
+end;
+
+procedure TOptionsForm.BorderLineEndCheckClick(Sender: TObject);
+begin
+  if BorderLineEndCheck.Checked then
+     LineColonEdit.Enabled := True
+  else
+     LineColonEdit.Enabled := False;
 end;
 
 procedure TOptionsForm.ChangeFontButtonClick(Sender: TObject);

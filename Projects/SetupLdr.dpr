@@ -2,17 +2,24 @@ program SetupLdr;
 
 {
   Inno Setup
-  Copyright (C) 1997-2019 Jordan Russell
+  Copyright (C) 1997-2020 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
   Setup Loader
 }
 
-{$SetPEFlags 1} 
-{$SETPEOSVERSION 6.0}
-{$SETPESUBSYSVERSION 6.0}
-{$WEAKLINKRTTI ON}
+{$SetPEFlags 1}
+{$IFNDEF IS_WINXP}
+  {$SETPEOSVERSION 6.0}
+  {$SETPESUBSYSVERSION 6.0}
+{$ELSE}
+  {$SETPEOSVERSION 5.1}
+  {$SETPESUBSYSVERSION 5.1}
+{$ENDIF}
+{$IFNDEF VER200}
+  {$WEAKLINKRTTI ON}
+{$ENDIF}
 
 uses
   SafeDLLPath in 'SafeDLLPath.pas',

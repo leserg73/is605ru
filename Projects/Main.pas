@@ -1025,9 +1025,16 @@ const
      ('commondesktop', 'commonstartmenu', 'commonprograms', 'commonstartup',
       'usersendto', 'fonts', 'commonappdata', 'commondocs', 'commontemplates',
       'commonfavorites' { not accepted anymore by the compiler }, 'localappdata'));
+{$IFNDEF PS_MINIVCL}
+  // Added 'apphwnd'
+  NoUninstallConsts: array[0..7] of String =
+    ('src', 'srcexe', 'userinfoname', 'userinfoorg', 'userinfoserial', 'hwnd',
+     'wizardhwnd', 'apphwnd');
+{$ELSE}
   NoUninstallConsts: array[0..6] of String =
     ('src', 'srcexe', 'userinfoname', 'userinfoorg', 'userinfoserial', 'hwnd',
      'wizardhwnd');
+{$ENDIF}
 var
   OriginalCnst, ShellFolder: String;
   Common: Boolean;
@@ -1165,6 +1172,15 @@ begin
     else
       Result := '0';
   end
+{$IFNDEF PS_MINIVCL}
+  // Added 'apphwnd'
+  else if Cnst = 'apphwnd' then begin
+    if Assigned(Application) then
+      Result := IntToStr(Application.Handle)
+    else
+      Result := '0';
+  end
+{$ENDIF}
   else if Cnst = 'wizardhwnd' then begin
     if Assigned(WizardForm) then
       Result := IntToStr(WizardForm.Handle)
@@ -3832,9 +3848,9 @@ begin
     'Portions Copyright (C) 2000-2020 Martijn Laan' + SNewLine +
     'All rights reserved.' + SNewLine2 +
     'Inno Setup home page:' + SNewLine +
-    'http://www.innosetup.com/');
+    'https://www.innosetup.com/');
   S := S + SNewLine2 + 'RemObjects Pascal Script home page:' + SNewLine +
-    'http://www.remobjects.com/ps';
+    'https://www.remobjects.com/ps';
   if SetupMessages[msgAboutSetupNote] <> '' then
     S := S + SNewLine2 + SetupMessages[msgAboutSetupNote];
   if SetupMessages[msgTranslatorNote] <> '' then
@@ -4331,7 +4347,7 @@ begin
           else
             SetupExitCode := ecCancelledBeforeInstall;
           TerminateApp;
-        end;
+        end{ else WizardForm.UpdateComponentsList};
       ssInstall:
         if (shAllowCancelDuringInstall in SetupHeader.Options) and not InitNoCancel then
           if ConfirmCancel(True) then

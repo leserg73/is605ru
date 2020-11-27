@@ -14,7 +14,7 @@ unit Extract;
 interface
 
 uses
-  Windows, SysUtils, Int64Em, FileClass, Compress, Struct, ArcFour;
+  Windows, SysUtils, Int64Em, FileClass, Compress,{$IFNDEF PS_MINIVCL} Classes,{$ENDIF} Struct, ArcFour;
 
 type
   TExtractorProgressProc = procedure(Bytes: Cardinal);
@@ -40,6 +40,10 @@ type
     destructor Destroy; override;
     procedure DecompressFile(const FL: TSetupFileLocationEntry; const DestF: TFile;
       const ProgressProc: TExtractorProgressProc; const VerifyChecksum: Boolean);
+    {$IFNDEF PS_MINIVCL}
+    procedure DecompressFileM(const FL: TSetupFileLocationEntry; const DestM: TStream;
+      const ProgressProc: TExtractorProgressProc; const VerifyChecksum: Boolean);
+    {$ENDIF}
     procedure SeekTo(const FL: TSetupFileLocationEntry;
       const ProgressProc: TExtractorProgressProc);
     property CryptKey: String write FCryptKey;
@@ -376,5 +380,60 @@ begin
     Dec(FEntered);
   end;
 end;
+
+{$IFNDEF PS_MINIVCL}
+procedure TFileExtractor.DecompressFileM(const FL: TSetupFileLocationEntry;
+  const DestM: TStream; const ProgressProc: TExtractorProgressProc;
+  const VerifyChecksum: Boolean);
+var
+  BytesLeft: Integer64;
+  Context: TSHA1Context;
+  AddrOffset: LongWord;
+  BufSize: Cardinal;
+  Buf: array[0..65535] of Byte;
+  { ^ *must* be the same buffer size used by the compiler (TCompressionHandler),
+    otherwise the TransformCallInstructions call will break }
+begin
+  if FEntered <> 0 then
+    InternalError('Cannot call file extractor recursively');
+  Inc(FEntered);
+  try
+    BytesLeft := FL.OriginalSize;
+
+    SHA1Init(Context);
+
+    try
+      AddrOffset := 0;
+      while True do begin
+        BufSize := SizeOf(Buf);
+        if (BytesLeft.Hi = 0) and (BytesLeft.Lo < BufSize) then
+          BufSize := BytesLeft.Lo;
+        if BufSize = 0 then
+          Break;
+
+        DecompressBytes(Buf, BufSize);
+        if foCallInstructionOptimized in FL.Flags then begin
+          TransformCallInstructions(Buf, BufSize, False, AddrOffset);
+          Inc(AddrOffset, BufSize);  { may wrap, but OK }
+        end;
+        Dec64(BytesLeft, BufSize);
+        SHA1Update(Context, Buf, BufSize);
+        DestM.WriteBuffer(Buf, BufSize);
+
+        if Assigned(ProgressProc) then
+          ProgressProc(BufSize);
+      end;
+    except
+      on E: ECompressDataError do
+        SourceIsCorrupted(E.Message);
+    end;
+
+    if VerifyChecksum and not SHA1DigestsEqual(SHA1Final(Context), FL.SHA1Sum) then
+      SourceIsCorrupted('SHA-1 hash mismatch');
+  finally
+    Dec(FEntered);
+  end;
+end;
+{$ENDIF}
 
 end.

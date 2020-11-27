@@ -109,14 +109,9 @@ begin
     TStartMenuFolderTreeView(FFolderTreeView).OnChange := FolderTreeViewChange;
     TStartMenuFolderTreeView(FFolderTreeView).OnRename := WizardForm.GroupTreeRename;
   end;
-  FFolderTreeView.SetBounds(16, 64, 317, 229);
-  FFolderTreeView.Anchors := [akLeft, akTop, akRight, akBottom];
-  FFolderTreeView.Visible := False;
-  FFolderTreeView.Parent := Self;
+
   PathEdit.BringToFront;     { for MSAA }
   BrowseLabel.BringToFront;  { for MSAA }
-  FFolderTreeView.TabOrder := 2;
-  FFolderTreeView.Visible := True;
 
   InitializeFont;
 
@@ -137,7 +132,12 @@ begin
   OKButton.SetBounds(CancelButton.Left - ScalePixelsX(6) - W,
     OKButton.Top + YDiff, W, OKButton.Height);
   ClientHeight := ClientHeight + YDiff;
-
+  FFolderTreeView.SetBounds(PathEdit.Left, ScalePixelsX(64), PathEdit.Width, ScalePixelsY(229));
+  FFolderTreeView.Anchors := [akLeft, akTop, akRight, akBottom];
+  FFolderTreeView.Visible := False;
+  FFolderTreeView.Parent := Self;
+  FFolderTreeView.TabOrder := 2;
+  FFolderTreeView.Visible := True;
   FlipSizeAndCenterIfNeeded(True, WizardForm, False);
 end;
 
