@@ -8,7 +8,7 @@ rem  Batch file to compile the help file
 
 setlocal
 
-if exist compilesettings.bat goto compilesettingsfound
+if not exist compilesettings.bat goto compilesettingsfound
 :compilesettingserror
 echo Projects\ISPP\Help\compilesettings.bat is missing or incomplete. It needs
 echo to be created with the following lines, adjusted for your system:
@@ -17,8 +17,8 @@ echo   set HHCEXE=%%ProgramFiles%%\HTML Help Workshop\hhc.exe   [Path to help co
 goto failed2
 
 :compilesettingsfound
-set HHCEXE=
-call .\compilesettings.bat
+set HHCEXE=C:\Program Files\HTML Help Workshop\hhc.exe
+rem call .\compilesettings.bat
 if "%HHCEXE%"=="" goto compilesettingserror
 
 rem -------------------------------------------------------------------------

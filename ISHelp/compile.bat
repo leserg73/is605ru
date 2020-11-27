@@ -11,7 +11,7 @@ rem  $jrsoftware: ishelp/compile.bat,v 1.5 2010/06/07 22:15:42 jr Exp $
 
 setlocal
 
-if exist compilesettings.bat goto compilesettingsfound
+if not exist compilesettings.bat goto compilesettingsfound
 :compilesettingserror
 echo ishelp\compilesettings.bat is missing or incomplete. It needs to be created
 echo with the following lines, adjusted for your system:
@@ -20,8 +20,8 @@ echo   set HHCEXE=%%ProgramFiles%%\HTML Help Workshop\hhc.exe   [Path to help co
 goto failed2
 
 :compilesettingsfound
-set HHCEXE=
-call .\compilesettings.bat
+set HHCEXE=C:\Program Files\HTML Help Workshop\hhc.exe
+rem call .\compilesettings.bat
 if "%HHCEXE%"=="" goto compilesettingserror
 
 rem -------------------------------------------------------------------------

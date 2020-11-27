@@ -8,7 +8,7 @@ Display compile progress=Yes
 Full-text search=Yes
 Full text search stop list file=stoplist.stp
 Index file=hh_generated_index.hhk
-Language=0x409 English (United States)
+Language=0x419 Russian
 Title=Inno Setup Preprocessor Help
 
 [WINDOWS]
