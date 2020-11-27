@@ -1,8 +1,9 @@
 ; -- 64BitThreeArch.iss --
-; Demonstrates how to install a program built for three different
-; architectures (x86, x64, ARM64) using a single installer.
+;
+; Демонстрирует установку программы, собранной для трех различных
+; архитектур (x86, x64, ARM64), используя один инсталлятор.
 
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -14,22 +15,35 @@ UninstallDisplayIcon={app}\MyProg.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=userdocs:Inno Setup Examples Output
-; "ArchitecturesInstallIn64BitMode=x64 arm64" requests that the install
-; be done in "64-bit mode" on x64 & ARM64, meaning it should use the
-; native 64-bit Program Files directory and the 64-bit view of the
-; registry. On all other architectures it will install in "32-bit mode".
+
+; "ArchitecturesInstallIn64BitMode=x64 arm64" указывает выполнять установку
+; в "64-бит режиме" на x64 & ARM64 системах. Это означает, что будет
+; использоваться 64-бит каталог "Program Files" и 64-бит представление
+; реестра. На всех остальных архитектурах установка будет в "32-бит режиме".
 ArchitecturesInstallIn64BitMode=x64 arm64
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
-; Install MyProg-x64.exe if running on x64, MyProg-ARM64.exe if
-; running on ARM64, MyProg.exe otherwise.
-; Place all x64 files here
+; Файл MyProg-x64.exe будет установлен при запуске на x64 системе
+; Файл MyProg-ARM64.exe будет установлен при запуске на ARM64 системе 
+; Файл MyProg.exe будет установлен во всех остальных случаях
+
+; Поместите здесь все x64 файлы
 Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: InstallX64
-; Place all ARM64 files here, first one should be marked 'solidbreak'
+
+; Поместите здесь все ARM64 файлы, для первого должен быть установлен флаг 'solidbreak'
 Source: "MyProg-ARM64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: InstallARM64; Flags: solidbreak
-; Place all x86 files here, first one should be marked 'solidbreak'
+
+; Поместите здесь все x86 файлы, для первого должен быть установлен флаг 'solidbreak'
 Source: "MyProg.exe"; DestDir: "{app}"; Check: InstallOtherArch; Flags: solidbreak
-; Place all common files here, first one should be marked 'solidbreak'
+
+; Поместите здесь все общие файлы, для первого должен быть установлен флаг 'solidbreak'
 Source: "MyProg.chm"; DestDir: "{app}"; Flags: solidbreak
 Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 

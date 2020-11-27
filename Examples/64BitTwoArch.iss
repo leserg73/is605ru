@@ -1,11 +1,11 @@
 ; -- 64BitTwoArch.iss --
-; Demonstrates how to install a program built for two different
-; architectures (x86 and x64) using a single installer: on a "x86"
-; edition of Windows the x86 version of the program will be
-; installed but on a "x64" edition of Windows the x64 version will
-; be installed.
+;
+; Демонстрирует установку программы, собранной для двух различных
+; архитектур (x86 и x64), используя один инсталлятор: на "x86"
+; редакциях Windows будет установлена x86 версия программы, а на
+; "x64" редакциях Windows будет установлена x64 версия.
 
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -17,23 +17,34 @@ WizardStyle=modern
 Compression=lzma2
 SolidCompression=yes
 OutputDir=userdocs:Inno Setup Examples Output
-; "ArchitecturesInstallIn64BitMode=x64" requests that the install be
-; done in "64-bit mode" on x64, meaning it should use the native
-; 64-bit Program Files directory and the 64-bit view of the registry.
-; On all other architectures it will install in "32-bit mode".
+
+; "ArchitecturesInstallIn64BitMode=x64" указывает выполнять установку
+; в "64-бит режиме" на x64 & ARM64 системах. Это означает, что будет
+; использоваться 64-бит каталог "Program Files" и 64-бит представление
+; реестра. На всех остальных архитектурах установка будет в "32-бит режиме".
 ArchitecturesInstallIn64BitMode=x64
-; Note: We don't set ProcessorsAllowed because we want this
-; installation to run on all architectures (including Itanium,
-; since it's capable of running 32-bit code too).
+; Примечание: мы не используем ProcessorsAllowed, т.к. хотим, чтобы
+; инсталлятор мог быть запущен на всех архитектурах (включая Itanium,
+; так как он также способен выполнять 32-бит код).
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
-; Install MyProg-x64.exe if running in 64-bit mode (x64; see above),
-; MyProg.exe otherwise.
-; Place all x64 files here
+; Файл MyProg-x64.exe будет установлен при запуске на x64 системе
+; Файл MyProg.exe будет установлен во всех остальных случаях
+
+; Поместите здесь все x64 файлы
 Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Is64BitInstallMode
-; Place all x86 files here, first one should be marked 'solidbreak'
+
+; Поместите здесь все x86 файлы, для первого должен быть установлен флаг 'solidbreak'
 Source: "MyProg.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak
-; Place all common files here, first one should be marked 'solidbreak'
+
+; Поместите здесь все общие файлы, для первого должен быть установлен флаг 'solidbreak'
 Source: "MyProg.chm"; DestDir: "{app}"; Flags: solidbreak
 Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 

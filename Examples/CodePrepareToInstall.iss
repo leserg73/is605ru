@@ -1,8 +1,10 @@
 ; -- CodePrepareToInstall.iss --
 ;
-; This script shows how the PrepareToInstall event function can be used to
-; install prerequisites and handle any reboots in between, while remembering
-; user selections across reboots.
+; Демонстрирует особенности использования событий функции PrepareToInstall
+; для установки важных файлов, проверки зависимостей и обработки любых
+; перезагрузок, запоминая сделанный пользователем выбор.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -13,10 +15,18 @@ DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
-; Place any prerequisite files here, for example:
+; Разместите здесь все важные файлы, например:
 ; Source: "MyProg-Prerequisite-setup.exe"; Flags: dontcopy
-; Place any regular files here, so *after* all your prerequisites.
+
+; Разместите здесь все остальные файлы после важных
 Source: "MyProg.exe"; DestDir: "{app}";
 Source: "MyProg.chm"; DestDir: "{app}";
 Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme;
@@ -26,11 +36,11 @@ Name: "{group}\My Program"; Filename: "{app}\MyProg.exe"
 
 [Code]
 const
-  (*** Customize the following to your own name. ***)
-  RunOnceName = 'My Program Setup restart';
+  (*** Строки сообщений (измените их согласно собственным задачам). ***)
+  RunOnceName = 'Перезапуск установки My Program';
 
-  QuitMessageReboot = 'The installation of a prerequisite program was not completed. You will need to restart your computer to complete that installation.'#13#13'After restarting your computer, Setup will continue next time an administrator logs in.';
-  QuitMessageError = 'Error. Cannot continue.';
+  QuitMessageReboot = 'Установка важных файлов программы не была завершена. Чтобы завершить установку, необходимо перезагрузить компьютер.'#13#13'После перезагрузки компьютера установка будет продолжена, как только администратор войдет в систему.';
+  QuitMessageError = 'Ошибка. Невозможно продолжить установку.';
 
 var
   Restarted: Boolean;
@@ -49,15 +59,15 @@ end;
 
 function DetectAndInstallPrerequisites: Boolean;
 begin
-  (*** Place your prerequisite detection and extraction+installation code below. ***)
-  (*** Return False if missing prerequisites were detected but their installation failed, else return True. ***)
+  (*** Разместите ниже код обнаружения зависимостей, извлечения и установки. ***)
+  (*** Функция вернёт False, если важные файлы не найдены или их установка не удалась, иначе True. ***)
 
-  //<your code here>
-  //extraction example: ExtractTemporaryFile('MyProg-Prerequisite-setup.exe');
+  //<введите здесь ваш код>
+  //пример извлечения: ExtractTemporaryFile('MyProg-Prerequisite-setup.exe');
 
   Result := True;
 
-  (*** Remove the following block! Used by this demo to simulate a prerequisite install requiring a reboot. ***)
+  (*** Удалите следующий блок кода. Он используется только для имитации установки зависимостей и перезагрузки. ***)
   if not Restarted then
     RestartReplace(ParamStr(0), '');
 end;
@@ -87,14 +97,14 @@ begin
   RunOnceData := AddParam(RunOnceData, 'DIR', Quote(WizardDirValue));
   RunOnceData := AddParam(RunOnceData, 'GROUP', Quote(WizardGroupValue));
   if WizardNoIcons then
-    RunOnceData := AddSimpleParam(RunOnceData, 'NOICONS');
+     RunOnceData := AddSimpleParam(RunOnceData, 'NOICONS');
   RunOnceData := AddParam(RunOnceData, 'TYPE', Quote(WizardSetupType(False)));
   RunOnceData := AddParam(RunOnceData, 'COMPONENTS', Quote(WizardSelectedComponents(False)));
   RunOnceData := AddParam(RunOnceData, 'TASKS', Quote(WizardSelectedTasks(False)));
 
-  (*** Place any custom user selection you want to remember below. ***)
+  (*** Разместите ниже выбранные пользователем данные, которые необходимо запомнить. ***)
 
-  //<your code here>
+  //<введите здесь ваш код>
   
   RegWriteStringValue(HKA, 'Software\Microsoft\Windows\CurrentVersion\RunOnce', RunOnceName, RunOnceData);
 end;

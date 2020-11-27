@@ -1,6 +1,8 @@
 ; -- CodeClasses.iss --
 ;
-; This script shows how to use the WizardForm object and the various VCL classes.
+; Демонстрирует использование объектов WizardForm и различных VCL классов.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -13,7 +15,14 @@ UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
 PrivilegesRequired=lowest
 
-; Uncomment the following three lines to test the layout when scaling and rtl are active
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
+; Раскомментируйте следующие три строки для проверки масштабирования и rtl
 ;[LangOptions]
 ;RightToLeft=yes
 ;DialogFontSize=12
@@ -24,12 +33,12 @@ Source: compiler:WizModernSmallImage.bmp; Flags: dontcopy
 [Code]
 procedure ButtonOnClick(Sender: TObject);
 begin
-  MsgBox('You clicked the button!', mbInformation, mb_Ok);
+  MsgBox('Вы нажали на кнопку!', mbInformation, mb_Ok);
 end;
 
 procedure BitmapImageOnClick(Sender: TObject);
 begin
-  MsgBox('You clicked the image!', mbInformation, mb_Ok);
+  MsgBox('Вы нажали на изображение!', mbInformation, mb_Ok);
 end;
 
 procedure FormButtonOnClick(Sender: TObject);
@@ -60,7 +69,7 @@ begin
     OKButton.Width := ScaleX(75);
     OKButton.Height := ScaleY(23);
     OKButton.Anchors := [akRight, akBottom]
-    OKButton.Caption := 'OK';
+    OKButton.Caption := 'ОК';
     OKButton.ModalResult := mrOk;
     OKButton.Default := True;
 
@@ -71,18 +80,20 @@ begin
     CancelButton.Width := ScaleX(75);
     CancelButton.Height := ScaleY(23);
     CancelButton.Anchors := [akRight, akBottom]
-    CancelButton.Caption := 'Cancel';
+    CancelButton.Caption := 'Отмена';
     CancelButton.ModalResult := mrCancel;
     CancelButton.Cancel := True;
 
     Form.ActiveControl := Edit;
-    { Keep the form from sizing vertically since we don't have any controls which can size vertically }
+    { Блокируем изменения размеров формы по вертикали, поскольку у нас нет }
+    { элементов управления, которые могут изменять размер по вертикали }
     Form.KeepSizeY := True;
-    { Center on WizardForm. Without this call it will still automatically center, but on the screen }
+    { Размещаем по центру WizardForm. Без вызова этой функции размещение }
+    { все равно автоматически будет по центру, но уже относительно экрана }
     Form.FlipSizeAndCenterIfNeeded(True, WizardForm, False);
 
     if Form.ShowModal() = mrOk then
-      MsgBox('You clicked OK.', mbInformation, MB_OK);
+      MsgBox('Вы нажали кнопку ОК.', mbInformation, MB_OK);
   finally
     Form.Free();
   end;
@@ -90,15 +101,16 @@ end;
 
 procedure TaskDialogButtonOnClick(Sender: TObject);
 begin
-  { TaskDialogMsgBox isn't a class but showing it anyway since it fits with the theme }
+  { TaskDialogMsgBox не является классом, но показывает сообщение
+    в любом случае, поскольку соответствует тематике выбора }
 
-  case TaskDialogMsgBox('Choose A or B',
-                        'You can choose A or B.',   
+  case TaskDialogMsgBox('Выберите A или B',
+                        'Вы можете выбрать A или B.',   
                         mbInformation,
-                        MB_YESNOCANCEL, ['I choose &A'#13#10'A will be chosen.', 'I choose &B'#13#10'B will be chosen.'],
+                        MB_YESNOCANCEL, ['Я выбираю &A'#13#10'Будет выбрано A.', 'Я выбираю &B'#13#10'Будет выбрано B.'],
                         IDYES) of
-    IDYES: MsgBox('You chose A.', mbInformation, MB_OK);
-    IDNO: MsgBox('You chose B.', mbInformation, MB_OK);
+    IDYES: MsgBox('Вы выбрали A.', mbInformation, MB_OK);
+    IDNO: MsgBox('Вы выбрали B.', mbInformation, MB_OK);
   end;
 end;
 
@@ -121,9 +133,9 @@ var
   BitmapFileName: String;
   RichEditViewer: TRichEditViewer;
 begin
-  { TButton and others }
+  { Элемент управления TButton и другие }
 
-  Page := CreateCustomPage(wpWelcome, 'Custom wizard page controls', 'TButton and others');
+  Page := CreateCustomPage(wpWelcome, 'Страница с элементами управления', 'TButton и другие');
 
   Button := TNewButton.Create(Page);
   Button.Width := ScaleX(75);
@@ -194,9 +206,9 @@ begin
   TaskDialogButton.OnClick := @TaskDialogButtonOnClick;
   TaskDialogButton.Parent := Page.Surface;
 
-  { TComboBox and others }
+  { Элемент управления TComboBox и другие }
 
-  Page := CreateCustomPage(Page.ID, 'Custom wizard page controls', 'TComboBox and others');
+  Page := CreateCustomPage(Page.ID, 'Страница с элементами управления', 'TComboBox и другие');
 
   ComboBox := TNewComboBox.Create(Page);
   ComboBox.Width := Page.SurfaceWidth;
@@ -246,7 +258,7 @@ begin
   ProgressBar2.Anchors := [akLeft, akRight, akBottom];
   ProgressBar2.Parent := Page.Surface;
   ProgressBar2.Position := 50;
-  { Note: TNewProgressBar.State property only has an effect on Windows Vista and newer }
+  { Примечание: свойство TNewProgressBar.State имеет эффект только на Windows Vista и выше }
   ProgressBar2.State := npbsError;
 
   ProgressBar3 := TNewProgressBar.Create(Page);
@@ -256,12 +268,12 @@ begin
   ProgressBar3.Height := ProgressBarLabel.Height + ScaleY(8);
   ProgressBar3.Anchors := [akLeft, akRight, akBottom];
   ProgressBar3.Parent := Page.Surface;
-  { Note: TNewProgressBar.Style property only has an effect on Windows XP and newer }
+  { Примечание: свойство TNewProgressBar.Style имеет эффект только на Windows XP и выше }
   ProgressBar3.Style := npbstMarquee;
   
-  { TNewCheckListBox }
+  { Элемент управления TNewCheckListBox }
 
-  Page := CreateCustomPage(Page.ID, 'Custom wizard page controls', 'TNewCheckListBox');
+  Page := CreateCustomPage(Page.ID, 'Страница с элементами управления', 'TNewCheckListBox');
 
   CheckListBox := TNewCheckListBox.Create(Page);
   CheckListBox.Width := Page.SurfaceWidth;
@@ -293,9 +305,9 @@ begin
   CheckListBox2.AddRadioButton('TNewCheckListBox', '', 0, True, True, nil);
   CheckListBox2.AddRadioButton('TNewCheckListBox', '', 0, False, True, nil);
 
-  { TFolderTreeView }
+  { Элемент управления TFolderTreeView }
 
-  Page := CreateCustomPage(Page.ID, 'Custom wizard page controls', 'TFolderTreeView');
+  Page := CreateCustomPage(Page.ID, 'Страница с элементами управления', 'TFolderTreeView');
 
   FolderTreeView := TFolderTreeView.Create(Page);
   FolderTreeView.Width := Page.SurfaceWidth;
@@ -304,9 +316,9 @@ begin
   FolderTreeView.Parent := Page.Surface;
   FolderTreeView.Directory := ExpandConstant('{src}');
 
-  { TBitmapImage }
+  { Элемент управления TBitmapImage }
 
-  Page := CreateCustomPage(Page.ID, 'Custom wizard page controls', 'TBitmapImage');
+  Page := CreateCustomPage(Page.ID, 'Страница с элементами управления', 'TBitmapImage');
 
   BitmapFileName := ExpandConstant('{tmp}\WizModernSmallImage.bmp');
   ExtractTemporaryFile(ExtractFileName(BitmapFileName));
@@ -340,16 +352,16 @@ begin
   BitmapImage3.OnClick := @BitmapImageOnClick;
   BitmapImage3.Parent := Page.Surface;
 
-  { TRichViewer }
+  { Элемент управления TRichViewer }
 
-  Page := CreateCustomPage(Page.ID, 'Custom wizard page controls', 'TRichViewer');
+  Page := CreateCustomPage(Page.ID, 'Страница с элементами управления', 'TRichViewer');
 
   RichEditViewer := TRichEditViewer.Create(Page);
   RichEditViewer.Width := Page.SurfaceWidth;
   RichEditViewer.Height := Page.SurfaceHeight;
   RichEditViewer.Anchors := [akLeft, akTop, akRight, akBottom];
   RichEditViewer.BevelKind := bkFlat;
-  RichEditViewer.BorderStyle := bsNone;
+  RichEditViewer.BorderStyle := bsSingle;
   RichEditViewer.Parent := Page.Surface;
   RichEditViewer.ScrollBars := ssVertical;
   RichEditViewer.UseRichEdit := True;
@@ -359,7 +371,7 @@ end;
 
 procedure AboutButtonOnClick(Sender: TObject);
 begin
-  MsgBox('This demo shows some features of the various form objects and control classes.', mbInformation, mb_Ok);
+  MsgBox('Этот пример показывает некоторые особенности различных объектов и классов формы.', mbInformation, mb_Ok);
 end;
 
 procedure URLLabelOnClick(Sender: TObject);
@@ -380,7 +392,7 @@ begin
   AboutButton.Width := CancelButton.Width;
   AboutButton.Height := CancelButton.Height;
   AboutButton.Anchors := [akLeft, akBottom];
-  AboutButton.Caption := '&About...';
+  AboutButton.Caption := '&О программе...';
   AboutButton.OnClick := @AboutButtonOnClick;
   AboutButton.Parent := ParentForm;
 
@@ -389,7 +401,7 @@ begin
   URLLabel.Cursor := crHand;
   URLLabel.OnClick := @URLLabelOnClick;
   URLLabel.Parent := ParentForm;
-  { Alter Font *after* setting Parent so the correct defaults are inherited first }
+  { Изменяем шрифт *после* параметра Parent, чтобы корректно наследовались первоначальные }
   URLLabel.Font.Style := URLLabel.Font.Style + [fsUnderline];
   URLLabel.Font.Color := clHotLight
   URLLabel.Top := AboutButton.Top + AboutButton.Height - URLLabel.Height - 2;
@@ -399,22 +411,22 @@ end;
 
 procedure InitializeWizard();
 begin
-  { Custom wizard pages }
+  { Пользовательские страницы мастера }
 
   CreateTheWizardPages;
   
-  { Custom controls }
+  { Пользовательские элементы управления }
 
   CreateAboutButtonAndURLLabel(WizardForm, WizardForm.CancelButton);
 
-  { Custom beveled label }
+  { Пользовательская метка }
 
   WizardForm.BeveledLabel.Caption := ' Bevel ';
 end;
 
 procedure InitializeUninstallProgressForm();
 begin
-  { Custom controls }
+  { Пользовательские элементы управления }
 
   CreateAboutButtonAndURLLabel(UninstallProgressForm, UninstallProgressForm.CancelButton);
 end;

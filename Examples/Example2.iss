@@ -1,21 +1,31 @@
 ; -- Example2.iss --
-; Same as Example1.iss, but creates its icon in the Programs folder of the
-; Start Menu instead of in a subfolder, and also creates a desktop icon.
+;
+; Этот пример аналогичен сценарию Example1.iss, за исключением места создания значка.
+; Он будет создан в меню ПУСК -> Программы, а также на Рабочем столе.
 
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
 AppVersion=1.5
 WizardStyle=modern
 DefaultDirName={autopf}\My Program
-; Since no icons will be created in "{group}", we don't need the wizard
-; to ask for a Start Menu folder name:
+
+; Поскольку мы не будем создавать значки в "{group}", то
+; укажем мастеру не запрашивать имя папки в меню ПУСК:
 DisableProgramGroupPage=yes
+
 UninstallDisplayIcon={app}\MyProg.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=userdocs:Inno Setup Examples Output
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"

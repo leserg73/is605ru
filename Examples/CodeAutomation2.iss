@@ -1,11 +1,13 @@
 ; -- CodeAutomation2.iss --
 ;
-; This script shows how to use IUnknown based COM Automation objects.
+; Демонстрирует использование IUnknown на основе объектов COM Automation.
 ;
-; Note: some unneeded interface functions which had special types have been replaced
-; by dummies to avoid having to define those types. Do not remove these dummies as
-; that would change the function indices which is bad. Also, not all function
-; protoypes have been tested, only those used by this example.
+; Примечание: некоторые ненужные интерфейсные функции, которые имели специальные типы,
+; были заменены на фиктивные (заглушки), чтобы избежать необходимости их определения.
+; Не удаляйте эти заглушки, так как это может изменить индексы функций. Кроме того,
+; не все прототипы функций были протестированы, только те, что используются в этом примере.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -17,6 +19,13 @@ DisableProgramGroupPage=yes
 DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Code]
 
@@ -69,20 +78,20 @@ var
   SL: IShellLinkW;
   PF: IPersistFile;
 begin
-  { Create the main ShellLink COM Automation object }
+  { Создание главного объекта ShellLink COM Automation }
   Obj := CreateComObject(StringToGuid(CLSID_ShellLink));
 
-  { Set the shortcut properties }
+  { Установка свойств ярлыка }
   SL := IShellLinkW(Obj);
   OleCheck(SL.SetPath(ExpandConstant('{srcexe}')));
   OleCheck(SL.SetArguments(''));
   OleCheck(SL.SetShowCmd(SW_SHOWNORMAL));
 
-  { Save the shortcut }
+  { Запись ярлыка }
   PF := IPersistFile(Obj);
   OleCheck(PF.Save(ExpandConstant('{autodesktop}\CodeAutomation2 Test.lnk'), True));
 
-  MsgBox('Saved a shortcut named ''CodeAutomation2 Test'' on the desktop.', mbInformation, mb_Ok);
+  MsgBox('Ярлык с именем ''CodeAutomation2 Test'' сохранён на общем Рабочем столе.', mbInformation, mb_Ok);
 end;
 
 {--- ITaskScheduler ---}
@@ -126,7 +135,7 @@ type
     rgfMonths: WORD;
   end;
 
-  { ROPS doesn't support unions, replace this with the type you need and adjust padding (end size has to be 48). }
+  { ROPS не поддерживает объединения, замените его на нужный вам тип и настройте отступы (конечный размер должен быть 48). }
   TTriggerTypeUnion = record
     Daily: TDaily;
     Pad1: WORD;
@@ -222,29 +231,29 @@ var
   TaskTrigger2: TTaskTrigger;
   PF: IPersistFile;
 begin
-  { Create the main TaskScheduler COM Automation object }
+  { Создание главного объекта TaskScheduler COM Automation }
   Obj := CreateComObject(StringToGuid(CLSID_TaskScheduler));
 
-  { Create the Task COM automation object }
+  { Создание объекта Task COM Automation }
   TaskScheduler := ITaskScheduler(Obj);
   G1 := StringToGuid(CLSID_Task);
   G2 := StringToGuid(IID_Task);
-  //This will throw an exception if the task already exists
+  // Вызываем исключение, если задание уже существует
   OleCheck(TaskScheduler.NewWorkItem('CodeAutomation2 Test', G1, G2, Obj2));
 
-  { Set the task properties }
+  { Установка свойств задания }
   Task := ITask(Obj2);
   OleCheck(Task.SetComment('CodeAutomation2 Test Comment'));
   OleCheck(Task.SetApplicationName(ExpandConstant('{srcexe}')));
 
-  { Set the task account information }
-  //Uncomment the following and provide actual user info to get a runnable task
+  { Установка данных учетной записи задания }
+  // Раскомментируйте команду ниже и предоставьте фактические данные о пользователе, чтобы получить работоспособное задание
   //OleCheck(Task.SetAccountInformation('username', 'password'));
 
-  { Create the TaskTrigger COM automation object }
+  { Создание объекта TaskTrigger COM Automation }
   OleCheck(Task.CreateTrigger(iNewTrigger, TaskTrigger));
 
-  { Set the task trigger properties }
+  { Установка свойств срабатывания задания }
   with TaskTrigger2 do begin
     cbTriggerSize := SizeOf(TaskTrigger2);
     wBeginYear := 2009;
@@ -256,11 +265,11 @@ begin
   end;
   OleCheck(TaskTrigger.SetTrigger(TaskTrigger2));
 
-  { Save the task }
+  { Запись задания }
   PF := IPersistFile(Obj2);
   OleCheck(PF.Save('', True));
 
-  MsgBox('Created a daily task named named ''CodeAutomation2 Test''.' + #13#13 + 'Note: Account information not set so the task won''t actually run, uncomment the SetAccountInfo call and provide actual user info to get a runnable task.', mbInformation, mb_Ok);
+  MsgBox('Создано ежедневное задание с именем ''CodeAutomation2 Test''.' + #13#13 + 'Примечание: Информация об учётной записи не предоставлена, поэтому задание будет неработоспособным. Раскомментируйте вызов SetAccountInfo и укажите фактические данные учётной записи, чтобы получить работоспособное задание.', mbInformation, mb_Ok);
 end;
 
 {---}

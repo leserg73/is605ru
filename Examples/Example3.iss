@@ -1,8 +1,10 @@
 ; -- Example3.iss --
-; Same as Example1.iss, but creates some registry entries too and allows the end
-; use to choose the install mode (administrative or non administrative).
+;
+; Этот пример аналогичен сценарию Example1.iss, но ещё дополнительно 
+; создает ключи в реестре и позволяет пользователю выбрать режим установки
+; (административный или не административный).
 
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -18,6 +20,13 @@ ChangesAssociations=yes
 UserInfoPage=yes
 PrivilegesRequiredOverridesAllowed=dialog
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
@@ -26,38 +35,43 @@ Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 [Icons]
 Name: "{group}\My Program"; Filename: "{app}\MyProg.exe"
 
-; NOTE: Most apps do not need registry entries to be pre-created. If you
-; don't know what the registry is or if you need to use it, then chances are
-; you don't need a [Registry] section.
+; ПРМЕЧАНИЕ: Большинству приложений не требуется предварительно создавать ключи
+; в реестре. Если вы не знаете, что такое "Реестр" и как его нужно использовать,
+; то скорее всего раздел [Registry] вам не нужен.
 
 [Registry]
-; Create "Software\My Company\My Program" keys under CURRENT_USER or
-; LOCAL_MACHINE depending on administrative or non administrative install
-; mode. The flags tell it to always delete the "My Program" key upon
-; uninstall, and delete the "My Company" key if there is nothing left in it.
+; Создаем ключ "Software\My Company\My Program" в разделе CURRENT_USER или
+; LOCAL_MACHINE в зависимости от режима установки (административный или не
+; административный). Флаги указывают удаление ключа "My Program" и удаление
+; ключа "My Company", если он пустой, при деинсталляции.
 Root: HKA; Subkey: "Software\My Company"; Flags: uninsdeletekeyifempty
 Root: HKA; Subkey: "Software\My Company\My Program"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "Language"; ValueData: "{language}"
-; Associate .myp files with My Program (requires ChangesAssociations=yes)
+
+; Ассоциация файлов с расширением .myp с программой "My Program"
+; (требуется использовать ChangesAssociations=yes)
 Root: HKA; Subkey: "Software\Classes\.myp"; ValueType: string; ValueName: ""; ValueData: "MyProgramFile.myp"; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\.myp\OpenWithProgids"; ValueType: string; ValueName: "MyProgramFile.myp"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\MyProgramFile.myp"; ValueType: string; ValueName: ""; ValueData: "My Program File"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\Classes\MyProgramFile.myp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\MyProg.exe,0"
 Root: HKA; Subkey: "Software\Classes\MyProgramFile.myp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\MyProg.exe"" ""%1"""
-; HKA (and HKCU) should only be used for settings which are compatible with
-; roaming profiles so settings like paths should be written to HKLM, which
-; is only possible in administrative install mode.
+
+; Разделы реестра HKA (и HKCU) следует использовать только для настроек,
+; которые совместимы с перемещаемыми профилями, поэтому такие настройки,
+; как пути, должны быть записаны в HKLM, что возможно только в режиме
+; административной установки.
 Root: HKLM; Subkey: "Software\My Company"; Flags: uninsdeletekeyifempty; Check: IsAdminInstallMode
 Root: HKLM; Subkey: "Software\My Company\My Program"; Flags: uninsdeletekey; Check: IsAdminInstallMode
 Root: HKLM; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Check: IsAdminInstallMode
-; User specific settings should always be written to HKCU, which should only
-; be done in non administrative install mode.
+
+; Пользовательские настройки всегда должны быть записаны в HKCU,
+; что должно быть сделано только в режиме не административной установки.
 Root: HKCU; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "UserName"; ValueData: "{userinfoname}"; Check: not IsAdminInstallMode
 Root: HKCU; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "UserOrganization"; ValueData: "{userinfoorg}"; Check: not IsAdminInstallMode
 
 [Code]
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-  // User specific pages should be skipped in administrative install mode
+  // Страница с данными пользователя может быть пропущена в режиме административной установки
   Result := IsAdminInstallMode and (PageID = wpUserInfo);
 end;

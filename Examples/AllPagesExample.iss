@@ -1,7 +1,9 @@
 ; -- AllPagesExample.iss --
-; Same as Example1.iss, but shows all the wizard pages Setup may potentially display
+;
+; Демонстрирует все страницы мастера программы установки,
+; которые потенциально могут быть показаны пользователю.
 
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -25,6 +27,13 @@ DisableDirPage=no
 DisableProgramGroupPage=no
 InfoAfterFile=readme.txt
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
@@ -34,10 +43,10 @@ Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 Name: "{group}\My Program"; Filename: "{app}\MyProg.exe"
 
 [Components]
-Name: "component"; Description: "Component";
+Name: "component"; Description: "Компонент программы";
 
 [Tasks]
-Name: "task"; Description: "Task";
+Name: "task"; Description: "Задача";
 
 [Code]
 var
@@ -74,7 +83,7 @@ begin
   AfterID := InputDirWizardPage.ID;
 
   InputFileWizardPage := CreateInputFilePage(AfterID, 'CreateInputFilePage', 'ADescription', 'ASubCaption');
-  InputFileWizardPage.Add('&APrompt:', 'Executable files|*.exe|All files|*.*', '.exe');
+  InputFileWizardPage.Add('&APrompt:', 'Исполняемые файлы|*.exe|Все файлы|*.*', '.exe');
   AfterID := InputFileWizardPage.ID;
 
   OutputMsgWizardPage := CreateOutputMsgPage(AfterID, 'CreateOutputMsgPage', 'ADescription', 'AMsg');
@@ -109,6 +118,6 @@ end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
-  if SuppressibleMsgBox('Do you want to stop Setup at the Preparing To Install wizard page?', mbConfirmation, MB_YESNO, IDNO) = IDYES then
-    Result := 'Stopped by user';
+  if SuppressibleMsgBox('Вы хотите остановить выполнение на странице подготовки к установке?', mbConfirmation, MB_YESNO, IDNO) = IDYES then
+    Result := 'Остановлено пользователем';
 end;

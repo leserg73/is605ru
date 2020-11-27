@@ -1,7 +1,10 @@
 ; -- ISPPExample1.iss --
 ;
-; This script shows various basic things you can achieve using Inno Setup Preprocessor (ISPP).
-; To enable commented #define's, either remove the ';' or use ISCC with the /D switch.
+; Демонстрирует основные принципы использования препроцессора Inno Setup (ISPP).
+; Для включения закомментированных #define-ов просто удалите знак ';'
+; или используйте ISCC с ключом /D.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 #pragma option -v+
 #pragma verboselevel 9
@@ -28,6 +31,13 @@ UninstallDisplayIcon={app}\MyProg.exe
 LicenseFile={#file AddBackslash(SourcePath) + "ISPPExample1License.txt"}
 VersionInfoVersion={#AppVersion}
 OutputDir=userdocs:Inno Setup Examples Output
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"

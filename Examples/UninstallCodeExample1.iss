@@ -1,6 +1,8 @@
 ; -- UninstallCodeExample1.iss --
 ;
-; This script shows various things you can achieve using a [Code] section for Uninstall.
+; Демонстрирует особенности использования секции [Code] для деинсталляции (Uninstall).
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -11,6 +13,13 @@ DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
@@ -19,14 +28,14 @@ Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
 [Code]
 function InitializeUninstall(): Boolean;
 begin
-  Result := MsgBox('InitializeUninstall:' #13#13 'Uninstall is initializing. Do you really want to start Uninstall?', mbConfirmation, MB_YESNO) = idYes;
+  Result := MsgBox('InitializeUninstall:' #13#13 'Выполнена инициализация деинсталлятора. Вы действительно хотите начать удаление?', mbConfirmation, MB_YESNO) = idYes;
   if Result = False then
-    MsgBox('InitializeUninstall:' #13#13 'Ok, bye bye.', mbInformation, MB_OK);
+    MsgBox('InitializeUninstall:' #13#13 'Ну, ладно. Пока-пока.', mbInformation, MB_OK);
 end;
 
 procedure DeinitializeUninstall();
 begin
-  MsgBox('DeinitializeUninstall:' #13#13 'Bye bye!', mbInformation, MB_OK);
+  MsgBox('DeinitializeUninstall:' #13#13 'Пока-пока!', mbInformation, MB_OK);
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
@@ -34,13 +43,13 @@ begin
   case CurUninstallStep of
     usUninstall:
       begin
-        MsgBox('CurUninstallStepChanged:' #13#13 'Uninstall is about to start.', mbInformation, MB_OK)
-        // ...insert code to perform pre-uninstall tasks here...
+        MsgBox('CurUninstallStepChanged:' #13#13 'Скоро начнется деинсталляция.', mbInformation, MB_OK)
+        // ...здесь вставьте код для выполнения каких-то задач перед деинсталляцией...
       end;
     usPostUninstall:
       begin
-        MsgBox('CurUninstallStepChanged:' #13#13 'Uninstall just finished.', mbInformation, MB_OK);
-        // ...insert code to perform post-uninstall tasks here...
+        MsgBox('CurUninstallStepChanged:' #13#13 'Деинсталляция завершена.', mbInformation, MB_OK);
+        // ...здесь вставьте код для выполнения каких-то задач после деинсталляции...
       end;
   end;
 end;

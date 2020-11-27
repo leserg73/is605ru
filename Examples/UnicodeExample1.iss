@@ -1,7 +1,9 @@
 ﻿; -- UnicodeExample1.iss --
-; Demonstrates some Unicode functionality.
 ;
-; SEE THE DOCUMENTATION FOR DETAILS ON CREATING .ISS SCRIPT FILES!
+; Демонстрирует некоторые функциональные возможности Unicode.
+; ВНИМАНИЕ! КОДИРОВКА СЦЕНАРИЯ UTF-8-BOM
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=ɯɐɹƃoɹd ʎɯ
@@ -13,6 +15,10 @@ UninstallDisplayIcon={app}\ƃoɹdʎɯ.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=userdocs:Inno Setup Examples Output
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile=compiler:Examples\Glow.vsf
 
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"; DestName: "ƃoɹdʎɯ.exe"

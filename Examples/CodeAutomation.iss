@@ -1,6 +1,8 @@
 ; -- CodeAutomation.iss --
 ;
-; This script shows how to use IDispatch based COM Automation objects.
+; Демонстрирует использование IDispatch на основе объектов COM Automation.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -12,6 +14,13 @@ DisableProgramGroupPage=yes
 DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
+
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Code]
 
@@ -26,25 +35,25 @@ var
   SQLServer, Database, DBFile, LogFile: Variant;
   IDColumn, NameColumn, Table: Variant;
 begin
-  if MsgBox('Setup will now connect to Microsoft SQL Server ''' + SQLServerName + ''' via a trusted connection and create a database. Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки выполнит подключение к серверу Microsoft SQL ''' + SQLServerName + ''' и создаст базу данных. Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
 
-  { Create the main SQLDMO COM Automation object }
+  { Создание главного объекта SQLDMO COM Automation }
 
   try
     SQLServer := CreateOleObject('SQLDMO.SQLServer');
   except
-    RaiseException('Please install Microsoft SQL server connectivity tools first.'#13#13'(Error ''' + GetExceptionMessage + ''' occurred)');
+    RaiseException('Сначала установите сервер Microsoft SQL.'#13#13'(Произошла ошибка ''' + GetExceptionMessage + ''')');
   end;
 
-  { Connect to the Microsoft SQL Server }
+  { Подключение к серверу Microsoft SQL }
 
   SQLServer.LoginSecure := True;
   SQLServer.Connect(SQLServerName);
   
-  MsgBox('Connected to Microsoft SQL Server ''' + SQLServerName + '''.', mbInformation, mb_Ok);
+  MsgBox('Выполнено подключение к серверу Microsoft SQL ''' + SQLServerName + '''.', mbInformation, mb_Ok);
 
-  { Setup a database }
+  { Установка базы данных }
 
   Database := CreateOleObject('SQLDMO.Database');
   Database.Name := 'Inno Setup';
@@ -64,13 +73,13 @@ begin
 
   Database.TransactionLog.LogFiles.Add(LogFile);
   
-  { Add the database }
+  { Добавление в базу данных }
 
   SQLServer.Databases.Add(Database);
 
   MsgBox('Added database ''' + Database.Name + '''.', mbInformation, mb_Ok);
 
-  { Setup some columns }
+  { Установка некоторых полей }
 
   IDColumn := CreateOleObject('SQLDMO.Column');
   IDColumn.Name := 'id';
@@ -86,20 +95,20 @@ begin
   NameColumn.Length := '64';
   NameColumn.AllowNulls := False;
   
-  { Setup a table }
+  { Установка таблицы }
 
   Table := CreateOleObject('SQLDMO.Table');
   Table.Name := 'authors';
   Table.FileGroup := 'PRIMARY';
   
-  { Add the columns and the table }
+  { Добавление колонок в таблицу }
   
   Table.Columns.Add(IDColumn);
   Table.Columns.Add(NameColumn);
 
   Database.Tables.Add(Table);
 
-  MsgBox('Added table ''' + Table.Name + '''.', mbInformation, mb_Ok);
+  MsgBox('Добавлена таблица ''' + Table.Name + '''.', mbInformation, mb_Ok);
 end;
 
 {--- IIS ---}
@@ -114,24 +123,24 @@ var
   IIS, WebSite, WebServer, WebRoot, VDir: Variant;
   ErrorCode: Integer;
 begin
-  if MsgBox('Setup will now connect to Microsoft IIS Server ''' + IISServerName + ''' and create a virtual directory. Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки выполнит подключение к серверу Microsoft IIS ''' + IISServerName + ''' и создаст виртуальный каталог. Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
 
-  { Create the main IIS COM Automation object }
+  { Создание главного объекта IIS COM Automation }
 
   try
     IIS := CreateOleObject('IISNamespace');
   except
-    RaiseException('Please install Microsoft IIS first.'#13#13'(Error ''' + GetExceptionMessage + ''' occurred)');
+    RaiseException('Сначала установите Microsoft IIS.'#13#13'(Произошла ошибка ''' + GetExceptionMessage + ''')');
   end;
 
-  { Connect to the IIS server }
+  { Подключение к серверу IIS }
 
   WebSite := IIS.GetObject('IIsWebService', IISServerName + '/w3svc');
   WebServer := WebSite.GetObject('IIsWebServer', IISServerNumber);
   WebRoot := WebServer.GetObject('IIsWebVirtualDir', 'Root');
 
-  { (Re)create a virtual dir }
+  { (Пере)создание виртуального каталога }
 
   try
     WebRoot.Delete('IIsWebVirtualDir', 'innosetup');
@@ -146,17 +155,17 @@ begin
   VDir.AppCreate(True);
   VDir.SetInfo();
 
-  MsgBox('Created virtual directory ''' + VDir.Path + '''.', mbInformation, mb_Ok);
+  MsgBox('Создан виртуальный каталог ''' + VDir.Path + '''.', mbInformation, mb_Ok);
 
-  { Write some html and display it }
+  { Запись HTML-кода и его отображение }
 
-  if MsgBox('Setup will now write some HTML and display the virtual directory. Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки запишет HTML-код и покажет виртуальный каталог. Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
 
   ForceDirectories(VDir.Path);
   SaveStringToFile(VDir.Path + '/index.htm', '<html><body>Inno Setup rocks!</body></html>', False);
   if not ShellExecAsOriginalUser('open', IISURL + '/innosetup/index.htm', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode) then
-    MsgBox('Can''t display the created virtual directory: ''' + SysErrorMessage(ErrorCode) + '''.', mbError, mb_Ok);
+    MsgBox('Не удается отобразить созданный виртуальный каталог: ''' + SysErrorMessage(ErrorCode) + '''.', mbError, mb_Ok);
 end;
 
 {--- MSXML ---}
@@ -171,18 +180,18 @@ var
   XMLHTTP, XMLDoc, NewNode, RootNode: Variant;
   Path: String;
 begin
-  if MsgBox('Setup will now use MSXML to download XML file ''' + XMLURL + ''' and save it to disk.'#13#13'Setup will then load, modify and save this XML file. Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки будет использовать MSXML для загрузки XML файла ''' + XMLURL + ''' и записи его на диск.'#13#13'Загруженный файл XML будет изменен и сохранен. Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
     
-  { Create the main MSXML COM Automation object }
+  { Создание главного объекта MSXML COM Automation }
 
   try
     XMLHTTP := CreateOleObject('MSXML2.ServerXMLHTTP');
   except
-    RaiseException('Please install MSXML first.'#13#13'(Error ''' + GetExceptionMessage + ''' occurred)');
+    RaiseException('Сначала установите MSXML.'#13#13'(Произошла ошибка ''' + GetExceptionMessage + ''')');
   end;
   
-  { Download the XML file }
+  { Загрузка файла XML }
 
   XMLHTTP.Open('GET', XMLURL, False);
   XMLHTTP.Send();
@@ -190,31 +199,31 @@ begin
   Path := ExpandConstant('{src}\');
   XMLHTTP.responseXML.Save(Path + XMLFileName);
 
-  MsgBox('Downloaded the XML file and saved it as ''' + XMLFileName + '''.', mbInformation, mb_Ok);
+  MsgBox('Загруженный файл XML записан как ''' + XMLFileName + '''.', mbInformation, mb_Ok);
 
-  { Load the XML File }
+  { Загрузка XML файла }
 
   XMLDoc := CreateOleObject('MSXML2.DOMDocument');
   XMLDoc.async := False;
   XMLDoc.resolveExternals := False;
   XMLDoc.load(Path + XMLFileName);
   if XMLDoc.parseError.errorCode <> 0 then
-    RaiseException('Error on line ' + IntToStr(XMLDoc.parseError.line) + ', position ' + IntToStr(XMLDoc.parseError.linepos) + ': ' + XMLDoc.parseError.reason);
+    RaiseException('Ошибка в строке ' + IntToStr(XMLDoc.parseError.line) + ', позиция ' + IntToStr(XMLDoc.parseError.linepos) + ': ' + XMLDoc.parseError.reason);
   
-  MsgBox('Loaded the XML file.', mbInformation, mb_Ok);
+  MsgBox('Загружен XML файл.', mbInformation, mb_Ok);
 
-  { Modify the XML document }
+  { Модификация документа XML }
   
   NewNode := XMLDoc.createElement('isxdemo');
   RootNode := XMLDoc.documentElement;
   RootNode.appendChild(NewNode);
   RootNode.lastChild.text := 'Hello, World';
 
-  { Save the XML document }
+  { Запись документа XML }
 
   XMLDoc.Save(Path + XMLFileName2);
 
-  MsgBox('Saved the modified XML as ''' + XMLFileName2 + '''.', mbInformation, mb_Ok);
+  MsgBox('Изменённый XML сохранен как ''' + XMLFileName2 + '''.', mbInformation, mb_Ok);
 end;
 
 
@@ -224,10 +233,10 @@ procedure WordButtonOnClick(Sender: TObject);
 var
   Word: Variant;
 begin
-  if MsgBox('Setup will now check whether Microsoft Word is running. Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки проверит запущенный процесс Microsoft Word. Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
 
-  { Try to get an active Word COM Automation object }
+  { Попытка получения активного объекта Word COM Automation }
   
   try
     Word := GetActiveOleObject('Word.Application');
@@ -235,9 +244,9 @@ begin
   end;
   
   if VarIsEmpty(Word) then
-    MsgBox('Microsoft Word is not running.', mbInformation, mb_Ok)
+    MsgBox('Microsoft Word не запущен.', mbInformation, mb_Ok)
   else
-    MsgBox('Microsoft Word is running.', mbInformation, mb_Ok)
+    MsgBox('Microsoft Word запущен.', mbInformation, mb_Ok)
 end;
 
 {--- Windows Firewall ---}
@@ -250,18 +259,18 @@ procedure FirewallButtonOnClick(Sender: TObject);
 var
   Firewall, Application: Variant;
 begin
-  if MsgBox('Setup will now add itself to Windows Firewall as an authorized application for the current profile (' + GetUserNameString + '). Do you want to continue?', mbInformation, mb_YesNo) = idNo then
+  if MsgBox('Программа установки добавит себя в Windows Firewall в качестве авторизованного приложения для текущего профиля (' + GetUserNameString + '). Вы хотите продолжить?', mbInformation, mb_YesNo) = idNo then
     Exit;
 
-  { Create the main Windows Firewall COM Automation object }
+  { Создание главного объекта Windows Firewall COM Automation }
 
   try
     Firewall := CreateOleObject('HNetCfg.FwMgr');
   except
-    RaiseException('Please install Windows Firewall first.'#13#13'(Error ''' + GetExceptionMessage + ''' occurred)');
+    RaiseException('Сначала установите Windows Firewall.'#13#13'(Произошла ошибка ''' + GetExceptionMessage + ''')');
   end;
 
-  { Add the authorization }
+  { Добавление авторизации }
 
   Application := CreateOleObject('HNetCfg.FwAuthorizedApplication');
   Application.Name := 'Setup';
@@ -272,7 +281,7 @@ begin
 
   Firewall.LocalPolicy.CurrentProfile.AuthorizedApplications.Add(Application);
 
-  MsgBox('Setup is now an authorized application for the current profile', mbInformation, mb_Ok);
+  MsgBox('Программа установки теперь является авторизованным приложением для текущего профиля.', mbInformation, mb_Ok);
 end;
 
 {---}

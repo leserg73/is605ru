@@ -1,9 +1,11 @@
 ; -- CodeDlg.iss --
 ;
-; This script shows how to insert custom wizard pages into Setup and how to handle
-; these pages. Furthermore it shows how to 'communicate' between the [Code] section
-; and the regular Inno Setup sections using {code:...} constants. Finally it shows
-; how to customize the settings text on the 'Ready To Install' page.
+; Демонстрирует создание собственных страниц мастера установки и их обработку.
+; Кроме того показывает, как настроить передачу данных между секцией [Code] и
+; обычными секциями Inno Setup, используя константы {code:...}. И наконец
+; показывает, как изменить параметры текста на странице "Все готово установке".
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -16,6 +18,13 @@ UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
 PrivilegesRequired=lowest
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
@@ -27,7 +36,7 @@ Root: HKA; Subkey: "Software\My Company\My Program"; Flags: uninsdeletekey
 Root: HKA; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "Name"; ValueData: "{code:GetUser|Name}"
 Root: HKA; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "Company"; ValueData: "{code:GetUser|Company}"
 Root: HKA; Subkey: "Software\My Company\My Program\Settings"; ValueType: string; ValueName: "DataDir"; ValueData: "{code:GetDataDir}"
-; etc.
+; и так далее.
 
 [Dirs]
 Name: {code:GetDataDir}; Flags: uninsneveruninstall
@@ -43,46 +52,46 @@ var
   
 procedure InitializeWizard;
 begin
-  { Create the pages }
+  { Создаем страницы }
   
   UserPage := CreateInputQueryPage(wpWelcome,
-    'Personal Information', 'Who are you?',
-    'Please specify your name and the company for whom you work, then click Next.');
-  UserPage.Add('Name:', False);
-  UserPage.Add('Company:', False);
+    'Персональные данные', 'Кто Вы?',
+    'Введите ваше имя и компанию, в которой вы работаете, затем нажмите "Далее".');
+  UserPage.Add('Имя:', False);
+  UserPage.Add('Компания:', False);
 
   UsagePage := CreateInputOptionPage(UserPage.ID,
-    'Personal Information', 'How will you use My Program?',
-    'Please specify how you would like to use My Program, then click Next.',
+    'Персональные данные', 'Как Вы будете использовать "My Program"?',
+    'Выберите, в каком режиме вы планируете использовать "My Program", затем нажмите "Далее".',
     True, False);
-  UsagePage.Add('Light mode (no ads, limited functionality)');
-  UsagePage.Add('Sponsored mode (with ads, full functionality)');
-  UsagePage.Add('Paid mode (no ads, full functionality)');
+  UsagePage.Add('Бесплатный (с рекламой, ограниченная функциональность)');
+  UsagePage.Add('Временный (с рекламой, полная функциональность)');
+  UsagePage.Add('Платный (без рекламы, полная функциональность)');
 
   LightMsgPage := CreateOutputMsgPage(UsagePage.ID,
-    'Personal Information', 'How will you use My Program?',
-    'Note: to enjoy all features My Program can offer and to support its development, ' +
-    'you can switch to sponsored or paid mode at any time by selecting ''Usage Mode'' ' +
-    'in the ''Help'' menu of My Program after the installation has completed.'#13#13 +
-    'Click Back if you want to change your usage mode setting now, or click Next to ' +
-    'continue with the installation.');
+    'Персональные данные', 'Как Вы будете использовать "My Program"',
+    'Примечание: Чтобы воспользоваться всеми функциями, которые может предложить ' +
+    '"My Program", и поддержать её дальнейшую разработку, вы в любое время в меню ' +
+    '"Справка" можете выбрать режим использования "My Program" уже после установки.'#13#13 +
+    'Нажмите "Назад", если хотите изменить режим использования сейчас, или нажмите ' +
+    '"Далее", чтобы продолжить установку.');
 
   KeyPage := CreateInputQueryPage(UsagePage.ID,
-    'Personal Information', 'What''s your registration key?',
-    'Please specify your registration key and click Next to continue. If you don''t ' +
-    'have a valid registration key, click Back to choose a different usage mode.');
-  KeyPage.Add('Registration key:', False);
+    'Персональные данные', 'У Вас есть ключ регистрации?',
+    'Введите ваш ключ регистрации и нажмите "Далее", чтобы продолжить установку. Если у вас нет ' +
+    'ключа регистрации, нажмите "Назад" и выберите другой режим использования.');
+  KeyPage.Add('Ключ регистрации:', False);
 
-  ProgressPage := CreateOutputProgressPage('Personal Information',
-    'What''s your registration key?');
+  ProgressPage := CreateOutputProgressPage('Персональные данные',
+    'Ваш ключ регистрации?');
 
   DataDirPage := CreateInputDirPage(wpSelectDir,
-    'Select Personal Data Directory', 'Where should personal data files be installed?',
-    'Select the folder in which Setup should install personal data files, then click Next.',
+    'Каталог персональных данных', 'Место установки файлов с персональными данными?',
+    'Выберите папку, в которую будут установлены файлы с персональными данными, и нажмите "Далее".',
     False, '');
   DataDirPage.Add('');
 
-  { Set default values, using settings that were stored last time if possible }
+  { Устанавливаем значения по умолчанию, используя параметры, сохраненные ранее }
 
   UserPage.Values[0] := GetPreviousData('Name', ExpandConstant('{sysuserinfoname}'));
   UserPage.Values[1] := GetPreviousData('Company', ExpandConstant('{sysuserinfoorg}'));
@@ -102,7 +111,7 @@ procedure RegisterPreviousData(PreviousDataKey: Integer);
 var
   UsageMode: String;
 begin
-  { Store the settings so we can restore them next time }
+  { Сохраняем параметры для повторного использования }
   SetPreviousData(PreviousDataKey, 'Name', UserPage.Values[0]);
   SetPreviousData(PreviousDataKey, 'Company', UserPage.Values[1]);
   case UsagePage.SelectedValueIndex of
@@ -116,7 +125,7 @@ end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
 begin
-  { Skip pages that shouldn't be shown }
+  { Пропускаем страницы, которые не должны быть показаны }
   if (PageID = LightMsgPage.ID) and (UsagePage.SelectedValueIndex <> 0) then
     Result := True
   else if (PageID = KeyPage.ID) and (UsagePage.SelectedValueIndex <> 2) then
@@ -129,10 +138,10 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 var
   I: Integer;
 begin
-  { Validate certain pages before allowing the user to proceed }
+  { Проверка страниц на введенные данные }
   if CurPageID = UserPage.ID then begin
     if UserPage.Values[0] = '' then begin
-      MsgBox('You must enter your name.', mbError, MB_OK);
+      MsgBox('Вы должны ввести имя.', mbError, MB_OK);
       Result := False;
     end else begin
       if DataDirPage.Values[0] = '' then
@@ -142,7 +151,7 @@ begin
   end else if CurPageID = KeyPage.ID then begin
     { Just to show how 'OutputProgress' pages work.
       Always use a try..finally between the Show and Hide calls as shown below. }
-    ProgressPage.SetText('Authorizing registration key...', '');
+    ProgressPage.SetText('Проверка ключа регистрации...', '');
     ProgressPage.SetProgress(0, 0);
     ProgressPage.Show;
     try
@@ -156,7 +165,7 @@ begin
     if GetSHA1OfString('codedlg' + KeyPage.Values[0]) = '8013f310d340dab18a0d0cda2b5b115d2dcd97e4' then
       Result := True
     else begin
-      MsgBox('You must enter a valid registration key. (Hint: The key is "inno".)', mbError, MB_OK);
+      MsgBox('Ключ недействительный. (Подсказка: введите "inno".)', mbError, MB_OK);
       Result := False;
     end;
   end else
@@ -168,32 +177,32 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 var
   S: String;
 begin
-  { Fill the 'Ready Memo' with the normal settings and the custom settings }
+  { Формирование текста для 'Ready Memo' с обычными и собственными параметрами }
   S := '';
-  S := S + 'Personal Information:' + NewLine;
+  S := S + 'Персональные данные:' + NewLine;
   S := S + Space + UserPage.Values[0] + NewLine;
   if UserPage.Values[1] <> '' then
     S := S + Space + UserPage.Values[1] + NewLine;
   S := S + NewLine;
   
-  S := S + 'Usage Mode:' + NewLine + Space;
+  S := S + 'Режим использования:' + NewLine + Space;
   case UsagePage.SelectedValueIndex of
-    0: S := S + 'Light mode';
-    1: S := S + 'Sponsored mode';
-    2: S := S + 'Paid mode';
+    0: S := S + 'Бесплатный';
+    1: S := S + 'Временный';
+    2: S := S + 'Платный';
   end;
   S := S + NewLine + NewLine;
   
   S := S + MemoDirInfo + NewLine;
-  S := S + Space + DataDirPage.Values[0] + ' (personal data files)' + NewLine;
+  S := S + Space + DataDirPage.Values[0] + ' (файлы персональных данных)' + NewLine;
 
   Result := S;
 end;
 
 function GetUser(Param: String): String;
 begin
-  { Return a user value }
-  { Could also be split into separate GetUserName and GetUserCompany functions }
+  { Получение пользовательских значений }
+  { Также можно разделить на отдельные функции GetUserName и GetUserCompany }
   if Param = 'Name' then
     Result := UserPage.Values[0]
   else if Param = 'Company' then
@@ -202,6 +211,6 @@ end;
 
 function GetDataDir(Param: String): String;
 begin
-  { Return the selected DataDir }
+  { Возвращение выбранного каталога DataDir }
   Result := DataDirPage.Values[0];
 end;

@@ -1,8 +1,10 @@
 ; -- CodeDll.iss --
 ;
-; This script shows how to call functions in external DLLs (like Windows API functions)
-; at runtime and how to perform direct callbacks from these functions to functions
-; in the script.
+; Демонстрирует использование вызовов из внешних динамических библиотек DLL
+; (подобно функциям Windows API) во время выполнения, а также обработку
+; прямых обратных вызовов из этих функций в функции сценария.
+
+; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!
 
 [Setup]
 AppName=My Program
@@ -14,30 +16,37 @@ DisableWelcomePage=no
 UninstallDisplayIcon={app}\MyProg.exe
 OutputDir=userdocs:Inno Setup Examples Output
 
+; Применение стиля к диалогам инсталлятора/деинсталлятора
+; ("SetupStyleFile=" определяет путь и файл стиля *.vsf)
+SetupStyleFile="compiler:Examples\Glow.vsf"
+
+[Languages]
+Name: ru; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Files]
 Source: "MyProg.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
 Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
-; Install our DLL to {app} so we can access it at uninstall time.
-; Use "Flags: dontcopy" if you don't need uninstall time access.
+; Установка нашего файла DLL в {app}, чтобы получить к нему доступ при деинсталляции.
+; Используйте "Flags: dontcopy", если не нужен доступ во время деинсталляции.
 Source: "MyDll.dll"; DestDir: "{app}"
 
 [Code]
 const
   MB_ICONINFORMATION = $40;
 
-// Importing a Unicode Windows API function.
+// Импорт функции (Unicode) Windows API.
 function MessageBox(hWnd: Integer; lpText, lpCaption: String; uType: Cardinal): Integer;
 external 'MessageBoxW@user32.dll stdcall';
 
-// Importing an ANSI custom DLL function, first for Setup, then for uninstall.
+// Импорт собственной функции (ANSI) из DLL сначала для установки, потом для удаления.
 procedure MyDllFuncSetup(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
 external 'MyDllFunc@files:MyDll.dll stdcall setuponly';
 
 procedure MyDllFuncUninstall(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
 external 'MyDllFunc@{app}\MyDll.dll stdcall uninstallonly';
 
-// Importing an ANSI function for a DLL which might not exist at runtime.
+// Отложенный импорт собственной функции (ANSI) для DLL.
 procedure DelayLoadedFunc(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
 external 'DllFunc@DllWhichMightNotExist.dll stdcall delayload';
 
@@ -48,15 +57,15 @@ begin
   if CurPage = wpWelcome then begin
     hWnd := StrToInt(ExpandConstant('{wizardhwnd}'));
 
-    MessageBox(hWnd, 'Hello from Windows API function', 'MessageBoxA', MB_OK or MB_ICONINFORMATION);
+    MessageBox(hWnd, 'Привет от функции Windows API', 'MessageBoxA', MB_OK or MB_ICONINFORMATION);
 
-    MyDllFuncSetup(hWnd, 'Hello from custom DLL function', 'MyDllFunc', MB_OK or MB_ICONINFORMATION);
+    MyDllFuncSetup(hWnd, 'Привет от функции DLL', 'MyDllFunc', MB_OK or MB_ICONINFORMATION);
 
     try
-      // If this DLL does not exist (it shouldn't), an exception will be raised. Press F9 to continue.
-      DelayLoadedFunc(hWnd, 'Hello from delay loaded function', 'DllFunc', MB_OK or MB_ICONINFORMATION);
+      // Если этой DLL не существует (не обязательно), будет вызвано исключение. Чтобы продолжить, нажмите F9.
+      DelayLoadedFunc(hWnd, 'Привет отложенной функции', 'DllFunc', MB_OK or MB_ICONINFORMATION);
     except
-      // <Handle missing dll here>
+      // <Здесь дескриптор отсутствующей DLL>
     end;
   end;
   Result := True;
@@ -64,17 +73,17 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  // Call our function just before the actual uninstall process begins.
+  // Вызов нашей функции из DLL перед началом процесса деинсталляции.
   if CurUninstallStep = usUninstall then begin
-    MyDllFuncUninstall(0, 'Hello from custom DLL function', 'MyDllFunc', MB_OK or MB_ICONINFORMATION);
+    MyDllFuncUninstall(0, 'Привет от функции DLL', 'MyDllFunc', MB_OK or MB_ICONINFORMATION);
     
-    // Now that we're finished with it, unload MyDll.dll from memory.
-    // We have to do this so that the uninstaller will be able to remove the DLL and the {app} directory.
+    // После завершения выгружаем наш файл MyDll.dll из памяти.
+    // Это необходимо сделать для того, чтобы деинсталлятор смог удалить файл DLL и каталог {app}.
     UnloadDLL(ExpandConstant('{app}\MyDll.dll'));
   end;
 end;
 
-// The following shows how to use callbacks.
+// Следующий код показывает использование обратных вызовов.
 
 function SetTimer(hWnd, nIDEvent, uElapse, lpTimerFunc: Longword): Longword;
 external 'SetTimer@user32.dll stdcall';
