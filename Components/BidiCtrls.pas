@@ -23,6 +23,13 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
   end;
 
+  {$IFNDEF PS_MINIVCL}
+  TNewGroupBox = class(TGroupBox)
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+  end;
+  {$ENDIF}
+
   TNewMemo = class(TMemo)
   protected
     procedure CreateParams(var Params: TCreateParams); override;
@@ -73,6 +80,16 @@ begin
   inherited;
   SetBiDiStyles(Self, Params);
 end;
+
+{ TNewGroupBox }
+
+{$IFNDEF PS_MINIVCL}
+procedure TNewGroupBox.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  SetBiDiStyles(Self, Params);
+end;
+{$ENDIF}
 
 { TNewMemo }
 

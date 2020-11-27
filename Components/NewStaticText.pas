@@ -18,17 +18,24 @@ interface
 {$ENDIF}
 
 uses
-  Windows, Messages, SysUtils, Classes, Controls, Forms;
+  Windows, Messages, SysUtils, Classes, Controls, Forms, Menus, Graphics, CommCtrl, ImgList, Themes;
 
 type
+  TStaticBorderStyle = (sbsNone, sbsSingle, sbsSunken);
+
   TNewStaticText = class(TWinControl)
   private
+    FAlignment: TAlignment;
     FAutoSize: Boolean;
+    FBorderStyle: TStaticBorderStyle;
     FFocusControl: TWinControl;
     FForceLTRReading: Boolean;
     FLastAdjustBoundsRTL: Boolean;
     FShowAccelChar: Boolean;
     FWordWrap: Boolean;
+    class constructor Create;
+    class destructor Destroy;
+    procedure CNCtlColorStatic(var Message: TWMCtlColorStatic); message CN_CTLCOLORSTATIC;
     procedure CMDialogChar(var Message: TCMDialogChar); message CM_DIALOGCHAR;
     procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
     procedure CMParentFontChanged(var Message: TMessage); message CM_PARENTFONTCHANGED;
@@ -36,22 +43,28 @@ type
     procedure AdjustBounds;
     function CalcBounds: TPoint;
     function GetDrawTextFlags: UINT;
+    procedure SetAlignment(Value: TAlignment);
+    procedure SetBorderStyle(Value: TStaticBorderStyle);
     procedure SetFocusControl(Value: TWinControl);
     procedure SetForceLTRReading(Value: Boolean);
     procedure SetShowAccelChar(Value: Boolean);
+    procedure SetTransparent(const Value: Boolean);
+    function GetTransparent: Boolean;
     procedure SetWordWrap(Value: Boolean);
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure SetAutoSize(Value: Boolean); {$IFDEF Delphi6OrHigher}override;{$ENDIF}
+    procedure SetAutoSize(Value: Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     function AdjustHeight: Integer;
   published
     property Align;
+    property Alignment: TAlignment read FAlignment write SetAlignment default taLeftJustify;
     property Anchors;
     property AutoSize: Boolean read FAutoSize write SetAutoSize default True;
+    property BorderStyle: TStaticBorderStyle read FBorderStyle write SetBorderStyle default sbsNone;
     property Caption;
     property Color;
     property DragCursor;
@@ -59,17 +72,16 @@ type
     property Enabled;
     property FocusControl: TWinControl read FFocusControl write SetFocusControl;
     property Font;
-    property ForceLTRReading: Boolean read FForceLTRReading write SetForceLTRReading
-      default False;
+    property ForceLTRReading: Boolean read FForceLTRReading write SetForceLTRReading default False;
     property ParentColor;
     property ParentFont;
     property ParentShowHint;
     property PopupMenu;
-    property ShowAccelChar: Boolean read FShowAccelChar write SetShowAccelChar
-      default True;
+    property ShowAccelChar: Boolean read FShowAccelChar write SetShowAccelChar default True;
     property ShowHint;
     property TabOrder;
     property TabStop;
+    property Transparent: Boolean read GetTransparent write SetTransparent default True;
     property Visible;
     property WordWrap: Boolean read FWordWrap write SetWordWrap default False;
     property OnClick;
@@ -78,9 +90,78 @@ type
     property OnDragOver;
     property OnEndDrag;
     property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
     property OnMouseMove;
     property OnMouseUp;
     property OnStartDrag;
+  end;
+
+
+  TStaticText = class(TNewStaticText)
+  strict private
+    class constructor Create;
+    class destructor Destroy;
+  published
+    property Align;
+    property Alignment;
+    property Anchors;
+    property AutoSize;
+    property BevelEdges;
+    property BevelInner;
+    property BevelKind default bkNone;
+    property BevelOuter;
+    property BiDiMode;
+    property BorderStyle;
+    property Caption;
+    property Color nodefault;
+    property Constraints;
+    property DoubleBuffered;
+    property DragCursor;
+    property DragKind;
+    property DragMode;
+    property Enabled;
+    property FocusControl;
+    property Font;
+    property ParentBiDiMode;
+    property ParentColor;
+    property ParentDoubleBuffered;
+    property ParentFont;
+    property ParentShowHint;
+    property PopupMenu;
+    property ShowAccelChar;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Touch;
+    property Transparent;
+    property Visible;
+    property StyleElements;
+    property OnClick;
+    property OnContextPopup;
+    property OnDblClick;
+    property OnDragDrop;
+    property OnDragOver;
+    property OnEndDock;
+    property OnEndDrag;
+    property OnGesture;
+    property OnMouseActivate;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnStartDock;
+    property OnStartDrag;
+  end;
+
+  TStaticTextStyleHook = class(TStyleHook)
+  strict protected
+    procedure Paint(Canvas: TCanvas); override;
+    procedure PaintNC(Canvas: TCanvas); override;
+    procedure WndProc(var Message: TMessage); override;
+  public
+    constructor Create(AControl: TWinControl); override;
   end;
 
 procedure Register;
@@ -88,7 +169,11 @@ procedure Register;
 implementation
 
 uses
-  BidiUtils;
+{$IF DEFINED(CLR)}
+  System.Runtime.InteropServices, System.Security, System.Security.Permissions, Types,
+{$ENDIF}
+  Vcl.Consts, System.RTLConsts, Vcl.ActnList, Winapi.UxTheme, Winapi.DwmApi,
+  System.Types, System.UITypes, System.StrUtils, Vcl.ExtCtrls, BidiUtils;
 
 procedure Register;
 begin
@@ -129,16 +214,26 @@ end;
 
 { TNewStaticText }
 
+class constructor TNewStaticText.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TNewStaticText, TStaticTextStyleHook);
+end;
+
 constructor TNewStaticText.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   ControlStyle := [csCaptureMouse, csClickEvents, csSetCaption,
-    csOpaque, csReplicatable, csDoubleClicks];
+    csReplicatable, csDoubleClicks];
   Width := 65;
   Height := 17;
   FAutoSize := True;
   FShowAccelChar := True;
   AdjustBounds;
+end;
+
+class destructor TNewStaticText.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TNewStaticText, TStaticTextStyleHook);
 end;
 
 procedure TNewStaticText.CreateParams(var Params: TCreateParams);
@@ -290,6 +385,24 @@ begin
     FFocusControl := nil;
 end;
 
+procedure TNewStaticText.SetAlignment(Value: TAlignment);
+begin
+  if FAlignment <> Value then
+  begin
+    FAlignment := Value;
+    RecreateWnd;
+  end;
+end;
+
+procedure TNewStaticText.SetBorderStyle(Value: TStaticBorderStyle);
+begin
+  if FBorderStyle <> Value then
+  begin
+    FBorderStyle := Value;
+    RecreateWnd;
+  end;
+end;
+
 procedure TNewStaticText.SetAutoSize(Value: Boolean);
 begin
   if FAutoSize <> Value then
@@ -324,6 +437,36 @@ begin
   end;
 end;
 
+procedure TNewStaticText.CNCtlColorStatic(var Message: TWMCtlColorStatic);
+begin
+  if StyleServices.Enabled and Transparent then
+  begin
+    SetBkMode(Message.ChildDC, Windows.TRANSPARENT);
+    StyleServices.DrawParentBackground(Handle, Message.ChildDC, nil, False);
+    { Return an empty brush to prevent Windows from overpainting what we just have created. }
+    Message.Result := GetStockObject(NULL_BRUSH);
+  end
+  else
+    inherited;
+end;
+
+procedure TNewStaticText.SetTransparent(const Value: Boolean);
+begin
+  if Transparent <> Value then
+  begin
+    if Value then
+      ControlStyle := ControlStyle - [csOpaque]
+    else
+      ControlStyle := ControlStyle + [csOpaque];
+    Invalidate;
+  end;
+end;
+
+function TNewStaticText.GetTransparent: Boolean;
+begin
+  Result := not (csOpaque in ControlStyle);
+end;
+
 procedure TNewStaticText.SetWordWrap(Value: Boolean);
 begin
   if FWordWrap <> Value then
@@ -332,6 +475,98 @@ begin
     RecreateWnd;
     AdjustBounds;
   end;
+end;
+
+{ TStaticTextStyleHook }
+
+constructor TStaticTextStyleHook.Create(AControl: TWinControl);
+begin
+  inherited;
+  OverridePaint := True;
+  OverridePaintNC := True;
+  OverrideEraseBkgnd := True;
+  PaintOnEraseBkgnd := True;
+  DoubleBuffered := True;
+end;
+
+procedure TStaticTextStyleHook.Paint(Canvas: TCanvas);
+const
+  Alignments: array[TAlignment] of Word = (DT_LEFT, DT_RIGHT, DT_CENTER);
+  States: array[Boolean] of TThemedTextLabel = (ttlTextLabelDisabled, ttlTextLabelNormal);
+var
+  Details: TThemedElementDetails;
+  R: TRect;
+  S: String;
+begin
+  if StyleServices.Available then
+  begin
+    R := Control.ClientRect;
+    if TStaticText(Control).Transparent then
+    begin
+      Details := StyleServices.GetElementDetails(tbCheckBoxUncheckedNormal);
+      StyleServices.DrawParentBackground(Handle, Canvas.Handle, Details, False);
+      Canvas.Brush.Style := bsClear;
+    end
+    else
+    begin
+      Canvas.Brush.Color := StyleServices.GetStyleColor(scWindow);
+      Canvas.FillRect(R);
+    end;
+    Details := StyleServices.GetElementDetails(States[Control.Enabled]);
+    if Control is TNewStaticText then
+      S := TNewStaticText(Control).Caption
+    else
+      S := Text;
+    DrawControlText(Canvas, Details, S, R,
+      Alignments[TNewStaticText(Control).Alignment] or DT_WORDBREAK);
+  end;
+end;
+
+procedure TStaticTextStyleHook.PaintNC(Canvas: TCanvas);
+var
+  R: TRect;
+  Buffer: TBitmap;
+  C1, C2: TColor;
+begin
+  if not StyleServices.Available then Exit;
+  R := Rect(0, 0, Control.Width, Control.Height);
+  if (R.Width = 0) or (R.Height = 0) then Exit;
+  if TNewStaticText(Control).BorderStyle = sbsNone then
+    Exit;
+  Buffer := TBitMap.Create;
+  try
+    Buffer.Width := R.Width;
+    Buffer.Height := R.Height;
+                                                                       
+    C1 := StyleServices.ColorToRGB(clBtnShadow);
+    if TNewStaticText(Control).BorderStyle = sbsSunken then
+      C2 := StyleServices.ColorToRGB(clBtnHighLight)
+    else
+      C2 := C1;
+    Frame3D(Buffer.Canvas, R, C1, C2, 1);
+    ExcludeClipRect(Canvas.Handle, 1, 1, Control.Width - 1, Control.Height - 1);
+    Canvas.Draw(0, 0, Buffer);
+  finally
+    Buffer.Free;
+  end;
+end;
+
+procedure TStaticTextStyleHook.WndProc(var Message: TMessage);
+begin
+  // Reserved for potential updates
+  inherited;
+end;
+
+{ TStaticText }
+
+class constructor TStaticText.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TStaticText, TStaticTextStyleHook);
+end;
+
+class destructor TStaticText.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TStaticText, TStaticTextStyleHook);
 end;
 
 end.

@@ -7,6 +7,8 @@ unit ScintStylerInnoSetup;
   For conditions of distribution and use, see LICENSE.TXT.
 
   TInnoSetupStyler: styler for Inno Setup scripts
+  
+  Requires MsgIDs.pas from the Inno Setup source code
 }
 
 interface
@@ -101,7 +103,7 @@ type
 implementation
 
 uses
-  TypInfo;
+  TypInfo, MsgIDs;
 
 type
   TInnoSetupStylerLineState = record
@@ -202,7 +204,14 @@ type
     ssReserveBytes,
     ssRestartApplications,
     ssRestartIfNeededByRun,
+    {$IFNDEF PS_MINIVCL}
+      ssRawDataResource,
+      ssIconResource,
+      ssBitmapResource,
+    {$ENDIF}
     ssSetupIconFile,
+    ssTaskBarView,
+    ssSetupStyleFile,
     ssSetupLogging,
     ssSetupMutex,
     ssShowComponentSizes,
@@ -244,6 +253,9 @@ type
     ssUsePreviousUserInfo,
     ssUseSetupLdr,
     ssUserInfoPage,
+    {$IFNDEF PS_MINIVCL}
+      ssVersionInfoComments,
+    {$ENDIF}
     ssVersionInfoCompany,
     ssVersionInfoCopyright,
     ssVersionInfoDescription,
@@ -1205,8 +1217,12 @@ begin
   end;
 
   case Section of
+    scCustomMessages:
+      I := 0;
     scLangOptions:
       I := GetEnumValue(TypeInfo(TLangOptionsSectionDirective), 'ls' + S);
+    scMessages:
+      I := GetEnumValue(TypeInfo(TSetupMessageID), 'msg' + S);
     scSetup:
       I := GetEnumValue(TypeInfo(TSetupSectionDirective), 'ss' + S);
   else
@@ -1215,7 +1231,7 @@ begin
   if I <> -1 then
     CommitStyle(stKeyword)
   else begin
-    if Section in [scLangOptions, scSetup] then
+    if Section in [scLangOptions, scMessages, scSetup] then
       CommitStyleSqPending(stDefault)
     else
       CommitStyle(stDefault);

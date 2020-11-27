@@ -64,6 +64,8 @@ type
     property OnDragOver;
     property OnEndDrag;
     property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
     property OnMouseMove;
     property OnMouseUp;
     property OnStartDrag;

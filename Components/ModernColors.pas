@@ -16,7 +16,8 @@ uses
 
 type
   TThemeType = (ttModernLight, ttModernDark, ttClassic);
-  TThemeColor = (tcFore, tcBack, tcToolBack, tcSelBack, tcMarginFore, tcMarginBack, tcSplitterBack, tcBraceBack, tcIdentGuideFore,
+  TThemeColor = (tcFore, tcBack, tcToolBack, tcSelBack, tcMarginFore, tcMarginBack, tcSplitterBack,
+                 tcBraceBack, tcIdentGuideFore, tcCaretLineBack, tcBorderLineEnd, tcBackWCCTabWrap,
                  tcRed, tcGreen, tcBlue, tcOrange, tcPurple, tcYellow, tcTeal, tcGray);
 
   TTheme = class
@@ -38,15 +39,18 @@ function TTheme.FGetColor(Color: TThemeColor): TColor;
 const
   { D = Dark, L = Light, M = Modern, C = Classic }
 
-  DFore = clWhite;
+  DFore = $D4D4D4;
   DBack = $2E2A2D;           { Monokai Pro }
   DToolBack = $413E40;       { Monokai Pro }
-  DSelBack = $413E40;        { Monokai Pro }
+  DSelBack = $633F13;        { Monokai Pro }
   DMarginFore = $716F71;     { Monokai Pro }
   DMarginBack = $413E40;     { Monokai Pro }
   DSplitterBack = $413E40;   { Monokai Pro }
   DBraceBack = $716F71;      { Monokai Pro }
   DIdentGuideFore = $716F71; { Monokai Pro }
+  DCaretLineBack = $1B3434;  { Monokai Pro }
+  DBorderLineEnd = $635F60;  { Monokai Pro }
+  DBackWCCTabWrap = $000040FF;
   //Monokai Pro's dark control color: $221F22
 
   LFore = clBlack;
@@ -58,6 +62,9 @@ const
   LSplitterBack = clBtnFace;
   LBraceBack = $E0E0E0;      { Inno Setup 5 }
   LIdentGuideFore = clSilver;
+  LCaretLineBack = $E6FFFA;
+  LBorderLineEnd = $FEFECC;
+  LBackWCCTabWrap = $00559BFB;
 
   CFore = clBlack;
   CBack = clWhite;
@@ -68,6 +75,9 @@ const
   CSplitterBack = clBtnFace;
   CBraceBack = $E0E0E0;      { Inno Setup 5 }
   CIdentGuideFore = clSilver;
+  CCaretLineBack = $D0FFFF;
+  CBorderLineEnd = $FEFE7F;
+  CBackWCCTabWrap = $003A80FF;
 
   { The Microsoft Azure DevOps work well as foreground colors on both dark and light backgrounds.
     Its red and blue also fit well with the colors used by Microsoft's VS Image Library. }
@@ -91,9 +101,9 @@ const
   CGray = $707070;           { Inno Setup 5 }
 
   Colors: array [TThemeType, TThemeColor] of TColor = (
-    (LFore, LBack, LToolBack, LSelBack, LMarginFore, LMarginBack, LSplitterBack, LBraceBack, LIdentGuideFore, MRed, MGreen, MBlue, MOrange, MPurple, MYellow, MTeal, MGray),
-    (DFore, DBack, DToolBack, DSelBack, DMarginFore, DMarginBack, DSplitterBack, DBraceBack, DIdentGuideFore, MRed, MGreen, MBlue, MOrange, MPurple, MYellow, MTeal, MGray),
-    (CFore, CBack, CToolBack, CSelBack, CMarginFore, CMarginBack, CSplitterBack, CBraceBack, CIdentGuideFore, CRed, CGreen, CBlue, COrange, CPurple, CYellow, CTeal, CGray)
+    (LFore, LBack, LToolBack, LSelBack, LMarginFore, LMarginBack, LSplitterBack, LBraceBack, LIdentGuideFore, LCaretLineBack, LBorderLineEnd, LBackWCCTabWrap, MRed, MGreen, MBlue, MOrange, MPurple, MYellow, MTeal, MGray),
+    (DFore, DBack, DToolBack, DSelBack, DMarginFore, DMarginBack, DSplitterBack, DBraceBack, DIdentGuideFore, DCaretLineBack, DBorderLineEnd, DBackWCCTabWrap, MRed, MGreen, MBlue, MOrange, MPurple, MYellow, MTeal, MGray),
+    (CFore, CBack, CToolBack, CSelBack, CMarginFore, CMarginBack, CSplitterBack, CBraceBack, CIdentGuideFore, CCaretLineBack, CBorderLineEnd, CBackWCCTabWrap, CRed, CGreen, CBlue, COrange, CPurple, CYellow, CTeal, CGray)
   );
   
 begin

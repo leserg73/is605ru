@@ -12,7 +12,7 @@ unit FolderTreeView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, CommCtrl;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, CommCtrl, StdCtrls;
 
 type
   TCustomFolderTreeView = class;
@@ -22,6 +22,7 @@ type
 
   TCustomFolderTreeView = class(TWinControl)
   private
+    FBorderStyle: TBorderStyle;
     FDestroyingHandle: Boolean;
     FDirectory: String;
     FFriendlyTree: Boolean;
@@ -39,8 +40,10 @@ type
     procedure SetItemHasChildren(const Item: HTREEITEM; const AHasChildren: Boolean);
     procedure SetDirectory(const Value: String);
     function TryExpandItem(const Item: HTREEITEM): Boolean;
+    procedure CMCtl3DChanged(var Message: TMessage); message CM_CTL3DCHANGED;
     procedure CNKeyDown(var Message: TWMKeyDown); message CN_KEYDOWN;
     procedure CNNotify(var Message: TWMNotify); message CN_NOTIFY;
+    procedure SetBorderStyle(Value: TBorderStyle);
     procedure WMCtlColorEdit(var Message: TMessage); message WM_CTLCOLOREDIT;
     procedure WMDestroy(var Message: TWMDestroy); message WM_DESTROY;
     procedure WMEraseBkgnd(var Message: TWMEraseBkgnd); message WM_ERASEBKGND;
@@ -55,6 +58,7 @@ type
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnRename: TFolderRenameEvent read FOnRename write FOnRename;
+    property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ChangeDirectory(const Value: String; const CreateNewItems: Boolean);
@@ -73,6 +77,8 @@ type
       const NewItem, SelectedImage: Boolean): Integer; override;
   published
     property Anchors;
+    property BorderStyle;
+    property Ctl3D;
     property TabOrder;
     property TabStop default True;
     property Visible;
@@ -97,6 +103,8 @@ type
       AUserStartup, ACommonStartup: String);
   published
     property Anchors;
+    property BorderStyle;
+    property Ctl3D;
     property TabOrder;
     property TabStop default True;
     property Visible;
@@ -375,6 +383,8 @@ begin
   ControlStyle := ControlStyle - [csCaptureMouse];
   Width := 121;
   Height := 97;
+//  FBorderStyle := bsNone;
+  Ctl3D := False;
   ParentColor := False;
   TabStop := True;
   if Lo(GetVersion) < 6 then
@@ -385,6 +395,7 @@ end;
 
 procedure TCustomFolderTreeView.CreateParams(var Params: TCreateParams);
 const
+  //BorderStyles: array[TBorderStyle] of Integer = (0, WS_BORDER);
   TVS_TRACKSELECT = $0200;
   TVS_SINGLEEXPAND = $0400;
 begin
@@ -393,7 +404,7 @@ begin
   CreateSubClass(Params, WC_TREEVIEW);
   with Params do begin
     Style := Style or WS_CLIPCHILDREN or WS_CLIPSIBLINGS or TVS_LINESATROOT or
-      TVS_HASBUTTONS or TVS_SHOWSELALWAYS or TVS_EDITLABELS;
+      TVS_HASBUTTONS or TVS_SHOWSELALWAYS or TVS_EDITLABELS or WS_BORDER{ or TVS_HASLINES};
     FFriendlyTree := UseFriendlyTree;
     if FFriendlyTree then
       Style := Style or TVS_TRACKSELECT or TVS_SINGLEEXPAND
@@ -403,7 +414,11 @@ begin
       else
         Style := Style or TVS_HASLINES;
     end;
-    ExStyle := ExStyle or WS_EX_CLIENTEDGE;
+    if Ctl3D and NewStyleControls and (FBorderStyle = bsSingle) then
+    begin
+      Style := Style and not WS_BORDER;
+      ExStyle := Params.ExStyle or WS_EX_CLIENTEDGE;
+    end;
     WindowClass.style := WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
   end;
 end;
@@ -422,7 +437,7 @@ begin
 
   { On Vista, enable the new Explorer-style look }
   if (Lo(GetVersion) >= 6) and Assigned(SetWindowTheme) then begin
-    SetWindowTheme(Handle, 'Explorer', nil);
+    //SetWindowTheme(Handle, 'Explorer', nil);
     { Like Explorer, enable double buffering to avoid flicker when the mouse
       is moved across the items }
     SendMessage(Handle, TVM_SETEXTENDEDSTYLE, TVS_EX_DOUBLEBUFFER,
@@ -537,6 +552,12 @@ begin
     FDirectory := '';
   if Assigned(FOnChange) then
     FOnChange(Self);
+end;
+
+procedure TCustomFolderTreeView.CMCtl3DChanged(var Message: TMessage);
+begin
+  inherited;
+  if FBorderStyle = bsSingle then RecreateWnd;
 end;
 
 procedure TCustomFolderTreeView.CNNotify(var Message: TWMNotify);
@@ -924,6 +945,15 @@ end;
 procedure TCustomFolderTreeView.SetDirectory(const Value: String);
 begin
   ChangeDirectory(Value, False);
+end;
+
+procedure TCustomFolderTreeView.SetBorderStyle(Value: TBorderStyle);
+begin
+  if BorderStyle <> Value then
+  begin
+    FBorderStyle := Value;
+    RecreateWnd;
+  end;
 end;
 
 procedure TCustomFolderTreeView.CreateNewDirectory(const ADefaultName: String);
