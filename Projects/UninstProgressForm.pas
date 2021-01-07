@@ -78,7 +78,7 @@ procedure UninstallMessageBoxCallback(const Flags: LongInt; const After: Boolean
   const Param: LongInt);
 const
   States: array [TNewProgressBarState] of TTaskbarProgressState =
-    (tpsNormal, tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
+    (tpsNormal, tpsError, tpsPaused);
 var
   UninstallProgressForm: TUninstallProgressForm;
   NewState: TNewProgressBarState;

@@ -150,9 +150,12 @@ TGraphic = class(TPersistent)
   property OnChange: TNotifyEvent; read write;
 end;
 
+TAlphaFormat = (afIgnored, afDefined, afPremultiplied);
+
 TBitmap = class(TGraphic)
   procedure LoadFromStream(Stream: TStream);
   procedure SaveToStream(Stream: TStream);
+  property AlphaFormat: TAlphaFormat; read write;
   property Canvas: TCanvas; read write;
   property Handle: HBITMAP; read write;
 end;
@@ -540,9 +543,11 @@ TNewCheckListBox = class(TCustomListBox)
   property State[Index: Integer]: TCheckBoxState; read write;
   property ItemCaption[Index: Integer]: String; read write;
   property ItemEnabled[Index: Integer]: Boolean; read write;
+  property ItemFontStyle[Index: Integer]: TFontStyles; read write;
   property ItemLevel[Index: Integer]: Byte; read;
   property ItemObject[Index: Integer]: TObject; read write;
   property ItemSubItem[Index: Integer]: String; read write;
+  property SubItemFontStyle[Index: Integer]: TFontStyles; read write;
   property Flat: Boolean; read write;
   property MinItemHeight: Integer; read write;
   property Offset: Integer; read write;
@@ -732,6 +737,7 @@ TUIStateForm = class(TForm)
 end;
 
 TSetupForm = class(TUIStateForm)
+  function CalculateButtonWidth(const ButtonCaptions: array of String): Integer;
   function ShouldSizeX: Boolean;
   function ShouldSizeY: Boolean;
   procedure FlipSizeAndCenterIfNeeded(const ACenterInsideControl: Boolean; const CenterInsideControlCtl: TWinControl; const CenterInsideControlInsideClientArea: Boolean);

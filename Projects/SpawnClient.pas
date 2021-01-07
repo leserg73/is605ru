@@ -108,7 +108,9 @@ begin
   if MsgResult and not $FFFF <> SPAWN_MSGRESULT_SUCCESS_BITS then
     InternalErrorFmt('CallSpawnServer: Unexpected response: $%x', [MsgResult]);
   SequenceNumber := Word(MsgResult);
-
+{$IFDEF VER200}
+  Status := 0;  { avoid compiler warning }
+{$ENDIF}
   LastQueryTime := GetTickCount;
   repeat
     ProcessMessagesProc;

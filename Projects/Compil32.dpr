@@ -37,8 +37,13 @@ uses
   CompWizard in 'CompWizard.pas' {WizardForm},
   CompWizardFile in 'CompWizardFile.pas' {WizardFileForm},
   CompFileAssoc in 'CompFileAssoc.pas',
+{$IFDEF VER200}
+  TmSchemaISX in '..\Components\TmSchemaISX.pas',
+  UxThemeISX in '..\Components\UxThemeISX.pas',
+{$ELSE}
   TmSchema in '..\Components\TmSchema.pas',
   UxTheme in '..\Components\UxTheme.pas',
+{$ENDIF}
   DebugStruct in 'DebugStruct.pas',
   BrowseFunc in 'BrowseFunc.pas',
   CompSignTools in 'CompSignTools.pas' {SignToolsForm},
@@ -46,6 +51,9 @@ uses
   ScintEdit in '..\Components\ScintEdit.pas',
   ScintStylerInnoSetup in '..\Components\ScintStylerInnoSetup.pas',
   ModernColors in '..\Components\ModernColors.pas',
+{$IFDEF IS_WINXP}
+  SynTaskDialog in '..\Components\TaskDialog\SynTaskDialog.pas',
+{$ENDIF}
   MessageBoxInsert in 'MessageBoxInsert.pas' {MBDForm};
 
 {$R *.res}

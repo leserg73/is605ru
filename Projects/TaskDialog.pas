@@ -19,7 +19,7 @@ function TaskDialogMsgBox(const Icon, Instruction, Text, Caption: String; const 
 implementation
 
 uses
-  Windows, Classes, StrUtils, Math, Forms, Dialogs, SysUtils, Commctrl, CmnFunc2, InstFunc, PathFunc;
+  Windows, Classes, StrUtils, Math, Forms, Dialogs, SysUtils, Commctrl, CmnFunc2, InstFunc, PathFunc{$IFDEF IS_WINXP}, SynTaskDialog{$ENDIF};
 
 var
   TaskDialogIndirectFunc: function(const pTaskConfig: TTaskDialogConfig;
@@ -98,64 +98,111 @@ begin
 end;
 
 function TaskDialogMsgBox(const Icon, Instruction, Text, Caption: String; const Typ: TMsgBoxType; const Buttons: Cardinal; const ButtonLabels: array of String; const ShieldButton: Integer): Integer;
+{$IFDEF IS_WINXP}
+  function JoinStrings(const StringArray : array of String{; const Separator : String}): String;
+  var
+    i : Integer;
+  begin
+    Result := '';
+    for i := low(StringArray) to high(StringArray) do
+      Result := Result + StringReplace(StringArray[i],#13#10,'\n',[rfReplaceAll, rfIgnoreCase]) + #13#10;
+    Delete(Result, Length(Result), 1);
+  end;
+{$ENDIF}
 var
   IconP: PChar;
   TDCommonButtons: Cardinal;
   NButtonLabelsAvailable: Integer;
-  ButtonIDs: array of Integer;
+  ButtonIDs, A: array of Integer;
+{$IFDEF IS_WINXP}
+  Task: TTaskDialog;
+  BTNs: TCommonButtons;
+  BTNStr: String;
+  IconDialog: TTaskDialogIcon;
+  Ret: Integer;
+  WinVer: Word;
+{$ENDIF}
 begin
-  if Icon <> '' then
-    IconP := PChar(Icon)
+  if Icon <> '' then begin
+    IconP := PChar(Icon);
+    {$IFDEF IS_WINXP}IconDialog := tiNotUsed;{$ENDIF} end
   else begin
     case Typ of
-      mbInformation: IconP := TD_INFORMATION_ICON;
-      mbError: IconP := TD_WARNING_ICON;
-      mbCriticalError: IconP := TD_ERROR_ICON;
-    else
+      mbInformation: begin IconP := TD_INFORMATION_ICON; {$IFDEF IS_WINXP}IconDialog := tiInformation;{$ENDIF} end;
+      mbError: begin IconP := TD_WARNING_ICON; {$IFDEF IS_WINXP}IconDialog := tiWarning;{$ENDIF} end;
+      mbCriticalError: begin IconP := TD_ERROR_ICON; {$IFDEF IS_WINXP}IconDialog := tiError;{$ENDIF} end;
+    else begin
       IconP := nil; { No other TD_ constant available, MS recommends to use no icon for questions now and the old icon should only be used for help entries }
+      {$IFDEF IS_WINXP}IconDialog := tiNotUsed;{$ENDIF} end;
     end;
   end;
   NButtonLabelsAvailable := Length(ButtonLabels);
+{$IFDEF IS_WINXP}
+  BTNs := [];
+  BTNStr := JoinStrings(ButtonLabels);
+{$ENDIF}
   case Buttons of
     MB_OK, MB_OKCANCEL:
       begin
-        if NButtonLabelsAvailable = 0 then
-          TDCommonButtons := TDCBF_OK_BUTTON
+        if NButtonLabelsAvailable = 0 then begin
+          TDCommonButtons := TDCBF_OK_BUTTON;
+          {$IFDEF IS_WINXP}BTNs := [cbOK];{$ENDIF} end
         else begin
           TDCommonButtons := 0;
-          ButtonIDs := [IDOK];
+          SetLength(A,1);
+          A[0] := IDOK;
+          ButtonIDs := A;
+          {$IFDEF IS_WINXP}BTNs := [];{$ENDIF}
         end;
-        if Buttons = MB_OKCANCEL then
+        if Buttons = MB_OKCANCEL then begin
           TDCommonButtons := TDCommonButtons or TDCBF_CANCEL_BUTTON;
+          {$IFDEF IS_WINXP}BTNs := [cbCancel];{$ENDIF} end;
       end;
     MB_YESNO, MB_YESNOCANCEL:
       begin
-        if NButtonLabelsAvailable = 0 then
-          TDCommonButtons := TDCBF_YES_BUTTON or TDCBF_NO_BUTTON
+        if NButtonLabelsAvailable = 0 then begin
+          TDCommonButtons := TDCBF_YES_BUTTON or TDCBF_NO_BUTTON;
+          {$IFDEF IS_WINXP}BTNs := [cbYes, cbNo];{$ENDIF} end
         else begin
           TDCommonButtons := 0;
-          ButtonIDs := [IDYES, IDNO];
+          SetLength(A,2);
+          A[0] := IDYES;
+          A[1] := IDNO;
+          ButtonIDs := A;
+          {$IFDEF IS_WINXP}BTNs := [];{$ENDIF}
         end;
-        if Buttons = MB_YESNOCANCEL then
+        if Buttons = MB_YESNOCANCEL then begin
           TDCommonButtons := TDCommonButtons or TDCBF_CANCEL_BUTTON;
+          {$IFDEF IS_WINXP}BTNs := [cbCancel];{$ENDIF} end;
       end;
     MB_RETRYCANCEL:
       begin
-        if NButtonLabelsAvailable = 0 then
-          TDCommonButtons := TDCBF_RETRY_BUTTON
+        if NButtonLabelsAvailable = 0 then begin
+          TDCommonButtons := TDCBF_RETRY_BUTTON;
+          {$IFDEF IS_WINXP}BTNs := [cbRetry];{$ENDIF} end
         else begin
           TDCommonButtons := 0;
-          ButtonIDs := [IDRETRY];
+          SetLength(A,1);
+          A[0] := IDRETRY;
+          ButtonIDs := A;
+          {$IFDEF IS_WINXP}BTNs := [];{$ENDIF}
         end;
         TDCommonButtons := TDCommonButtons or TDCBF_CANCEL_BUTTON;
+        {$IFDEF IS_WINXP}BTNs := [cbCancel];{$ENDIF}
       end;
     MB_ABORTRETRYIGNORE:
       begin
         if NButtonLabelsAvailable = 0 then
           InternalError('TaskDialogMsgBox: Invalid ButtonLabels')
-        else
-          ButtonIDs := [IDRETRY, IDIGNORE, IDABORT]; { Notice the order, abort label must be last }
+        else begin
+          SetLength(A,3);
+          A[0] := IDRETRY;
+          A[1] := IDIGNORE;
+          A[2] := IDABORT;
+          ButtonIDs := A;
+        end;
         TDCommonButtons := 0;
+        {$IFDEF IS_WINXP}BTNs := [];{$ENDIF}
       end;
     else
       begin
@@ -165,10 +212,58 @@ begin
   end;
   if Length(ButtonIDs) <> NButtonLabelsAvailable then
     InternalError('TaskDialogMsgBox: Invalid ButtonLabels');
+
+{$IFDEF IS_WINXP}
+  WinVer := Swap(Word(GetVersion()));
+  if WinVer = $0501 then
+  begin
+    Ret := 0;
+    Task.Title := Caption;
+    Task.Inst := Instruction;
+    Task.Content := Text;
+    Task.Buttons := BTNStr;
+
+    if GetMessageBoxRightToLeft and (Buttons = MB_ABORTRETRYIGNORE) then
+       Ret:= Task.Execute(BTNs,0,[tdfUseCommandLinks, tdfRtlLayout],IconDialog,tfiBlank)
+    else if GetMessageBoxRightToLeft then
+       Ret:= Task.Execute(BTNs,0,[tdfUseCommandLinks, tdfAllowDialogCancellation, tdfRtlLayout],IconDialog,tfiBlank)
+    else 
+      begin
+        if Buttons = MB_ABORTRETRYIGNORE then
+           Ret:= Task.Execute(BTNs,0,[tdfUseCommandLinks],IconDialog,tfiBlank)
+        else
+           Ret:= Task.Execute(BTNs,0,[tdfUseCommandLinks, tdfAllowDialogCancellation],IconDialog,tfiBlank);
+      end;
+
+    case Ret of
+      100: begin
+             if (Buttons = MB_OK) or (Buttons = MB_OKCANCEL) then Result := IDOK;
+             if (Buttons = MB_YESNO) or (Buttons = MB_YESNOCANCEL) then Result := IDYES;
+             if Buttons = MB_RETRYCANCEL then Result := IDRETRY;
+             if Buttons = MB_ABORTRETRYIGNORE then Result := IDRETRY;
+           end;
+
+      101: begin
+             if Buttons = MB_OKCANCEL then Result := IDCANCEL;
+             if (Buttons = MB_YESNO) or (Buttons = MB_YESNOCANCEL) then Result := IDNO;
+             if Buttons = MB_RETRYCANCEL then Result := IDCANCEL;
+             if Buttons = MB_ABORTRETRYIGNORE then Result := IDIGNORE;
+           end;
+
+      102: begin
+             if Buttons = MB_YESNOCANCEL then Result := IDCANCEL;
+             if Buttons = MB_ABORTRETRYIGNORE then Result := IDABORT;
+           end;
+    else
+      Result := Ret;
+    end;
+
+  end else
+{$ENDIF}
   if not DoTaskDialog(Application.Handle, PChar(Instruction), PChar(Text),
            GetMessageBoxCaption(PChar(Caption), Typ), IconP, TDCommonButtons, ButtonLabels, ButtonIDs, ShieldButton,
            GetMessageBoxRightToLeft, IfThen(Typ in [mbError, mbCriticalError], MB_ICONSTOP, 0), Result) then //note that MB_ICONEXCLAMATION (used by mbError) includes MB_ICONSTOP (used by mbCriticalError)
-    Result := 0;
+   Result := 0;
 end;
 
 procedure InitCommonControls; external comctl32 name 'InitCommonControls';

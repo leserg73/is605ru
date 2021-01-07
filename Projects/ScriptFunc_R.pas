@@ -27,7 +27,7 @@ uses
   Struct, ScriptDlg, Main, PathFunc, CmnFunc, CmnFunc2, FileClass, RedirFunc,
   Install, InstFunc, InstFnc2, Msgs, MsgIDs, NewDisk, BrowseFunc, Wizard, VerInfo,
   SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper,
-  SpawnClient, UninstProgressForm, ASMInline, DotNet, TaskbarProgressFunc;
+  SpawnClient, UninstProgressForm, ASMInline,{$IFNDEF PS_MINIVCL} TaskbarProgressFunc,{$ENDIF} DotNet;
 
 var
   ScaleBaseUnitsInitialized: Boolean;
@@ -1612,7 +1612,7 @@ function OtherProc(Caller: TPSExec; Proc: TPSExternalProcRec; Global, Stack: TPS
 
   function GetExceptionMessage: String;
   var
-    Code: TPSError;
+    Code: TPSErrors;
     E: TObject;
   begin
     Code := Caller.{$IFDEF UNICODE} LastEx {$ELSE} ExceptionCode {$ENDIF};

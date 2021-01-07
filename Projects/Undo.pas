@@ -515,6 +515,9 @@ begin
   for I := 0 to High(Data) do
     Data[I] := '';
   I := 0;
+{$IFDEF VER200}
+  L := 0;  { prevent warning }
+{$ENDIF}
   X := @Rec^.Data;
   while I <= High(Data) do begin
     case X^ of
@@ -1141,7 +1144,11 @@ begin
   end;
 {$ENDIF}
   if MaxDestBytes <> 0 then
+  {$IFNDEF VER200}
     AnsiStrings.StrPLCopy(Dest, AnsiString(Source), MaxDestBytes - 1);
+  {$ELSE}
+    StrPLCopy(Dest, AnsiString(Source), MaxDestBytes - 1);
+  {$ENDIF}
   Result := (N + 1) * SizeOf(Dest^);
 end;
 

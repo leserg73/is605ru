@@ -156,9 +156,10 @@ type
       ssRawDataResource,
       ssIconResource,
       ssBitmapResource,
+      ssTaskBarView,
+      ssVersionInfoComments,
     {$ENDIF}
     ssSetupIconFile,
-    ssTaskBarView,
     ssSetupStyleFile,
     ssSetupLogging,
     ssSetupMutex,
@@ -201,9 +202,6 @@ type
     ssUsePreviousUserInfo,
     ssUseSetupLdr,
     ssUserInfoPage,
-    {$IFNDEF PS_MINIVCL}
-      ssVersionInfoComments,
-    {$ENDIF}
     ssVersionInfoCompany,
     ssVersionInfoCopyright,
     ssVersionInfoDescription,
@@ -4249,14 +4247,14 @@ begin
           AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
         BitmapResourceList := Value;
       end;
+    ssTaskBarView: begin
+        SetupHeader.TaskBarOn := StrToBool(Value);
+      end;
     {$ENDIF}
     ssSetupIconFile: begin
         if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
           AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
         SetupIconFilename := Value;
-      end;
-    ssTaskBarView: begin
-        SetupHeader.TaskBarOn := StrToBool(Value);
       end;
     ssSetupStyleFile: begin
         if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
@@ -7565,7 +7563,11 @@ begin
     Rec.Param2 := Param2;
     Rec.Param3 := Param3;
     FillChar(Rec.Param4, SizeOf(Rec.Param4), 0);
+{$IFNDEF VER200}
     AnsiStrings.StrPCopy(Rec.Param4, Param4);
+{$ELSE}
+    StrPCopy(Rec.Param4, Param4);
+{$ENDIF}
     CodeDebugInfo.WriteBuffer(Rec, SizeOf(Rec));
     Inc(VariableDebugEntryCount);
   end;
@@ -8502,7 +8504,7 @@ var
         ResRawDates := TStringList.Create;
         ResRawDates.NameValueSeparator := '>';
         ResRawDates.CommaText := RawDataResourceList;
-        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        AddStatus(Format(SCompilerStatusUpdatingRes, ['SETUP.E32']));
         LineNumber := SetupDirectiveLines[ssRawDataResource];
         AddStatus(Format(SCompilerStatusReadingFile, ['RawDataResource']));
         try
@@ -8523,7 +8525,7 @@ var
         ResRawDates := TStringList.Create;
         ResRawDates.NameValueSeparator := '>';
         ResRawDates.CommaText := BitmapResourceList;
-        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        AddStatus(Format(SCompilerStatusUpdatingRes, ['SETUP.E32']));
         LineNumber := SetupDirectiveLines[ssRawDataResource];
         AddStatus(Format(SCompilerStatusReadingFile, ['BitmapResource']));
         try
@@ -8544,7 +8546,7 @@ var
         ResRawDates := TStringList.Create;
         ResRawDates.NameValueSeparator := '>';
         ResRawDates.CommaText := IconResourceList;
-        AddStatus(Format(SCompilerStatusUpdatingStyles, ['SETUP.E32']));
+        AddStatus(Format(SCompilerStatusUpdatingRes, ['SETUP.E32']));
         LineNumber := SetupDirectiveLines[ssRawDataResource];
         AddStatus(Format(SCompilerStatusReadingFile, ['IconResource']));
         try

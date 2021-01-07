@@ -79,7 +79,7 @@ const
 implementation
 
 uses
-  Generics.Collections, UITypes,
+  Generics.Collections,{$IFNDEF VER200} UITypes,{$ENDIF}
   CmnFunc2, Main, Msgs, BidiUtils;
 
 var

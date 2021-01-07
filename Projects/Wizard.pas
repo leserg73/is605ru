@@ -341,7 +341,7 @@ function ValidateCustomDirEdit(const AEdit: TEdit;
 implementation
 
 uses
-  ShellApi, ShlObj, Types, Msgs, Main, PathFunc, CmnFunc, CmnFunc2, TaskbarProgressFunc,
+  ShellApi, ShlObj, Types, Msgs, Main, PathFunc, CmnFunc, CmnFunc2,{$IFNDEF PS_MINIVCL} TaskbarProgressFunc,{$ENDIF}
   MD5, InstFunc, SelFolderForm, Extract, Logging, RestartManager, ScriptRunner;
 
 {$R *.DFM}
@@ -1179,6 +1179,7 @@ begin
   { Initialize BeveledLabel }
   if SetupMessages[msgBeveledLabel] <> '' then begin
     BeveledLabel.Transparent := False;
+    BeveledLabel.Top := Bevel.Top;
     BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' ';
   end
   else
@@ -1441,12 +1442,16 @@ begin
   inherited;
   { Ensure the form is *always* on top of MainForm by making MainForm
     the "parent" of the form. }
+{$IFNDEF PS_MINIVCL}
   if SetupHeader.TaskBarOn then
     // Show Thumbnail Wizard on TaskBar
     Params.WndParent := Application.Handle
   else
     // Hide Thumbnail Wizard on TaskBar
     Params.WndParent := MainForm.Handle;
+{$ELSE}
+  Params.WndParent := MainForm.Handle;
+{$ENDIF}
 end;
 
 function TWizardForm.PageIndexFromID(const ID: Integer): Integer;

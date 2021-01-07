@@ -35,7 +35,7 @@ object MBDForm: TMBDForm
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 1
   end
-  object TaskMesssageLabel: TNewStaticText
+  object TaskMessageLabel: TNewStaticText
     Left = 9
     Top = 40
     Width = 80
@@ -43,7 +43,7 @@ object MBDForm: TMBDForm
     Caption = 'Сообщение:'
     TabOrder = 12
   end
-  object TaskMesssageText: TEdit
+  object TaskMessageText: TEdit
     Left = 93
     Top = 36
     Width = 445

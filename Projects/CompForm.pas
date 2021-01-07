@@ -1886,7 +1886,7 @@ begin
         if AppData.ErrorLine > 0 then
           S := S + Format('Line %d:' + SNewLine, [AppData.ErrorLine]);
         S := S + AppData.ErrorMsg;
-        SetAppTaskbarProgressState(tpsErrog); // tpsError >> tpsErrog for TaskBar
+        SetAppTaskbarProgressState(tpsError);
         MsgBox(S, 'Compiler Error', mbCriticalError, MB_OK)
       end;
       Abort;

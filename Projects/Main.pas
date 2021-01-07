@@ -265,7 +265,7 @@ uses
   Wizard, DebugClient, VerInfo, Extract, FileClass, Logging, MD5, SHA1,
   {$IFNDEF Delphi3orHigher} OLE2, {$ELSE} ActiveX, {$ENDIF}
   SimpleExpression, Helper, SpawnClient, SpawnServer, DotNet, BitmapImage,
-  TaskDialog;
+  TaskDialog{$IFDEF IS_WINXP}, SynTaskDialog{$ENDIF};
 
 {$R *.DFM}
 
@@ -4347,7 +4347,7 @@ begin
           else
             SetupExitCode := ecCancelledBeforeInstall;
           TerminateApp;
-        end{ else WizardForm.UpdateComponentsList};
+        end;
       ssInstall:
         if (shAllowCancelDuringInstall in SetupHeader.Options) and not InitNoCancel then
           if ConfirmCancel(True) then
@@ -4448,8 +4448,8 @@ var
   KernelModule: HMODULE;
   GetNativeSystemInfoFunc: procedure(var lpSystemInfo: TSystemInfo); stdcall;
   IsWow64ProcessFunc: function(hProcess: THandle; var Wow64Process: BOOL): BOOL; stdcall;
-  IsWow64Process2Func: function(hProcess: THandle; var pProcessMachine, pNativeMachine: USHORT): BOOL; stdcall;
-  ProcessMachine, NativeMachine: USHORT;
+  IsWow64Process2Func: function(hProcess: THandle; var pProcessMachine, pNativeMachine: {$IFNDEF VER200}USHORT{$ELSE}WORD{$ENDIF}): BOOL; stdcall;
+  ProcessMachine, NativeMachine: {$IFNDEF VER200}USHORT{$ELSE}WORD{$ENDIF};
   Wow64Process: BOOL;
   SysInfo: TSystemInfo;
 begin

@@ -105,7 +105,7 @@ begin
   raise Exception.Create(Error);
 end;
 
-procedure ShowPSExecError(const Error: TPSError);
+procedure ShowPSExecError(const Error: TPSErrors);
 begin
   ShowError('Script error: ' + PSErrorToString(Error, ''));
 end;
@@ -314,7 +314,7 @@ begin
   end;
 end;
 
-procedure PSExecOnException(Sender: TPSExec; ExError: TPSError; const ExParam: AnsiString; ExObject: TObject; ProcNo, Position: Cardinal);
+procedure PSExecOnException(Sender: TPSExec; ExError: TPSErrors; const ExParam: AnsiString; ExObject: TObject; ProcNo, Position: Cardinal);
 var
   ScriptRunner: TScriptRunner;
 begin

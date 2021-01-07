@@ -14,26 +14,28 @@ unit TaskbarProgressFunc;
 interface
 
 type
-  TTaskbarProgressState = (tpsNoProgress, tpsIndeterminate, tpsNormal,
-    tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
+  TTaskbarProgressState = (tpsNoProgress, tpsIndeterminate, tpsNormal, tpsError, tpsPaused);
 
 procedure SetAppTaskbarProgressState(const State: TTaskbarProgressState);
 procedure SetAppTaskbarProgressValue(const Completed, Total: Cardinal);
-procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);
-procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);
-procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);
+{$IFNDEF PS_MINIVCL}
+  procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);
+  procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);
+  procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);
 {
-procedure SetAppTaskbarRegisterTab(const hwndTab, hwndMDI: THandle);
-procedure SetAppTaskbarTabActive(const hwndTab, hwndMDI: THandle);
-procedure SetAppTaskbarTabOrder(const hwndTab, hwndInsertBefore: THandle);
-procedure SetAppTaskbarUnregisterTab(const hwndTab: THandle);
-procedure SetAppTaskbarThumbnailClip(const hwnd: THandle; var prcClip: TRect);
+  procedure SetAppTaskbarRegisterTab(const hwndTab, hwndMDI: THandle);
+  procedure SetAppTaskbarTabActive(const hwndTab, hwndMDI: THandle);
+  procedure SetAppTaskbarTabOrder(const hwndTab, hwndInsertBefore: THandle);
+  procedure SetAppTaskbarUnregisterTab(const hwndTab: THandle);
+  procedure SetAppTaskbarThumbnailClip(const hwnd: THandle; var prcClip: TRect);
 }
+{$ENDIF}
 
 implementation
 
 uses
-  Windows, {$IFDEF VER90} OLE2 {$ELSE} ActiveX {$ENDIF}, Forms, Graphics, SysUtils, dwTaskbarList;
+  Windows, {$IFDEF VER90} OLE2 {$ELSE} ActiveX {$ENDIF}, Forms,
+   {$IFNDEF PS_MINIVCL}Graphics, SysUtils,{$ENDIF} dwTaskbarList;
 
 var
   TaskbarListInitialized: Boolean;
@@ -82,72 +84,74 @@ begin
   end;
 end;
 
-procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.SetThumbnailTooltip(Application.Handle, PWideChar(WideString(ToolTipStr)));
-end;
+{$IFNDEF PS_MINIVCL}
+  procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.SetThumbnailTooltip(Application.Handle, PWideChar(WideString(ToolTipStr)));
+  end;
 
 {
-procedure SetAppTaskbarRegisterTab(const hwndTab, hwndMDI: THandle);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.RegisterTab(hwndTab, hwndMDI);
-end;
+  procedure SetAppTaskbarRegisterTab(const hwndTab, hwndMDI: THandle);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.RegisterTab(hwndTab, hwndMDI);
+  end;
 
-procedure SetAppTaskbarTabActive(const hwndTab, hwndMDI: THandle);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.SetTabActive(hwndTab, hwndMDI, 0);
-end;
+  procedure SetAppTaskbarTabActive(const hwndTab, hwndMDI: THandle);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.SetTabActive(hwndTab, hwndMDI, 0);
+  end;
 
-procedure SetAppTaskbarTabOrder(const hwndTab, hwndInsertBefore: THandle);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.SetTabOrder(hwndTab, hwndInsertBefore);
-end;
+  procedure SetAppTaskbarTabOrder(const hwndTab, hwndInsertBefore: THandle);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.SetTabOrder(hwndTab, hwndInsertBefore);
+  end;
 
-procedure SetAppTaskbarUnregisterTab(const hwndTab: THandle);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.UnregisterTab(hwndTab);
-end;
+  procedure SetAppTaskbarUnregisterTab(const hwndTab: THandle);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.UnregisterTab(hwndTab);
+  end;
 
-procedure SetAppTaskbarThumbnailClip(const hwnd: THandle; var prcClip: TRect);
-begin
-  if InitializeTaskbarList then
-    TaskbarListInterface.SetThumbnailClip(hwnd, prcClip);
-end;
+  procedure SetAppTaskbarThumbnailClip(const hwnd: THandle; var prcClip: TRect);
+  begin
+    if InitializeTaskbarList then
+      TaskbarListInterface.SetThumbnailClip(hwnd, prcClip);
+  end;
 }
 
-procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);
-var
-  Icon: TIcon;
-begin
-  Icon := TIcon.Create;
-  try
-    Icon.LoadFromResourceName(HInstance, ResOvIcon);
-    if InitializeTaskbarList then
-      TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(ResOvIcon)));
-  finally
-    Icon.Free;
+  procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);
+  var
+    Icon: TIcon;
+  begin
+    Icon := TIcon.Create;
+    try
+      Icon.LoadFromResourceName(HInstance, ResOvIcon);
+      if InitializeTaskbarList then
+        TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(ResOvIcon)));
+    finally
+      Icon.Free;
+    end;
   end;
-end;
 
-procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);
-var
-  Icon: TIcon;
-  IconFile: String;
-begin
-  Icon := TIcon.Create;
-  try
-    Icon.LoadFromFile(FileIcon);
-    IconFile := ExtractFileName(FileIcon);
-    if InitializeTaskbarList then
-      TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(IconFile)));
-  finally
-    Icon.Free;
+  procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);
+  var
+    Icon: TIcon;
+    IconFile: String;
+  begin
+    Icon := TIcon.Create;
+    try
+      Icon.LoadFromFile(FileIcon);
+      IconFile := ExtractFileName(FileIcon);
+      if InitializeTaskbarList then
+        TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(IconFile)));
+    finally
+      Icon.Free;
+    end;
   end;
-end;
+{$ENDIF}
 
 end.

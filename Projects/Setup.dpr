@@ -24,7 +24,10 @@ program Setup;
 uses
   SafeDLLPath in 'SafeDLLPath.pas',
   XPTheme in 'XPTheme.pas',
-  //D2009Win2kFix in 'D2009Win2kFix.pas',
+{$IFDEF VER200}
+  D2009Win2kFix in 'D2009Win2kFix.pas',
+  UxThemeISX in '..\Components\UxThemeISX.pas',
+{$ENDIF}
   Forms,
   Windows,
   SysUtils,
@@ -79,6 +82,9 @@ uses
   SpawnCommon in 'SpawnCommon.pas',
   SpawnServer in 'SpawnServer.pas',
   SpawnClient in 'SpawnClient.pas',
+{$IFDEF IS_WINXP}
+  SynTaskDialog in '..\Components\TaskDialog\SynTaskDialog.pas',
+{$ENDIF}
   TaskDialog in 'TaskDialog.pas',
   Vcl.Themes,
   Vcl.Styles,

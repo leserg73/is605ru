@@ -128,6 +128,9 @@ const
   SCompilerStatusUpdatingVersionInfo = '   Обновление версии (%s)';
   SCompilerStatusUpdatingIcons = '   Обновление значков (%s)';
   SCompilerStatusUpdatingStyles = '   Добавление стиля (%s)';
+{$IFNDEF PS_MINIVCL}
+  SCompilerStatusUpdatingRes = '   Обновление ресурсов (%s)';
+{$ENDIF}
   SCompilerStatusCreatingDisk = '   Создание диска %d';
   SCompilerStatusFinished = '*** Компиляция завершена.  [%s, прошло %s]';
   SCompilerStatusError = 'ОШИБКА:';

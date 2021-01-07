@@ -231,7 +231,9 @@ var
 begin
   Name := FToken;
   Next;
-
+{$IFDEF VER200}
+  Result := False; { Silence compiler }
+{$ENDIF}
   FillChar(Parameters, SizeOf(Parameters), 0);
   try
     if FParametersAllowed and (FTokenId = tiOpenRound) then begin

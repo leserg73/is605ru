@@ -22,10 +22,10 @@ procedure PerformInstall(var Succeeded: Boolean; const ChangesEnvironment,
 procedure ExtractTemporaryFile(const BaseName: String);
 function ExtractTemporaryFiles(const Pattern: String): Integer;
 {$IFNDEF PS_MINIVCL}
-procedure ExtractTemporaryFileEx(const BaseName: String; const DirName: String);
-procedure ExtractTemporaryFileToStream(const BaseName: String; const BaseStream: TStream);
-function ExtractTemporaryFileSize(const BaseName: String): Cardinal;
-function HInstance: LongWord;
+  procedure ExtractTemporaryFileEx(const BaseName: String; const DirName: String);
+  procedure ExtractTemporaryFileToStream(const BaseName: String; const BaseStream: TStream);
+  function ExtractTemporaryFileSize(const BaseName: String): Cardinal;
+  function HInstance: LongWord;
 {$ENDIF}
 
 implementation
@@ -72,7 +72,7 @@ procedure InstallMessageBoxCallback(const Flags: LongInt; const After: Boolean;
   const Param: LongInt);
 const
   States: array [TNewProgressBarState] of TTaskbarProgressState =
-    (tpsNormal, tpsErrog, tpsPaused);  // tpsError >> tpsErrog for TaskBar
+    (tpsNormal, tpsError, tpsPaused);
 var
   NewState: TNewProgressBarState;
 begin

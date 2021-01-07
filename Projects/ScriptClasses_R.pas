@@ -24,7 +24,14 @@ implementation
 uses
   Windows, Controls, Forms, StdCtrls, Graphics,
   uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms, 
-  {$IFNDEF PS_MINIVCL}uPSR_menus, Menus, uPSR_buttons, Buttons, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg, {$ENDIF}
+  {$IFNDEF PS_MINIVCL}
+    uPSR_menus, Menus, uPSR_buttons, Buttons, 
+    {$IFNDEF VER200}
+      Imaging.pngimage, Imaging.jpeg, 
+    {$ELSE}
+      pngimage, jpeg, 
+    {$ENDIF}
+  {$ENDIF}
   uPSR_stdctrls, uPSR_extctrls, uPSR_comobj, {$IFNDEF UNICODE} uPSUtils, {$ENDIF}
   NewStaticText, NewCheckListBox, NewProgressBar, RichEditViewer,
   ExtCtrls, UIStateForm, SetupForm, Main, Wizard, SetupTypes, PasswordEdit,

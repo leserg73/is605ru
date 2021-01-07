@@ -59,6 +59,10 @@ type
     // Entries: array [0..idType - 1] of TGroupIconRsrcEntry;
   end;
 
+{$IFDEF VER200}  //anything prior to Delphi 2009
+  UIntPtr = Cardinal;
+  IntPtr = Integer;
+{$ENDIF}
 
   TSmoGroupIcon = record
     Header: TGroupIconRsrcHeader;
@@ -722,107 +726,99 @@ var
 begin
   if not GetGroupIconFromIcoFile(IcoFileName, IconA) then
       ErrorWithLastError('GetGroupIconFromIcoFile failed');
-  if not SetGroupIcon(FileName, PChar(IcoResName), IconA) then
+  if not SetGroupIcon(FileName, PChar(AnsiUpperCase(IcoResName)), IconA) then
       ErrorWithLastError('SetGroupIcon failed');
 end;
 {$ENDIF}
 
 { Add Resource files to setup.exe }
 procedure UpdateResRaw(const FileName, ResRawFileName, ResRawName: String; ResTypeID: Integer);
+  {* Write resource to the file:
+      FileName       - Name of file,
+      ResRawFileName - Name of file resource,
+      ResRawName     - Name of resource,
+      ResTypeID      - Type of resource
+      Buf            - Pointer to data block,
+      Size           - Size of data block }
 
-  function AddResource(FileName, ResName: String; ResType: Integer; Buf: Pointer; Size: Integer): Integer;
-  {* Write resource to the section VCLSTYLE in a file:
-     FileName - Name of file,
-     ResName  - Name of resource,
-     ResType  - Type of resource
-     Buf      - Pointer to data block,
-     Size     - Size of data block }
-  { Predefined Resource Types
-    RT_CURSOR       = MakeIntResource(1);
-    RT_BITMAP       = MakeIntResource(2);
-    RT_ICON         = MakeIntResource(3);
-    RT_MENU         = MakeIntResource(4);
-    RT_DIALOG       = MakeIntResource(5);
-    RT_STRING       = MakeIntResource(6);
-    RT_FONTDIR      = MakeIntResource(7);
-    RT_FONT         = MakeIntResource(8);
-    RT_ACCELERATOR  = MakeIntResource(9);
-    RT_RCDATA       = MakeIntResource(10);
-    RT_MESSAGETABLE = MakeIntResource(11);
-    RT_GROUP_CURSOR = MakeIntResource(DWORD(RT_CURSOR) + 11);
-    RT_GROUP_ICON   = MakeIntResource(DWORD(RT_ICON) + 11);
-    RT_VERSION      = MakeIntResource(16);
-    RT_DLGINCLUDE   = MakeIntResource(17);
-    RT_PLUGPLAY     = MakeIntResource(19);
-    RT_VXD          = MakeIntResource(20);
-    RT_ANICURSOR    = MakeIntResource(21);
-    RT_ANIICON      = MakeIntResource(22);
-    RT_HTML         = MakeIntResource(23);
-    RT_MANIFEST     = MakeIntResource(24); }
-  var
-    H: THandle;
-  begin
-    H := BeginUpdateResource(PChar(FileName), false);
-    if H = 0 then begin
-      ErrorWithLastError('BeginUpdateResource failed (1)');
-      Exit;
-    end;
-    { VCLSTYLE, RT_RCDATA(MAKEINTRESOURCE(10)) or   RT_RCDATA = PChar(10); }
-    case ResType of
-    50:  if not UpdateResource(H, 'VCLSTYLE', PChar(ResName), 1033, Buf, Size) then
-           ErrorWithLastError('UpdateResource failed (1)');
-    else
-      if not UpdateResource(H, MakeIntResource(ResType), PChar(ResName), 1033, Buf, Size) then
-        ErrorWithLastError('UpdateResource failed (1)');
-    end;
-    //else result := 0;
-
-    if not EndUpdateResource(H, False) then
-      ErrorWithLastError('EndUpdateResource failed');
-  end;
-
-  function AddFileToExe(ExeName, FileName, ResName: String; ResType: Integer): Boolean;
-  {* Add any file to resource:
-     ExeName  - Path to the file,
-     FileName - Path to the resource file,
-     ResName  - Name of resource for write
-     ResType  - Type of resource }
-  var
-    F: TFileStream;
-    Buf:  pointer;
-    c1: dword;
-  begin
-    try
-      F := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-      F.Position := 0;
-      if ResType = 2 then begin // RT_BITMAP
-        c1 := GetFileSize(F.Handle, nil) - sizeOf(TBitmapFileHeader);
-        GetMem(Buf, c1);
-        SetFilePointer(F.Handle, sizeOf(TBitmapFileHeader), nil, FILE_BEGIN);
-        F.Read(Buf^, c1);
-        result := AddResource(ExeName, ResName, ResType, Buf, c1) = 0;
-      end else begin // RT_RCDATA, VCLSTYLE
-        GetMem(Buf, F.Size);
-        F.Read(Buf^, F.Size);
-        result := AddResource(ExeName, ResName, ResType, Buf, F.Size) = 0;
-      end;
-
-      F.Free;
-      FreeMem(Buf);
-    except
-      result := false;
-    end;
-  end;
+  {* Predefined Resource Types (ResTypeID)
+      RT_CURSOR       = MakeIntResource(1);
+      RT_BITMAP       = MakeIntResource(2);
+      RT_ICON         = MakeIntResource(3);
+      RT_MENU         = MakeIntResource(4);
+      RT_DIALOG       = MakeIntResource(5);
+      RT_STRING       = MakeIntResource(6);
+      RT_FONTDIR      = MakeIntResource(7);
+      RT_FONT         = MakeIntResource(8);
+      RT_ACCELERATOR  = MakeIntResource(9);
+      RT_RCDATA       = MakeIntResource(10);
+      RT_MESSAGETABLE = MakeIntResource(11);
+      RT_GROUP_CURSOR = MakeIntResource(DWORD(RT_CURSOR) + 11);
+      RT_GROUP_ICON   = MakeIntResource(DWORD(RT_ICON) + 11);
+      RT_VERSION      = MakeIntResource(16);
+      RT_DLGINCLUDE   = MakeIntResource(17);
+      RT_PLUGPLAY     = MakeIntResource(19);
+      RT_VXD          = MakeIntResource(20);
+      RT_ANICURSOR    = MakeIntResource(21);
+      RT_ANIICON      = MakeIntResource(22);
+      RT_HTML         = MakeIntResource(23);
+      RT_MANIFEST     = MakeIntResource(24); }
 
 var
+  H: THandle;
+  F: TFileStream;
+  Buf: Pointer;
+  c1, c2: Dword;
   StyleInfo: TStyleInfo;
 
 begin
+  Buf := nil;
+  F := nil;
+  c1 := 0;
   if ResTypeID = 50 then
     { Ensure the style file is valid }
     if not TStyleManager.IsValidStyle(ResRawFileName, StyleInfo) then
       Error('Style file is invalid');
-  AddFileToExe(FileName, ResRawFileName, ResRawName, ResTypeID);
-end;
+  try
+      try
+        F := TFileStream.Create(ResRawFileName, fmOpenRead or fmShareDenyWrite);
+        F.Position := 0;
+        c2 := GetFileSize(F.Handle, nil);
 
+        case ResTypeID of
+        2:  begin // RT_BITMAP
+              c1 := c2 - sizeOf(TBitmapFileHeader);
+              GetMem(Buf, c1);
+              SetFilePointer(F.Handle, sizeOf(TBitmapFileHeader), nil, FILE_BEGIN);
+              F.Read(Buf^, c1);
+            end;
+        10,50: begin // RT_RCDATA, VCLSTYLE
+              GetMem(Buf, c2);
+              F.Read(Buf^, c2);
+             end;
+        end;
+
+      finally
+        F.Free;
+      end;
+
+      H := BeginUpdateResource(PChar(FileName), False);
+      if H = 0 then ErrorWithLastError('BeginUpdateResource failed (1)');
+
+      { VCLSTYLE, RT_RCDATA(MAKEINTRESOURCE(10)) or RT_RCDATA = PChar(10); }
+      case ResTypeID of
+      50:  if not UpdateResource(H, PChar(AnsiUpperCase('VCLSTYLE')), PChar(AnsiUpperCase(ResRawName)), 1033, Buf, c2) then
+             ErrorWithLastError('UpdateResource failed (1)');
+      2:   if not UpdateResource(H, RT_BITMAP, PChar(AnsiUpperCase(ResRawName)), 1033, Buf, c1) then
+             ErrorWithLastError('UpdateResource failed (1)');
+      10:  if not UpdateResource(H, RT_RCDATA, PChar(AnsiUpperCase(ResRawName)), 1033, Buf, c2) then
+             ErrorWithLastError('UpdateResource failed (1)');
+      end;
+
+      if not EndUpdateResource(H, False) then ErrorWithLastError('EndUpdateResource failed');
+
+  finally
+    FreeMem(Buf);
+  end;
+end;
 end.

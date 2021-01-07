@@ -208,9 +208,10 @@ type
       ssRawDataResource,
       ssIconResource,
       ssBitmapResource,
+      ssTaskBarView,
+      ssVersionInfoComments,
     {$ENDIF}
     ssSetupIconFile,
-    ssTaskBarView,
     ssSetupStyleFile,
     ssSetupLogging,
     ssSetupMutex,
@@ -253,9 +254,6 @@ type
     ssUsePreviousUserInfo,
     ssUseSetupLdr,
     ssUserInfoPage,
-    {$IFNDEF PS_MINIVCL}
-      ssVersionInfoComments,
-    {$ENDIF}
     ssVersionInfoCompany,
     ssVersionInfoCopyright,
     ssVersionInfoDescription,

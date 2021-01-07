@@ -315,7 +315,11 @@ end;
 
 constructor TScriptCompiler.Create;
 begin
+{$IFNDEF VER200}
   FObsoleteFunctionWarnings := TDictionary<String, String>.Create(TIStringComparer.Ordinal);
+{$ELSE}
+  FObsoleteFunctionWarnings := TDictionary<String, String>.Create(TStringComparer.Ordinal);
+{$ENDIF}
   FExports := TList.Create();
   FUsedLines := TList.Create();
   FFunctionsFound := TStringList.Create();
