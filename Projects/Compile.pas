@@ -153,6 +153,7 @@ type
     ssRestartApplications,
     ssRestartIfNeededByRun,
     {$IFNDEF PS_MINIVCL}
+      ssDirSelectModern,
       ssRawDataResource,
       ssIconResource,
       ssBitmapResource,
@@ -4185,7 +4186,7 @@ begin
     ssOutput: begin
         if not FixedOutput then
           Output := StrToBool(Value);
-		end;
+    end;
     ssOutputBaseFilename: begin
         if not FixedOutputBaseFilename then
           OutputBaseFilename := Value;
@@ -4231,7 +4232,10 @@ begin
     ssRestartIfNeededByRun: begin
         SetSetupHeaderOption(shRestartIfNeededByRun);
       end;
-    {$IFNDEF PS_MINIVCL}
+{$IFNDEF PS_MINIVCL}
+    ssDirSelectModern: begin
+        SetSetupHeaderOption(shDirSelectModern);
+      end;
     ssRawDataResource: begin
         if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
           AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
@@ -4248,9 +4252,9 @@ begin
         BitmapResourceList := Value;
       end;
     ssTaskBarView: begin
-        SetupHeader.TaskBarOn := StrToBool(Value);
+        SetSetupHeaderOption(shTaskBarView);
       end;
-    {$ENDIF}
+{$ENDIF}
     ssSetupIconFile: begin
         if (Value <> '') and (Win32Platform <> VER_PLATFORM_WIN32_NT) then
           AbortCompileOnLineFmt(SCompilerDirectiveIsNTOnly, ['Setup', KeyName]);
@@ -7249,7 +7253,7 @@ begin
 end;
 
 procedure TSetupCompiler.CheckCustomMessageReferences;
-{ Checks existance of expected custom message constants }
+{ Checks existence of expected custom message constants }
 var
   LineInfo: TLineInfo;
   Found: Boolean;
@@ -8804,7 +8808,6 @@ begin
       VersionInfoComments := 'This installation was built with Inno Setup.';
     {$ENDIF}
     SetupHeader.SetupStyle := False;
-    SetupHeader.TaskBarOn := False;
 
     { Read [Setup] section }
     EnumIniSection(EnumSetupProc, 'Setup', 0, True, True, '', False, False);
@@ -9266,7 +9269,7 @@ begin
       AddDefaultSetupType(DefaultTypeEntryNames[2], [toIsCustom], ttDefaultCustom);
     end;
 
-    { Check existance of expected custom message constants }
+    { Check existence of expected custom message constants }
     CheckCustomMessageReferences;
 
     { Compile CodeText }
@@ -9472,7 +9475,6 @@ begin
     FreeAndNil(InternalCompressProps);
   end;
 end;
-
 
 { Interface functions }
 

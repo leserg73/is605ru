@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, StdCtrls,
-  Wizard,
+  Wizard, {$IFNDEF PS_MINIVCL}Dialogs,{$ENDIF}
   NewCheckListBox, NewStaticText, NewProgressBar, PasswordEdit, RichEditViewer,
   BidiCtrls, TaskbarProgressFunc;
 
@@ -387,12 +387,42 @@ procedure TInputDirWizardPage.ButtonClick(Sender: TObject);
 var
   I: Integer;
   Edit: TEdit;
-  S: String;
+  S{$IFNDEF PS_MINIVCL}, SModern{$ENDIF}: String;
+{$IFNDEF PS_MINIVCL}
+label
+  OldDir;
+{$ENDIF}
 begin
   I := FButtons.IndexOf(Sender);
   if I <> -1 then begin
     Edit := TEdit(FEdits[I]);
     S := Edit.Text;
+{$IFNDEF PS_MINIVCL}
+  { Modern Select Dir Dialog - Vista+ }
+  if shDirSelectModern in SetupHeader.Options then begin
+    if Win32MajorVersion >= 6 then begin
+      with TFileOpenDialog.Create(nil) do
+        try
+          SModern := RemoveBackslashUnlessRoot(StringReplace(Trim(RemoveBackslashUnlessRoot(S)), FNewFolderName, '', [rfIgnoreCase]));
+          Title := SetupMessages[msgBrowseDialogTitle];
+          OkButtonLabel := SetupMessages[msgButtonOK];
+          Options := [fdoPickFolders, fdoHideMRUPlaces, fdoDontAddToRecent, fdoNoDereferenceLinks, fdoPathMustExist, fdoForceFileSystem];
+          DefaultFolder := SModern;
+          //FileName := S;
+          if Execute then
+             if shAppendDefaultDirName in SetupHeader.Options then
+                Edit.Text := AddBackslash(FileName) + FNewFolderName
+             else
+                Edit.Text := FileName;
+        finally
+          Free;
+        end;
+    end else goto OldDir;
+  end
+  else
+  OldDir:
+{$ENDIF}
+  { Inno Setup Select Dir Dialog - XP }
     if ShowSelectFolderDialog(False, FAppendDir, S, FNewFolderName) then
       Edit.Text := S;
   end;
@@ -441,7 +471,7 @@ var
   Edit: TEdit;
   Button: TNewButton;
 begin
-  ButtonWidth := WizardForm.CalculateButtonWidth([msgButtonWizardBrowse]);
+  ButtonWidth := WizardForm.CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
 
   if APrompt <> '' then begin
     PromptLabel := TNewStaticText.Create(Self);
@@ -583,7 +613,7 @@ var
   Edit: TEdit;
   Button: TNewButton;
 begin
-  ButtonWidth := WizardForm.CalculateButtonWidth([msgButtonWizardBrowse]);
+  ButtonWidth := WizardForm.CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
 
   if APrompt <> '' then begin
     PromptLabel := TNewStaticText.Create(Self);
@@ -721,8 +751,14 @@ begin
     Width := SurfaceWidth;
     Height := WizardForm.ScalePixelsY(DefaultBoxBottom) - Y;
     Anchors := [akLeft, akTop, akRight, akBottom];
-    BevelKind := bkFlat;
-    BorderStyle := bsNone;
+    // Fix border style for TRichEditViewer
+    if SetupHeader.SetupStyle then begin
+       BevelKind := bkNone;
+       BorderStyle := bsSingle;
+    end else begin
+       BevelKind := bkFlat;
+       BorderStyle := bsNone;
+    end;
     ReadOnly := True;
     ScrollBars := ssVertical;
     WantReturns := False;
