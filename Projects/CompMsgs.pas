@@ -2,7 +2,7 @@ unit CompMsgs;
 
 {
   Inno Setup
-  Copyright (C) 1997-2019 Jordan Russell
+  Copyright (C) 1997-2020 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
@@ -28,6 +28,9 @@ const
   SCompilerOpenFilter = 'Сценарии Inno Setup (*.iss)|*.iss|Все файлы|*.*';
   SCompilerExampleScripts = 'Примеры сценариев...';
   SCompilerMoreFiles = 'Другие файлы сценариев...';
+{$IFDEF IS_WINXP}
+  SCompilerSynTaskDlgButtonCancel = 'Отмена';
+{$ENDIF}
 
   { Compiler Script Wizard }
   SWizardDefaultName = 'Мастер создания сценариев Inno Setup';
@@ -79,7 +82,7 @@ const
   SWizardFileAppDestRootDirError = 'Пожалуйста, укажите основную папку установки отличную от папки приложения.';
   SWizardLanguagesSelError = 'Пожалуйста, выберите не менее одного языка поддержки.';
 
-  SWizardScriptHeader = '; Этот сценарий создан с помощью Мастера Inno Setup.' + SNewLine  + '; ОБРАТИТЕСЬ К СПРАВОЧНОЙ ДОКУМЕНТАЦИИ, ЧТОБЫ ИСПОЛЬЗОВАТЬ ВСЕ ВОЗМОЖНОСТИ INNO SETUP!';
+  SWizardScriptHeader = '; Этот сценарий создан с помощью Мастера Inno Setup.' + SNewLine  + '; ИНФОРМАЦИЮ О СОЗДАНИИ СЦЕНАРИЕВ .ISS СМОТРИТЕ В ДОКУМЕНТАЦИИ INNO SETUP!';
 
   { Compiler-specific messages }
   SCompilerVersion = 'version %s';
@@ -114,7 +117,7 @@ const
   SCompilerStatusParsingMessages = 'Анализ секций [LangOptions], [Messages] и [CustomMessages]';
   SCompilerStatusReadingCode = 'Чтение секции [Code]';
   SCompilerStatusCompilingCode = 'Компиляция секции [Code]';
-  SCompilerStatusReadingInFile = '   Файл: %s';
+  SCompilerStatusReadingInFile = '   Чтение файла: %s';
   SCompilerStatusReadingInScriptMsgs = '   Сообщения из файла сценария';
   SCompilerStatusCreateSetupFiles = 'Создание файлов установки';
   SCompilerStatusSkippingCreateSetupFiles = 'Пропуск создания установочных файлов, вывод отключен';
@@ -196,8 +199,11 @@ const
   SCompilerDirectiveNotUsingDefault = 'В секции [Setup] директива "%s" отклонит значение по умолчанию, т.к. %s содержит константы.';
   SCompilerDirectiveNotUsingPreferredDefault = 'В секции [Setup] директива "%s" по умолчанию будет установлена в %s, т.к. %s содержит константы.';
   SCompilerDirectivePatternTooLong = 'В секции [Setup] директива "%s" содержит слишком длинное значение.';
-  SCompilerOutputBaseFileNameSetup = 'Не рекомендуется в секции [Setup] для параметра "OutputBaseFileName" указывать имя "setup", т.к. все исполняемые файлы вида "setup.exe" на системе Windows используются для обеспечения совместимости приложений ' +
-                                     'и загрузки дополнительных файлов DLL, таких как version.dll и др. Загрузка этих файлов DLL является небезопасной и система Windows может быть взломана. Попробуйте использовать другое имя, например "mysetup".';
+  SCompilerOutputBaseFileNameSetup = 'Не рекомендуется в секции [Setup] для параметра "OutputBaseFileName" указывать имя "setup", ' + SNewLine +
+                                     'т.к. все исполняемые файлы вида "setup.exe" на системе Windows используются для обеспечения ' + SNewLine +
+                                     'совместимости приложений и загрузки дополнительных файлов DLL, таких как version.dll и др. ' + SNewLine +
+                                     'Загрузка этих файлов DLL является небезопасной и система Windows может быть взломана. ' + SNewLine +
+                                     'Попробуйте использовать другое имя, например "mysetup".';
 
   { Signing }
   SCompilerSignatureNeeded = 'Включен режим подписи деинсталляции. Используя ' +

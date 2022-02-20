@@ -122,11 +122,11 @@ begin
   WizardSmallBitmapImage.Bitmap.Width := Application.Icon.Width;
   WizardSmallBitmapImage.Bitmap.Height := Application.Icon.Height;
   WizardSmallBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
+  BeveledLabel.Transparent := False;
+  BeveledLabel.Top := Bevel.Top - BeveledLabel.Height div 2;
   if SetupMessages[msgBeveledLabel] <> '' then begin
     BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' ';
     BeveledLabel.Visible := True;
-    BeveledLabel.Transparent := False;
-    BeveledLabel.Top := Bevel.Top;
   end;
   CancelButton.Caption := SetupMessages[msgButtonCancel];
 end;

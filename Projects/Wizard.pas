@@ -18,7 +18,7 @@ uses
   Forms, Dialogs, StdCtrls, ExtCtrls,
   SetupForm, Struct, Int64Em, NewCheckListBox, RichEditViewer, NewStaticText,
   SetupTypes, NewProgressBar, MsgIDs, PasswordEdit, FolderTreeView, BitmapImage,
-  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles, Vcl.Styles.NewCheckListBox;
+  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles;
 
 type
   TWizardForm = class;
@@ -233,7 +233,6 @@ type
     function PageFromID(const ID: Integer): TWizardPage;
     function PageIndexFromID(const ID: Integer): Integer;
     procedure UpdateCurPageButtonVisibility;
-    procedure UpdateComponentsList;
     procedure SetCurPage(const NewPageID: Integer);
     procedure SelectComponents(const SelectComponents, DeselectComponents: TStringList; const KeepFixedComponents: Boolean);
     procedure SelectTasks(const SelectTasks, DeselectTasks: TStringList);
@@ -625,22 +624,6 @@ begin
   end;
 end;
 
-procedure TWizardForm.UpdateComponentsList();
-begin
-  // Fix remove VCL style from TNewCheckListBox
-  if SetupHeader.SetupStyle then
-      begin
-          WizardForm.ComponentsList.BorderStyle := bsNone;
-          WizardForm.ComponentsList.BorderStyle := bsSingle;
-
-          WizardForm.TasksList.BorderStyle := bsSingle;
-          WizardForm.TasksList.BorderStyle := bsNone;
-
-          WizardForm.RunList.BorderStyle := bsSingle;
-          WizardForm.RunList.BorderStyle := bsNone;
-      end;
-end;
-
 { TWizardPage }
 
 constructor TWizardPage.Create(AOwner: TComponent);
@@ -830,32 +813,6 @@ var
 begin
   inherited;
 
-//  if SetupHeader.TaskBarOn then begin
-    { Set TitleApp on TaskBar }
-    //SetWindowText(Application.Handle, 'Proba Title');
-
-    { Set ThumbnailAppSetup on TaskBar }
-    //SetAppTaskbarRegisterTab(MainForm.Handle, Application.Handle);
-    //SetAppTaskbarTabActive(MainForm.Handle, Application.Handle);
-    //SetAppTaskbarTabOrder(MainForm.Handle, Application.Handle);
-    //SetAppTaskbarUnregisterTab(MainForm.Handle);
-
-    { Set ProgressState on TaskBar }
-    //SetAppTaskbarProgressState(tpsPaused); // tpsIndeterminate  tpsPaused // статус прогрессбара
-
-    { Set ProgressState on TaskBar }
-    //SetAppTaskbarProgressValue(10,100);  // передавать начальное значение прогрессбара
-
-    { Set OverlayIcon on TaskBar }
-    //SetAppTaskbarOverlayIconRes('_IS_OVICON'); // передавать имя ресурса
-
-    { Set ThumbnailTooltip on TaskBar }
-    //SetAppTaskbarThumbnailTooltip('Application');
-    //SetAppTaskbarThumbnailTooltip('MainForm');
-
-//  end;
-  // DoubleBuffered := False;
-
   FPageList := TList.Create;
   InitialSelectedComponents := TStringList.Create();
   PrevSelectedComponents := TStringList.Create();
@@ -937,8 +894,9 @@ begin
   end;
   
   { Position the buttons, and scale their size }
-  W1 := CalculateButtonWidth([msgButtonBack, msgButtonCancel, msgButtonFinish,
-    msgButtonInstall, msgButtonNext]);  { width of each button }
+  W1 := CalculateButtonWidth([SetupMessages[msgButtonBack], SetupMessages[msgButtonCancel],
+    SetupMessages[msgButtonFinish], SetupMessages[msgButtonInstall],
+    SetupMessages[msgButtonNext]]);  { width of each button }
   W2 := ScalePixelsX(10);  { margin, and space between Next & Cancel }
 
   BackButton.Width := W1;
@@ -1076,7 +1034,7 @@ begin
   DirEdit.Top := DirEdit.Top + I;
   TryEnableAutoCompleteFileSystem(DirEdit.Handle);
   DirBrowseButton.Caption := SetupMessages[msgButtonWizardBrowse];
-  X := CalculateButtonWidth([msgButtonWizardBrowse]);
+  X := CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
   DirBrowseButton.SetBounds(InnerNotebook.Width - X,
     DirBrowseButton.Top + I, X, DirBrowseButton.Height);
   DirEdit.Width := DirBrowseButton.Left - ScalePixelsX(10) - DirEdit.Left;
@@ -1121,7 +1079,7 @@ begin
   Inc(I, AdjustLabelHeight(SelectStartMenuFolderBrowseLabel));
   GroupEdit.Top := GroupEdit.Top + I;
   GroupBrowseButton.Caption := SetupMessages[msgButtonWizardBrowse];
-  X := CalculateButtonWidth([msgButtonWizardBrowse]);
+  X := CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
   GroupBrowseButton.SetBounds(InnerNotebook.Width - X,
     GroupBrowseButton.Top + I, X, GroupBrowseButton.Height);
   GroupEdit.Width := GroupBrowseButton.Left - ScalePixelsX(10) - GroupEdit.Left;
@@ -1177,11 +1135,10 @@ begin
   RunList.MinItemHeight := ScalePixelsY(22);
 
   { Initialize BeveledLabel }
-  if SetupMessages[msgBeveledLabel] <> '' then begin
-    BeveledLabel.Transparent := False;
-    BeveledLabel.Top := Bevel.Top;
-    BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' ';
-  end
+  BeveledLabel.Transparent := False;
+  BeveledLabel.Top := Bevel.Top - BeveledLabel.Height div 2;
+  if SetupMessages[msgBeveledLabel] <> '' then
+    BeveledLabel.Caption := ' ' + SetupMessages[msgBeveledLabel] + ' '
   else
     BeveledLabel.Caption := '';
 
@@ -1443,15 +1400,13 @@ begin
   { Ensure the form is *always* on top of MainForm by making MainForm
     the "parent" of the form. }
 {$IFNDEF PS_MINIVCL}
-  if SetupHeader.TaskBarOn then
-    // Show Thumbnail Wizard on TaskBar
+  if shTaskBarView in SetupHeader.Options then
+    { Show Thumbnail Wizard on TaskBar }
     Params.WndParent := Application.Handle
   else
-    // Hide Thumbnail Wizard on TaskBar
-    Params.WndParent := MainForm.Handle;
-{$ELSE}
-  Params.WndParent := MainForm.Handle;
 {$ENDIF}
+    { Hide Thumbnail Wizard on TaskBar }
+    Params.WndParent := MainForm.Handle;
 end;
 
 function TWizardForm.PageIndexFromID(const ID: Integer): Integer;
@@ -2545,11 +2500,7 @@ procedure TWizardForm.NextButtonClick(Sender: TObject);
 
         if (S <> '') and (LoggedMsgBox(FmtSetupMessage1(msgNoUninstallWarning, S),
            SetupMessages[msgNoUninstallWarningTitle], mbConfirmation, MB_YESNO, True, IDYES) <> IDYES) then
-        begin
-          // Fix remove VCL style from TNewCheckListBox on msgNoUninstallWarningTitle
-          UpdateComponentsList();
           Exit;
-        end;
       end;
     end;
 
@@ -2623,11 +2574,6 @@ begin
     UpdatePage(NewPageID);
 
     case NewPageID of
-      // Fix remove VCL style from TNewCheckListBox on NextButtonClick
-      wpSelectComponents: UpdateComponentsList;
-      wpSelectTasks: UpdateComponentsList;
-      wpFinished: UpdateComponentsList;
-
       wpPreparing: begin
           WizardComponents := nil;
           WizardTasks := nil;
@@ -2700,23 +2646,12 @@ begin
   PrevPageID := GetPreviousPageID;
   if PrevPageID <> -1 then
     SetCurPage(PrevPageID);
-
-   // Fix remove VCL style from TNewCheckListBox on BackButtonClick
-  if PrevPageID = wpSelectComponents then
-    UpdateComponentsList;
-  if PrevPageID = wpSelectTasks then
-    UpdateComponentsList;
 end;
 
 procedure TWizardForm.CancelButtonClick(Sender: TObject);
 begin
   { Clicking Cancel will do the same thing as the Close button }
   Close;
-  // Fix remove VCL style from TNewCheckListBox on CancelButtonClick
-  if CurPageID = wpSelectComponents then
-    UpdateComponentsList;
-  if CurPageID = wpSelectTasks then
-    UpdateComponentsList;
 end;
 
 procedure TWizardForm.CallCancelButtonClick(var ACancel, AConfirm: Boolean);
@@ -2735,11 +2670,6 @@ begin
   { Redirect an attempt to close this form to MainForm }
   MainForm.Close;
   Action := caNone;
-  // Fix remove VCL style from TNewCheckListBox on CloseButtonClick
-  if CurPageID = wpSelectComponents then
-    UpdateComponentsList;
-  if CurPageID = wpSelectTasks then
-    UpdateComponentsList;
 end;
 
 procedure TWizardForm.TypesComboChange(Sender: TObject);
@@ -2763,9 +2693,6 @@ begin
       ComponentsDiskSpaceLabel.Visible := ComponentsList.Visible;
     end;
   end;
-
-  // Fix remove VCL style from TNewCheckListBox on TypesComboChange
-//  UpdateComponentsList();
 
   UpdateComponentSizes;
   CalcCurrentComponentsSpace;
@@ -2799,9 +2726,6 @@ begin
       end;
     end
   end;
-
-  // Fix remove VCL style from TNewCheckListBox on ComponentsListClickCheck
-//  UpdateComponentsList();
 
   UpdateComponentSizes;
   CalcCurrentComponentsSpace;
@@ -3030,7 +2954,11 @@ end;
 
 procedure TWizardForm.DirBrowseButtonClick(Sender: TObject);
 var
-  NewFolderName, Path: String;
+  NewFolderName, Path{$IFNDEF PS_MINIVCL}, PathModern{$ENDIF}: String;
+{$IFNDEF PS_MINIVCL}
+label
+  OldDir;
+{$ENDIF}
 begin
   NewFolderName := Trim(PathExtractName(RemoveBackslashUnlessRoot(ExpandedDefaultDirName)));
   { If ExpandedDefaultDirName is a root directory, there will be no name }
@@ -3038,6 +2966,32 @@ begin
     NewFolderName := Trim(SetupMessages[msgNewFolderName]);
 
   Path := DirEdit.Text;
+{$IFNDEF PS_MINIVCL}
+  { Modern Select Dir Dialog - Vista+ }
+  if shDirSelectModern in SetupHeader.Options then begin
+    if Win32MajorVersion >= 6 then begin
+      with TFileOpenDialog.Create(nil) do
+        try
+          PathModern := RemoveBackslashUnlessRoot(StringReplace(Trim(RemoveBackslashUnlessRoot(Path)), NewFolderName, '', [rfIgnoreCase]));
+          Title := SetupMessages[msgBrowseDialogTitle];
+          OkButtonLabel := SetupMessages[msgButtonOK];
+          Options := [fdoPickFolders, fdoHideMRUPlaces, fdoDontAddToRecent, fdoNoDereferenceLinks, fdoPathMustExist, fdoForceFileSystem];
+          DefaultFolder := PathModern;
+          //FileName := Path;
+          if Execute then
+             if shAppendDefaultDirName in SetupHeader.Options then
+                DirEdit.Text := AddBackslash(FileName) + NewFolderName
+             else
+                DirEdit.Text := FileName;
+        finally
+          Free;
+        end;
+    end else goto OldDir;
+  end
+  else
+  OldDir:
+{$ENDIF}
+  { Inno Setup Select Dir Dialog - XP }
   if ShowSelectFolderDialog(False, shAppendDefaultDirName in SetupHeader.Options,
      Path, NewFolderName) then
     DirEdit.Text := Path;
@@ -3172,12 +3126,6 @@ begin
 end;
 
 initialization
- TStyleManager.Engine.RegisterStyleHook(TNewCheckListBox, TEditStyleHookColor);
-
   SHPathPrepareForWriteFunc := GetProcAddress(SafeLoadLibrary(AddBackslash(GetSystemDir) + shell32,
     SEM_NOOPENFILEERRORBOX), {$IFDEF UNICODE}'SHPathPrepareForWriteW'{$ELSE}'SHPathPrepareForWriteA'{$ENDIF});
-
-finalization
- TStyleManager.Engine.UnRegisterStyleHook(TNewCheckListBox, TEditStyleHookColor);
-
 end.
