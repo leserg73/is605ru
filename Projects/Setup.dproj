@@ -23,7 +23,7 @@
 			<DCC_UnitSearchPath>..\components;..\components\unips\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>Setup.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_Define>PS_MINIVCL;PS_NOGRAPHCONST;IS_WINXP;PS_PANSICHAR;PS_NOINTERFACEGUIDBRACKETS;$(DCC_Define)</DCC_Define>
+			<DCC_Define>PS_MINIVCL;PS_NOGRAPHCONST;IS_WINXP;SETUP_DPR;PS_PANSICHAR;PS_NOINTERFACEGUIDBRACKETS;$(DCC_Define)</DCC_Define>
 			<DCC_Alignment>1</DCC_Alignment>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_Platform>x86</DCC_Platform>

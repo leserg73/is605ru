@@ -66,7 +66,7 @@ type
     shSignedUninstaller, shUsePreviousLanguage, shDisableWelcomePage,
     shCloseApplications, shRestartApplications, shAllowNetworkDrive,
     shForceCloseApplications, shAppNameHasConsts, shUsePreviousPrivileges,
-    shWizardResizable);
+    shWizardResizable, shDirSelectModern, shTaskBarView); // Added two Option: shDirSelectModern & shTaskBarView
   TSetupLanguageDetectionMethod = (ldUILanguage, ldLocale, ldNone);
   TSetupCompressMethod = (cmStored, cmZip, cmBzip, cmLZMA, cmLZMA2);
   TSetupSalt = array[0..7] of Byte;
@@ -105,8 +105,7 @@ type
     MinVersion, OnlyBelowVersion: TSetupVersionData;
     BackColor, BackColor2: Longint;
     WizardStyle: TSetupWizardStyle;
-    SetupStyle: Boolean;
-    TaskBarOn: Boolean;
+    SetupStyle: Boolean; // for VCL Style Check
     WizardSizePercentX, WizardSizePercentY: Integer;
     WizardImageAlphaFormat: (afIgnored, afDefined, afPremultiplied); // Must be same as Graphics.TAlphaFormat
     PasswordHash: TSHA1Digest;

@@ -282,7 +282,7 @@ begin
   FLanguages := TStringList.Create;
   FLanguages.Sorted := True;
   FLanguages.Duplicates := dupIgnore; { Some systems also return .islu files when searching for *.isl }
-  AddLanguages('isl'); 
+  AddLanguages('isl');
   AddLanguages('islu');
   FLanguages.Sorted := False;
   FLanguages.Insert(0, LanguagesDefaultIsl);
@@ -321,7 +321,7 @@ begin
   AppNameEdit.Text := 'My Program';
   AppVersionEdit.Text := '1.5';
   AppPublisherEdit.Text := 'My Company, Inc.';
-  AppURLEdit.Text := 'http://msilab.net/';
+  AppURLEdit.Text := 'https://www.example.com/';
 
   { AppDir }
   for I := Low(AppRootDirs) to High(AppRootDirs) do

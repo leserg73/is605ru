@@ -100,7 +100,7 @@ type
     ExtraData: Longint;
     DataSize: Cardinal;
     Typ: TUninstallRecTyp;
-    Data: array[0..$6FFFFFFF] of Byte;  { *must* be last field }	
+    Data: array[0..$6FFFFFFF] of Byte;  { *must* be last field }
   end;
 
   TDeleteUninstallDataFilesProc = procedure;

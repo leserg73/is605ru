@@ -14,7 +14,8 @@ unit TaskbarProgressFunc;
 interface
 
 type
-  TTaskbarProgressState = (tpsNoProgress, tpsIndeterminate, tpsNormal, tpsError, tpsPaused);
+  TTaskbarProgressState = (tpsNoProgress, tpsIndeterminate, tpsNormal,
+    tpsError, tpsPaused);
 
 procedure SetAppTaskbarProgressState(const State: TTaskbarProgressState);
 procedure SetAppTaskbarProgressValue(const Completed, Total: Cardinal);
@@ -128,13 +129,26 @@ end;
     Icon: TIcon;
   begin
     Icon := TIcon.Create;
-    try
-      Icon.LoadFromResourceName(HInstance, ResOvIcon);
-      if InitializeTaskbarList then
-        TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(ResOvIcon)));
-    finally
-      Icon.Free;
-    end;
+    Icon.SetSize(16,16);
+    if ResOvIcon <> '' then
+      begin
+        try
+          Icon.LoadFromResourceName(HInstance, ResOvIcon);
+          if InitializeTaskbarList then
+            TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(ResOvIcon)));
+        finally
+          Icon.Free;
+        end;
+      end
+    else
+      begin
+        try
+          if InitializeTaskbarList then
+            TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, nil);
+        finally
+          Icon.Free;
+        end;
+      end;
   end;
 
   procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);
@@ -143,14 +157,27 @@ end;
     IconFile: String;
   begin
     Icon := TIcon.Create;
-    try
-      Icon.LoadFromFile(FileIcon);
-      IconFile := ExtractFileName(FileIcon);
-      if InitializeTaskbarList then
-        TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(IconFile)));
-    finally
-      Icon.Free;
-    end;
+    Icon.SetSize(16,16);
+    if FileIcon <> '' then
+      begin
+        try
+          Icon.LoadFromFile(FileIcon);
+          IconFile := ExtractFileName(FileIcon);
+          if InitializeTaskbarList then
+            TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, PWideChar(WideString(IconFile)));
+        finally
+          Icon.Free;
+        end;
+      end
+    else
+      begin
+        try
+          if InitializeTaskbarList then
+            TaskbarListInterface.SetOverlayIcon(Application.Handle, Icon.Handle, nil);
+        finally
+          Icon.Free;
+        end;
+      end;
   end;
 {$ENDIF}
 

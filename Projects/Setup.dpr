@@ -98,9 +98,8 @@ uses
   Vcl.Styles.Utils.Forms in '..\Components\VCL\Vcl.Styles.Utils.Forms.pas',
   Vcl.Styles.Utils.Menus in '..\Components\VCL\Vcl.Styles.Utils.Menus.pas',
   Vcl.Styles.Utils.ScreenTips in '..\Components\VCL\Vcl.Styles.Utils.ScreenTips.pas',
-  Vcl.Styles.FontAwesome in '..\Components\VCL\Vcl.Styles.FontAwesome.pas',
+//  Vcl.Styles.FontAwesome in '..\Components\VCL\Vcl.Styles.FontAwesome.pas',
   Vcl.Styles.Utils.Misc in '..\Components\VCL\Vcl.Styles.Utils.Misc.pas',
-  Vcl.Styles.NewCheckListBox in '..\Components\VCL\Vcl.Styles.NewCheckListBox.pas',
   DDetours in '..\Components\VCL\delphi-detours-library\DDetours.pas',
   InstDecode in '..\Components\VCL\delphi-detours-library\InstDecode.pas',
   CPUID in '..\Components\VCL\delphi-detours-library\CPUID.pas'; 
@@ -344,7 +343,7 @@ begin
     try
       DeinitSetup(False);
     except
-      { don't propogate any exceptions, so that Halt is always called }
+      { don't propagate any exceptions, so that Halt is always called }
       ShowExceptionMsg;
     end;
     if SetupExitCode <> 0 then

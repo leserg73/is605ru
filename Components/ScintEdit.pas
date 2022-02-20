@@ -387,7 +387,7 @@ type
 implementation
 
 uses
-  ShellAPI, RTLConsts, UITypes;
+  ShellAPI, RTLConsts{$IFNDEF VER200}, UITypes{$ENDIF};
 
 { TScintEdit }
 
