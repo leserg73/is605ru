@@ -528,6 +528,9 @@ procedure TDShowMessage( instr : string; msg:string=''; Title : string = 'Inform
 
 implementation
 
+uses
+  {$IFNDEF SETUP_DPR}CompMsgs;{$ELSE}Msgs, MsgIDs;{$ENDIF}
+
 {$IFNDEF WITHLAZARUSARROW}
 {$R SynTaskDialog.res}
 {$ENDIF}
@@ -589,16 +592,21 @@ begin
 end;
 
 {$ELSE}
-function TD_BTNS(button: TCommonButton): pointer;
+function TD_BTNS(button: TCommonButton): string;
 begin
   case button of
-    cbOK:     result := {$ifndef fpc}@SMsgDlgOK{$else}@rsMbOK{$endif};
-    cbYes:    result := {$ifndef fpc}@SMsgDlgYes{$else}@rsMbYes{$endif};
-    cbNo:     result := {$ifndef fpc}@SMsgDlgNo{$else}@rsMbNo{$endif};
-    cbCancel: result := {$ifndef fpc}@SMsgDlgCancel{$else}@rsMbCancel{$endif};
-    cbRetry:  result := {$ifndef fpc}@SMsgDlgRetry{$else}@rsMbRetry{$endif};
-    cbClose:  result := {$ifndef fpc}@SCloseButton{$else}@rsMbClose{$endif};
-        else  result := nil;
+    cbOK:     result := {$ifndef fpc}LoadResString(@SMsgDlgOK){$else}@rsMbOK{$endif};
+    cbYes:    result := {$ifndef fpc}LoadResString(@SMsgDlgYes){$else}@rsMbYes{$endif};
+    cbNo:     result := {$ifndef fpc}LoadResString(@SMsgDlgNo){$else}@rsMbNo{$endif};
+    cbCancel:
+            {$IFNDEF SETUP_DPR}
+              result := SCompilerSynTaskDlgButtonCancel;
+            {$ELSE}
+              result := SetupMessages[msgButtonCancel];
+            {$ENDIF}
+    cbRetry:  result := {$ifndef fpc}LoadResString(@SMsgDlgRetry){$else}@rsMbRetry{$endif};
+    cbClose:  result := {$ifndef fpc}LoadResString(@SCloseButton){$else}@rsMbClose{$endif};
+        else  result := '?';
   end;
 end;
 {$ENDIF}
@@ -1442,11 +1450,11 @@ begin
         end;
       for B := high(B) downto low(B) do
         if B in aCommonButtons then
-          {$IFDEF FMX}
+//          {$IFDEF FMX}
           AddButton(TD_Trans(TD_BTNS(B)),TD_BTNMOD[B]);
-          {$ELSE}
-          AddButton(TD_Trans(LoadResString(TD_BTNS(B))), TD_BTNMOD[B]);
-          {$ENDIF}
+//          {$ELSE}
+//          AddButton(TD_Trans(LoadResString(TD_BTNS(B))), TD_BTNMOD[B]);
+//          {$ENDIF}
       if Verify<>'' then begin
         Dialog.Form.Verif := TCheckBox.Create(Dialog.Form);
         with Dialog.Form.Verif do begin
