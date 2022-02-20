@@ -43,6 +43,8 @@ type
     {$IFNDEF PS_MINIVCL}
     procedure DecompressFileM(const FL: TSetupFileLocationEntry; const DestM: TStream;
       const ProgressProc: TExtractorProgressProc; const VerifyChecksum: Boolean);
+    procedure DecompressFileB(const FL: TSetupFileLocationEntry; DestB: Integer;
+      const ProgressProc: TExtractorProgressProc; const VerifyChecksum: Boolean);
     {$ENDIF}
     procedure SeekTo(const FL: TSetupFileLocationEntry;
       const ProgressProc: TExtractorProgressProc);
@@ -382,6 +384,7 @@ begin
 end;
 
 {$IFNDEF PS_MINIVCL}
+{ Extract File to Stream }
 procedure TFileExtractor.DecompressFileM(const FL: TSetupFileLocationEntry;
   const DestM: TStream; const ProgressProc: TExtractorProgressProc;
   const VerifyChecksum: Boolean);
@@ -419,6 +422,62 @@ begin
         Dec64(BytesLeft, BufSize);
         SHA1Update(Context, Buf, BufSize);
         DestM.WriteBuffer(Buf, BufSize);
+
+        if Assigned(ProgressProc) then
+          ProgressProc(BufSize);
+      end;
+    except
+      on E: ECompressDataError do
+        SourceIsCorrupted(E.Message);
+    end;
+
+    if VerifyChecksum and not SHA1DigestsEqual(SHA1Final(Context), FL.SHA1Sum) then
+      SourceIsCorrupted('SHA-1 hash mismatch');
+  finally
+    Dec(FEntered);
+  end;
+end;
+
+{ Extract TXT File to Buffer }
+procedure TFileExtractor.DecompressFileB(const FL: TSetupFileLocationEntry;
+  DestB: Integer; const ProgressProc: TExtractorProgressProc;
+  const VerifyChecksum: Boolean);
+var
+  BytesLeft: Integer64;
+  Context: TSHA1Context;
+  AddrOffset: LongWord;
+  BufSize: Cardinal;
+  Buf: array[0..65535] of Byte;  // 64K
+//  Buf: array [0..262143] of Byte;  // 256K
+  { ^ *must* be the same buffer size used by the compiler (TCompressionHandler),
+    otherwise the TransformCallInstructions call will break }
+begin
+  if FEntered <> 0 then
+    InternalError('Cannot call file extractor recursively');
+  Inc(FEntered);
+  try
+    BytesLeft := FL.OriginalSize;
+
+    SHA1Init(Context);
+
+    try
+      AddrOffset := 0;
+      while True do begin
+        BufSize := SizeOf(Buf);
+        if (BytesLeft.Hi = 0) and (BytesLeft.Lo < BufSize) then
+          BufSize := BytesLeft.Lo;
+        if BufSize = 0 then
+          Break;
+
+        DecompressBytes(Buf, BufSize);
+        if foCallInstructionOptimized in FL.Flags then begin
+          TransformCallInstructions(Buf, BufSize, False, AddrOffset);
+          Inc(AddrOffset, BufSize);  { may wrap, but OK }
+        end;
+        Dec64(BytesLeft, BufSize);
+        SHA1Update(Context, Buf, BufSize);
+        //Move(Buf[0], Pointer(DestB)^, BufSize * SizeOf(Char)); { work }
+        Move(Buf[0], PAnsiChar(Pointer(DestB)^), BufSize * SizeOf(Char));
 
         if Assigned(ProgressProc) then
           ProgressProc(BufSize);

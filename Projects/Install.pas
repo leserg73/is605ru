@@ -24,6 +24,7 @@ function ExtractTemporaryFiles(const Pattern: String): Integer;
 {$IFNDEF PS_MINIVCL}
   procedure ExtractTemporaryFileEx(const BaseName: String; const DirName: String);
   procedure ExtractTemporaryFileToStream(const BaseName: String; const BaseStream: TStream);
+  procedure ExtractTemporaryFileToBuffer(const BaseName: String; BaseBuffer: Integer);
   function ExtractTemporaryFileSize(const BaseName: String): Cardinal;
   function HInstance: LongWord;
 {$ENDIF}
@@ -393,7 +394,7 @@ var
   begin
     N := Length(CompiledCodeText);
     if N mod 2 = 1 then
-      Inc(N); { This will lead to 1 extra byte being moved but that's ok since its the #0 }
+      Inc(N); { This will lead to 1 extra byte being moved but that's ok since it is the #0 }
     N := N div 2;
     SetString(Result, PChar(Pointer(CompiledCodeText)), N);
 {$ELSE}
@@ -3471,7 +3472,7 @@ procedure InternalExtractTemporaryFileToStream(const DestName: String;
   const CurFile: PSetupFileEntry; const CurFileLocation: PSetupFileLocationEntry;
   const BaseMStream: TStream);
 begin
-  Log('Extracting file to memory: ' + DestName);
+  Log('Extracting file to stream: ' + DestName);
   try
     FileExtractor.SeekTo(CurFileLocation^, nil);
     FileExtractor.DecompressFileM(CurFileLocation^, BaseMStream, nil, not (foDontVerifyChecksum in CurFile^.Options));
@@ -3520,6 +3521,62 @@ begin
     end;
   end;
   InternalError(Format('ExtractTemporaryFileToStream: The file "%s" was not found', [BaseName]));
+end;
+
+{ procedure InternalExtractTemporaryFileToBuffer }
+procedure InternalExtractTemporaryFileToBuffer(const DestName: String;
+  const CurFile: PSetupFileEntry; const CurFileLocation: PSetupFileLocationEntry;
+  BaseMBuffer: Integer);
+begin
+  Log('Extracting file to buffer: ' + DestName);
+  try
+    FileExtractor.SeekTo(CurFileLocation^, nil);
+    FileExtractor.DecompressFileB(CurFileLocation^, BaseMBuffer, nil, not (foDontVerifyChecksum in CurFile^.Options));
+  except
+    raise;
+  end
+end;
+
+procedure ExtractTemporaryFileToBuffer(const BaseName: String; BaseBuffer: Integer);
+
+  function EscapeBraces(const S: String): String;
+  { Changes all '{' to '{{'. Uses ConstLeadBytes^ for the lead byte table. }
+  var
+    I: Integer;
+  begin
+    Result := S;
+    I := 1;
+    while I <= Length(Result) do begin
+      if Result[I] = '{' then begin
+        Insert('{', Result, I);
+        Inc(I);
+  {$IFDEF UNICODE}
+      end;
+  {$ELSE}
+      end
+      else if Result[I] in ConstLeadBytes^ then
+        Inc(I);
+  {$ENDIF}
+      Inc(I);
+    end;
+  end;
+
+var
+  EscapedBaseName: String;
+  CurFileNumber: Integer;
+  CurFile: PSetupFileEntry;
+begin
+  { We compare BaseName to the filename portion of TSetupFileEntry.DestName
+    which has braces escaped, but BaseName does not; escape it to match }
+  EscapedBaseName := EscapeBraces(BaseName);
+  for CurFileNumber := 0 to Entries[seFile].Count-1 do begin
+    CurFile := PSetupFileEntry(Entries[seFile][CurFileNumber]);
+    if (CurFile^.LocationEntry <> -1) and (CompareText(PathExtractName(CurFile^.DestName), EscapedBaseName) = 0) then begin
+      InternalExtractTemporaryFileToBuffer(BaseName, CurFile, Entries[seFileLocation][CurFile^.LocationEntry], BaseBuffer);
+      Exit;
+    end;
+  end;
+  InternalError(Format('ExtractTemporaryFileToBuffer: The file "%s" was not found', [BaseName]));
 end;
 
 { function get HInstance }

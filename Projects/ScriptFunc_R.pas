@@ -753,6 +753,8 @@ begin
     ExtractTemporaryFileEx(Stack.GetString(PStart), Stack.GetString(PStart-1));
   end else if Proc.Name = 'EXTRACTTEMPORARYFILETOSTREAM' then begin
     ExtractTemporaryFileToStream(Stack.GetString(PStart), TStream(Stack.GetClass(PStart-1)));
+  end else if Proc.Name = 'EXTRACTTEMPORARYFILETOBUFFER' then begin
+    ExtractTemporaryFileToBuffer(Stack.GetString(PStart), Stack.GetInt(PStart-1));
   end else if Proc.Name = 'EXTRACTTEMPORARYFILESIZE' then begin
     Stack.SetUInt(PStart, ExtractTemporaryFileSize(Stack.GetString(PStart-1)));
   {$ENDIF}
@@ -1913,6 +1915,12 @@ begin
     Stack.SetInt(PStart, Integer(PChar(Stack.GetString(PStart-1))));
   end else if Proc.Name = 'CASTINTEGERTOSTRING' then begin
     Stack.SetString(PStart, String(PChar(Stack.GetInt(PStart-1))));
+{$IFNDEF PS_MINIVCL}
+  end else if Proc.Name = 'CASTANSISTRINGTOINTEGER' then begin
+    Stack.SetInt(PStart, Integer(PAnsiChar(Stack.GetAnsiString(PStart-1))));
+  end else if Proc.Name = 'CASTINTEGERTOANSISTRING' then begin
+    Stack.SetAnsiString(PStart, AnsiString(PAnsiChar(Stack.GetInt(PStart-1))));
+{$ENDIF}
   end else if Proc.Name = 'ABORT' then begin
     Abort;
   end else if Proc.Name = 'GETEXCEPTIONMESSAGE' then begin

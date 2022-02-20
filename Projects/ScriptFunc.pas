@@ -121,7 +121,7 @@ const
 
   { Install }
 {$IFNDEF PS_MINIVCL}
-  InstallTable: array [0..4] of AnsiString =
+  InstallTable: array [0..5] of AnsiString =
 {$ELSE}
   InstallTable: array [0..1] of AnsiString =
 {$ENDIF}
@@ -130,6 +130,7 @@ const
     {$IFNDEF PS_MINIVCL}
       'procedure ExtractTemporaryFileEx(const FileName: String; const DestDir: String);',
       'procedure ExtractTemporaryFileToStream(const FileName: String; const Stream: TStream);',
+      'procedure ExtractTemporaryFileToBuffer(const FileName: String; Buffer: Integer);',
       'function ExtractTemporaryFileSize(const FileName: String): Cardinal;',
     {$ENDIF}
     'function ExtractTemporaryFiles(const Pattern: String): Integer;'
@@ -358,7 +359,11 @@ const
   );
 
   { Other }
-  OtherTable: array [0..31] of AnsiString =
+{$IFNDEF PS_MINIVCL}
+    OtherTable: array [0..33] of AnsiString =
+{$ELSE}
+    OtherTable: array [0..31] of AnsiString =
+{$ENDIF}
   (
     'procedure BringToFrontAndRestore;',
     'function WizardDirValue: String;',
@@ -376,6 +381,10 @@ const
     'function CurrentSourceFilename: String;',
     'function CastStringToInteger(var S: String): Longint;',
     'function CastIntegerToString(const L: Longint): String;',
+    {$IFNDEF PS_MINIVCL}
+      'function CastAnsiStringToInteger(var S: AnsiString): Longint;',
+      'function CastIntegerToAnsiString(const L: Longint): AnsiString;',
+    {$ENDIF}
     'procedure Abort;',
     'function GetExceptionMessage: String;',
     'procedure RaiseException(const Msg: String);',
