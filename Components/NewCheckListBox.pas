@@ -14,8 +14,8 @@ unit NewCheckListBox;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, {$IFNDEF VER200}UxTheme{$ELSE}UxThemeISX{$ENDIF};
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, UITypes,
+  StdCtrls, Vcl.Themes, Vcl.Styles, {$IFNDEF VER200}UxTheme{$ELSE}UxThemeISX{$ENDIF};
 
 const
   WM_UPDATEUISTATE = $0128;
@@ -37,7 +37,9 @@ type
     SubItem: string;
     ThreadCache: set of Byte;
     MeasuredHeight: Integer;
+    ItemFontColor: TColor;
     ItemFontStyle: TFontStyles;
+    SubItemFontColor: TColor;
     SubItemFontStyle: TFontStyles;
   end;
 
@@ -67,6 +69,11 @@ type
     FDisableItemStateDeletion: Integer;
     FWheelAccum: Integer;
     FUseRightToLeft: Boolean;
+    FUseStyledColor: Boolean;
+    // VCL Style support
+    class constructor Create;
+    class destructor Destroy;
+    // ---
     procedure UpdateThemeData(const Close, Open: Boolean);
     function CanFocusItem(Item: Integer): Boolean;
     function CheckPotentialRadioParents(Index, ALevel: Integer): Boolean;
@@ -111,11 +118,13 @@ type
     function GetCaption(Index: Integer): String;
     function GetChecked(Index: Integer): Boolean;
     function GetItemEnabled(Index: Integer): Boolean;
+    function GetItemFontColor(Index: Integer): TColor;
     function GetItemFontStyle(Index: Integer): TFontStyles;
     function GetLevel(Index: Integer): Byte;
     function GetObject(Index: Integer): TObject;
     function GetState(Index: Integer): TCheckBoxState;
     function GetSubItem(Index: Integer): string;
+    function GetSubItemFontColor(Index: Integer): TColor;
     function GetSubItemFontStyle(Index: Integer): TFontStyles;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
@@ -128,12 +137,15 @@ type
     procedure SetChecked(Index: Integer; const AChecked: Boolean);
     procedure SetFlat(Value: Boolean);
     procedure SetItemEnabled(Index: Integer; const AEnabled: Boolean);
+    procedure SetItemFontColor(Index: Integer; const AItemFontColor: TColor);
     procedure SetItemFontStyle(Index: Integer; const AItemFontStyle: TFontStyles);
     procedure SetObject(Index: Integer; const AObject: TObject);
     procedure SetOffset(AnOffset: Integer);
     procedure SetShowLines(Value: Boolean);
     procedure SetSubItem(Index: Integer; const ASubItem: String);
+    procedure SetSubItemFontColor(Index: Integer; const ASubItemFontColor: TColor);
     procedure SetSubItemFontStyle(Index: Integer; const ASubItemFontStyle: TFontStyles);
+    procedure SetUseStyledColor(Value: Boolean);
     property ItemStates[Index: Integer]: TItemState read GetItemState;
   public
     constructor Create(AOwner: TComponent); override;
@@ -153,11 +165,13 @@ type
     property Checked[Index: Integer]: Boolean read GetChecked write SetChecked;
     property ItemCaption[Index: Integer]: String read GetCaption write SetCaption;
     property ItemEnabled[Index: Integer]: Boolean read GetItemEnabled write SetItemEnabled;
+    property ItemFontColor[Index: Integer]: TColor read GetItemFontColor write SetItemFontColor;
     property ItemFontStyle[Index: Integer]: TFontStyles read GetItemFontStyle write SetItemFontStyle;
     property ItemLevel[Index: Integer]: Byte read GetLevel;
     property ItemObject[Index: Integer]: TObject read GetObject write SetObject;
     property ItemSubItem[Index: Integer]: string read GetSubItem write SetSubItem;
     property State[Index: Integer]: TCheckBoxState read GetState;
+    property SubItemFontColor[Index: Integer]: TColor read GetSubItemFontColor write SetSubItemFontColor;
     property SubItemFontStyle[Index: Integer]: TFontStyles read GetSubItemFontStyle write SetSubItemFontStyle;
   published
     property Align;
@@ -199,6 +213,7 @@ type
     property ShowHint;
     property ShowLines: Boolean read FShowLines write SetShowLines default True;
     property TabOrder;
+    property UseStyledColor: Boolean read FUseStyledColor write SetUseStyledColor default False;
     property Visible;
     property WantTabs: Boolean read FWantTabs write FWantTabs default False;
   end;
@@ -385,6 +400,13 @@ end;
 
 { TNewCheckListBox }
 
+// VCL Style support
+class constructor TNewCheckListBox.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TNewCheckListBox, TScrollingStyleHook);
+end;
+// ---
+
 constructor TNewCheckListBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -450,6 +472,13 @@ begin
   inherited CreateWindowHandle(Params);
   UpdateThemeData(True, True);
 end;
+
+// VCL Style support
+class destructor TNewCheckListBox.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TNewCheckListBox, TScrollingStyleHook);
+end;
+// ---
 
 destructor TNewCheckListBox.Destroy;
 var
@@ -766,6 +795,11 @@ var
   SubItemWidth: Integer;
   PartId, StateId: Integer;
   Size: TSize;
+  // Support VCL Style
+  SaveIndex: Integer;
+  SaveColor, LColor: TColor;
+  ElementDetails, LDetails: TThemedElementDetails;
+  // ---
 begin
   if FShowLines and not FThreadsUpToDate then begin
     UpdateThreads;
@@ -782,21 +816,59 @@ begin
   else
     UIState := 0; //no UISF_HIDEACCEL and no UISF_HIDEFOCUS
   Disabled := not Enabled or not ItemState.Enabled;
+
   with Canvas do begin
-    if not FWantTabs and (odSelected in State) and Focused then begin
-      Brush.Color := clHighlight;
-      NewTextColor := clHighlightText;
-    end
-    else begin
-      Brush.Color := Self.Color;
-      if Disabled then
-        NewTextColor := clGrayText
+    if StyleServices.Enabled and (seFont in StyleElements) then
+       NewTextColor := StyleServices.GetStyleFontColor(sfListItemTextNormal)
+    else
+       NewTextColor := Self.Font.Color;
+
+    if not FWantTabs and (odSelected in State) and Focused then
+    begin
+      if StyleServices.Enabled and (seClient in StyleElements) then
+         Brush.Color := StyleServices.GetSystemColor(clHighlight)
       else
-        NewTextColor := Self.Font.Color;
+         Brush.Color := clHighlight;
+      if StyleServices.Enabled and (seFont in StyleElements) then
+      begin
+        if TStyleManager.IsCustomStyleActive then
+           NewTextColor := StyleServices.GetStyleFontColor(sfListItemTextSelected) else
+           NewTextColor := StyleServices.GetSystemColor(clHighlightText);
+      end
+        else
+           NewTextColor := clHighlightText;
+      FillRect(Rect);
+    end
+      else
+    begin
+      Brush.Color := Self.Color;
+      if StyleServices.Enabled then
+      begin
+        if FSpaceDown or (FLastMouseMoveIndex = Index) then
+           LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedPressed)
+        else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+           LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedHot)
+        else
+           LDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedNormal);
+        if Disabled then
+        begin
+          if TStyleManager.IsCustomStyleActive then
+            NewTextColor := StyleServices.GetStyleFontColor(sfCheckBoxTextDisabled)
+          else
+            NewTextColor := clGrayText;
+        end
+        else
+          if (seFont in StyleElements) and StyleServices.GetElementColor(LDetails, ecTextColor, LColor) and (LColor <> clNone) then
+            NewTextColor := LColor;
+      end;
     end;
+
     { Draw threads }
     if FShowLines then begin
-      Pen.Color := clGrayText;
+      if TStyleManager.IsCustomStyleActive then
+         Pen.Color := StyleServices.GetSystemColor(clGrayText)
+      else
+         Pen.Color := clGrayText;
       ThreadLevel := ItemLevel[Index];
       for I := 0 to ThreadLevel - 1 do
         if I in ItemStates[Index].ThreadCache then begin
@@ -813,63 +885,178 @@ begin
             @LineDDAProc, Integer(Canvas));
         end;
     end;
+
     { Draw checkmark}
-    if ItemState.ItemType <> itGroup then begin
+    if ItemState.ItemType <> itGroup then
+    begin
       CheckRect := Bounds(Rect.Left - (FCheckWidth + FOffset),
-        Rect.Top + ((Rect.Bottom - Rect.Top - FCheckHeight) div 2),
-        FCheckWidth, FCheckHeight);
+      Rect.Top + ((Rect.Bottom - Rect.Top - FCheckHeight) div 2),
+      FCheckWidth, FCheckHeight);
       FlipRect(CheckRect, SavedClientRect, FUseRightToLeft);
-      if FThemeData = 0 then begin
+      // BEGIN	support VCL Style
+      if TStyleManager.IsCustomStyleActive then
+      begin
         case ItemState.State of
-          cbChecked: uState := ButtonStates[ItemState.ItemType] or DFCS_CHECKED;
-          cbUnchecked: uState := ButtonStates[ItemState.ItemType];
+          cbChecked:
+            if Enabled then
+            begin
+              if ItemState.ItemType = itRadio then
+                 if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedPressed)
+                 else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedHot)
+                 else
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedNormal);
+              if ItemState.ItemType = itCheck then
+                 if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedPressed)
+                 else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedHot)
+                 else
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedNormal);
+            end
+              else
+            begin
+              if ItemState.ItemType = itRadio then
+                 ElementDetails := StyleServices.GetElementDetails(tbRadioButtonCheckedDisabled)
+              else
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxCheckedDisabled);
+            end;
+          cbUnchecked:
+            if Enabled then
+            begin
+              if ItemState.ItemType = itRadio then
+                 if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonUncheckedPressed)
+                 else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonUnCheckedHot)
+                 else
+                    ElementDetails := StyleServices.GetElementDetails(tbRadioButtonUnCheckedNormal);
+              if ItemState.ItemType = itCheck then
+                 if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedPressed)
+                 else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxUnCheckedHot)
+                 else
+                    ElementDetails := StyleServices.GetElementDetails(tbCheckBoxUnCheckedNormal);
+            end
+              else
+            begin
+              if ItemState.ItemType = itRadio then
+                 ElementDetails := StyleServices.GetElementDetails(tbRadioButtonUnCheckedDisabled)
+              else
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxUncheckedDisabled)
+            end
+              else // cbGrayed
+            if Enabled then
+            begin
+              if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxMixedPressed)
+              else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxMixedHot)
+              else
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxMixedNormal);
+            end
+              else
+                 ElementDetails := StyleServices.GetElementDetails(tbCheckBoxMixedDisabled);
+        end;
+
+        SaveColor := Brush.Color;
+        SaveIndex := SaveDC(Handle);
+        try
+          if TStyleManager.IsCustomStyleActive and (seClient in StyleElements) then
+             Brush.Color := StyleServices.GetStyleColor(scListBox)
+          else
+             Brush.Color := Color;
+             FillRect(Rect);
+             IntersectClipRect(Handle, CheckRect.Left, CheckRect.Top, CheckRect.Right, CheckRect.Bottom);
+             StyleServices.DrawElement(Handle, ElementDetails, CheckRect, nil, FCurrentPPI);
+          finally
+             RestoreDC(Handle, SaveIndex);
+        end;
+        Brush.Color := SaveColor;
+      end
+      // --- END support VCL Style
+      else
+      begin
+        if FThemeData = 0 then
+        begin
+          case ItemState.State of
+            cbChecked: uState := ButtonStates[ItemState.ItemType] or DFCS_CHECKED;
+            cbUnchecked: uState := ButtonStates[ItemState.ItemType];
           else
             uState := DFCS_BUTTON3STATE or DFCS_CHECKED;
-        end;
-        if FFlat then
-          uState := uState or DFCS_FLAT;
-        if Disabled then
-          uState := uState or DFCS_INACTIVE;
-        if (FCaptureIndex = Index) and (FSpaceDown or (FLastMouseMoveIndex = Index)) then
-          uState := uState or DFCS_PUSHED;
-        DrawFrameControl(Handle, CheckRect, DFC_BUTTON, uState)
-      end else begin
-        PartId := ButtonPartIds[ItemState.ItemType];
-        if Disabled then
-          StateId := ButtonStateIds[ItemState.State][cb2Disabled]
-        else if Index = FCaptureIndex then
-          if FSpaceDown or (FLastMouseMoveIndex = Index) then
-            StateId := ButtonStateIds[ItemState.State][cb2Pressed]
-          else
-            StateId := ButtonStateIds[ItemState.State][cb2Hot]
-        else if (FCaptureIndex < 0) and (Index = FHotIndex) then
-          StateId := ButtonStateIds[ItemState.State][cb2Hot]
+          end;
+
+          if FFlat then
+             uState := uState or DFCS_FLAT;
+
+          if Disabled then
+             uState := uState or DFCS_INACTIVE;
+
+          if (FCaptureIndex = Index) and (FSpaceDown or (FLastMouseMoveIndex = Index)) then
+             uState := uState or DFCS_PUSHED;
+
+          DrawFrameControl(Handle, CheckRect, DFC_BUTTON, uState)
+        end
         else
-          StateId := ButtonStateIds[ItemState.State][cb2Normal];
-        GetThemePartSize(FThemeData, Handle, PartId, StateId, @CheckRect, TS_TRUE, Size);
-        if (Size.cx <> FCheckWidth) or (Size.cy <> FCheckHeight) then begin
-          CheckRect := Bounds(Rect.Left - (Size.cx + FOffset),
-            Rect.Top + ((Rect.Bottom - Rect.Top - Size.cy) div 2),
-            Size.cx, Size.cy);
-          FlipRect(CheckRect, SavedClientRect, FUseRightToLeft);
-        end;
-        //if IsThemeBackgroundPartiallyTransparent(FThemeData, PartId, StateId) then
-        //  DrawThemeParentBackground(Self.Handle, Handle, @CheckRect);
-        DrawThemeBackGround(FThemeData, Handle, PartId, StateId, CheckRect, @CheckRect);
+        begin
+          PartId := ButtonPartIds[ItemState.ItemType];
+            if Disabled then
+              StateId := ButtonStateIds[ItemState.State][cb2Disabled]
+            else if Index = FCaptureIndex then
+              if FSpaceDown or (FLastMouseMoveIndex = Index) then
+                StateId := ButtonStateIds[ItemState.State][cb2Pressed]
+              else
+                StateId := ButtonStateIds[ItemState.State][cb2Hot]
+            else if (FCaptureIndex < 0) and (Index = FHotIndex) then
+              StateId := ButtonStateIds[ItemState.State][cb2Hot]
+            else
+              StateId := ButtonStateIds[ItemState.State][cb2Normal];
+            GetThemePartSize(FThemeData, Handle, PartId, StateId, @CheckRect, TS_TRUE, Size);
+          if (Size.cx <> FCheckWidth) or (Size.cy <> FCheckHeight) then
+          begin
+              CheckRect := Bounds(Rect.Left - (Size.cx + FOffset),
+                Rect.Top + ((Rect.Bottom - Rect.Top - Size.cy) div 2),
+                Size.cx, Size.cy);
+              FlipRect(CheckRect, SavedClientRect, FUseRightToLeft);
+            end;
+            //if IsThemeBackgroundPartiallyTransparent(FThemeData, PartId, StateId) then
+            //  DrawThemeParentBackground(Self.Handle, Handle, @CheckRect);
+            DrawThemeBackGround(FThemeData, Handle, PartId, StateId, CheckRect, @CheckRect);
+          end;
       end;
     end;
+
     { Draw SubItem }
     FlipRect(Rect, SavedClientRect, FUseRightToLeft);
     FillRect(Rect);
     FlipRect(Rect, SavedClientRect, FUseRightToLeft);
     Inc(Rect.Left);
     OldColor := SetTextColor(Handle, ColorToRGB(NewTextColor));
+
     if ItemState.SubItem <> '' then
     begin
       DrawTextFormat := DT_NOCLIP or DT_NOPREFIX or DT_SINGLELINE or DT_VCENTER;
       if FUseRightToLeft then
         DrawTextFormat := DrawTextFormat or (DT_RIGHT or DT_RTLREADING);
       Font.Style := ItemState.SubItemFontStyle;
+
+      // Set color text fo SubItem if VCL Style used
+      if not Focused or FWantTabs then begin
+        if not FUseStyledColor then begin
+          if ItemStates[Index].SubItemFontColor <> 0 then
+            Font.Color := ItemState.SubItemFontColor
+        end else Font.Color := NewTextColor
+      end
+      else begin
+        if not FUseStyledColor then begin
+          if ItemStates[Index].SubItemFontColor <> 0 then
+            Font.Color := ItemState.SubItemFontColor
+        end else Font.Color := OldColor
+      end;
+      // ---
+
       SetRectEmpty(SubItemRect);
       InternalDrawText(ItemState.SubItem, SubItemRect, DrawTextFormat or
         DT_CALCRECT, False);
@@ -883,6 +1070,7 @@ begin
     end
     else
       Dec(Rect.Right, FOffset);
+
     { Draw item text }
     if not FWantTabs then
       Inc(Rect.Left);
@@ -895,6 +1083,22 @@ begin
     if FUseRightToLeft then
       DrawTextFormat := DrawTextFormat or (DT_RIGHT or DT_RTLREADING);
     Font.Style := ItemState.ItemFontStyle;
+
+    // Set color text for Item if VCL Style used
+    if not Focused or FWantTabs then begin
+      if not FUseStyledColor then begin
+        if ItemStates[Index].ItemFontColor <> 0 then
+          Font.Color := ItemState.ItemFontColor
+      end else Font.Color := NewTextColor
+    end
+    else begin
+      if not FUseStyledColor then begin
+        if ItemStates[Index].ItemFontColor <> 0 then
+          Font.Color := ItemState.ItemFontColor
+      end else Font.Color := OldColor
+    end;
+    // ---
+
     { When you call DrawText with the DT_CALCRECT flag and there's a word wider
       than the rectangle width, it increases the rectangle width and wraps
       at the new Right point. On the other hand, when you call DrawText
@@ -907,6 +1111,7 @@ begin
     InternalDrawText(Items[Index], Rect, DrawTextFormat or DT_CALCRECT, False);
     FlipRect(Rect, SavedClientRect, FUseRightToLeft);
     InternalDrawText(Items[Index], Rect, DrawTextFormat, FWantTabs and Disabled);
+
     { Draw focus rectangle }
     if FWantTabs and not Disabled and (odSelected in State) and Focused and
       (UIState and UISF_HIDEFOCUS = 0) then
@@ -1077,6 +1282,11 @@ begin
   Result := ItemStates[Index].Enabled;
 end;
 
+function TNewCheckListBox.GetItemFontColor(Index: Integer): TColor;
+begin
+  Result := ItemStates[Index].ItemFontColor;
+end;
+
 function TNewCheckListBox.GetItemFontStyle(Index: Integer): TFontStyles;
 begin
   Result := ItemStates[Index].ItemFontStyle;
@@ -1121,6 +1331,11 @@ end;
 function TNewCheckListBox.GetSubItem(Index: Integer): String;
 begin
   Result := ItemStates[Index].SubItem;
+end;
+
+function TNewCheckListBox.GetSubItemFontColor(Index: Integer): TColor;
+begin
+  Result := ItemStates[Index].SubItemFontColor;
 end;
 
 function TNewCheckListBox.GetSubItemFontStyle(Index: Integer): TFontStyles;
@@ -1503,6 +1718,17 @@ begin
   end;
 end;
 
+procedure TNewCheckListBox.SetItemFontColor(Index: Integer; const AItemFontColor: TColor);
+var
+  R: TRect;
+begin
+  if ItemStates[Index].ItemFontColor <> AItemFontColor then begin
+    ItemStates[Index].ItemFontColor := AItemFontColor;
+    R := ItemRect(Index);
+    InvalidateRect(Handle, @R, True);
+  end;
+end;
+
 procedure TNewCheckListBox.SetItemFontStyle(Index: Integer; const AItemFontStyle: TFontStyles);
 var
   R: TRect;
@@ -1563,6 +1789,17 @@ begin
   end;
 end;
 
+procedure TNewCheckListBox.SetSubItemFontColor(Index: Integer; const ASubItemFontColor: TColor);
+var
+  R: TRect;
+begin
+  if ItemStates[Index].SubItemFontColor <> ASubItemFontColor then begin
+    ItemStates[Index].SubItemFontColor := ASubItemFontColor;
+    R := ItemRect(Index);
+    InvalidateRect(Handle, @R, True);
+  end;
+end;
+
 procedure TNewCheckListBox.SetSubItemFontStyle(Index: Integer; const ASubItemFontStyle: TFontStyles);
 var
   R: TRect;
@@ -1571,6 +1808,15 @@ begin
     ItemStates[Index].SubItemFontStyle := ASubItemFontStyle;
     R := ItemRect(Index);
     InvalidateRect(Handle, @R, True);
+  end;
+end;
+
+procedure TNewCheckListBox.SetUseStyledColor(Value: Boolean);
+begin
+  if Value <> FUseStyledColor then
+  begin
+    FUseStyledColor := Value;
+    Invalidate;
   end;
 end;
 

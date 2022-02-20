@@ -543,10 +543,12 @@ TNewCheckListBox = class(TCustomListBox)
   property State[Index: Integer]: TCheckBoxState; read write;
   property ItemCaption[Index: Integer]: String; read write;
   property ItemEnabled[Index: Integer]: Boolean; read write;
+  property ItemFontColor[Index: Integer]: TColor; read write;
   property ItemFontStyle[Index: Integer]: TFontStyles; read write;
   property ItemLevel[Index: Integer]: Byte; read;
   property ItemObject[Index: Integer]: TObject; read write;
   property ItemSubItem[Index: Integer]: String; read write;
+  property SubItemFontColor[Index: Integer]: TColor; read write;
   property SubItemFontStyle[Index: Integer]: TFontStyles; read write;
   property Flat: Boolean; read write;
   property MinItemHeight: Integer; read write;
@@ -562,6 +564,7 @@ TNewCheckListBox = class(TCustomListBox)
   property OnKeyPress: TKeyPressEvent; read write;
   property OnKeyUp: TKeyEvent; read write;
   property ShowLines: Boolean; read write;
+  property UseStyledColor: Boolean; read write;
   property WantTabs: Boolean; read write;
   property RequireRadioSelection: Boolean; read write;
 end;
