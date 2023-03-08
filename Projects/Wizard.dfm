@@ -16,9 +16,6 @@ object WizardForm: TWizardForm
   Scaled = False
   OnClose = FormClose
   OnResize = FormResize
-  DesignSize = (
-    497
-    360)
   PixelsPerInch = 96
   TextHeight = 13
   object FBevel: TBevel
@@ -74,9 +71,6 @@ object WizardForm: TWizardForm
     object FWelcomePage: TNewNotebookPage
       Color = clWindow
       ParentColor = False
-      DesignSize = (
-        497
-        313)
       object FWizardBitmapImage: TBitmapImage
         Left = 0
         Top = 0
@@ -111,9 +105,6 @@ object WizardForm: TWizardForm
       end
     end
     object FInnerPage: TNewNotebookPage
-      DesignSize = (
-        497
-        313)
       object FBevel1: TBevel
         Left = 0
         Top = 58
@@ -131,9 +122,6 @@ object WizardForm: TWizardForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 1
         object FLicensePage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FLicenseNotAcceptedRadio: TNewRadioButton
             Left = 0
             Top = 216
@@ -184,9 +172,6 @@ object WizardForm: TWizardForm
           end
         end
         object FPasswordPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FPasswordEdit: TPasswordEdit
             Left = 0
             Top = 40
@@ -221,9 +206,6 @@ object WizardForm: TWizardForm
           end
         end
         object FInfoBeforePage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FInfoBeforeMemo: TRichEditViewer
             Left = 0
             Top = 24
@@ -252,9 +234,6 @@ object WizardForm: TWizardForm
           end
         end
         object FUserInfoPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FUserInfoSerialEdit: TNewEdit
             Left = 0
             Top = 120
@@ -323,9 +302,6 @@ object WizardForm: TWizardForm
           end
         end
         object FSelectDirPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FSelectDirBitmapImage: TBitmapImage
             Left = 0
             Top = 0
@@ -354,7 +330,7 @@ object WizardForm: TWizardForm
             TabOrder = 3
             OnClick = DirBrowseButtonClick
           end
-          object FDirEdit: TEdit
+          object FDirEdit: TNewEdit
             Left = 0
             Top = 68
             Width = 397
@@ -389,9 +365,6 @@ object WizardForm: TWizardForm
           end
         end
         object FSelectComponentsPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FComponentsDiskSpaceLabel: TNewStaticText
             Left = 0
             Top = 216
@@ -438,9 +411,6 @@ object WizardForm: TWizardForm
           end
         end
         object FSelectProgramGroupPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FSelectGroupBitmapImage: TBitmapImage
             Left = 0
             Top = 0
@@ -502,9 +472,6 @@ object WizardForm: TWizardForm
           end
         end
         object FSelectTasksPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FTasksList: TNewCheckListBox
             Left = 0
             Top = 24
@@ -531,9 +498,6 @@ object WizardForm: TWizardForm
           end
         end
         object FReadyPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FReadyMemo: TNewMemo
             Left = 0
             Top = 24
@@ -561,9 +525,6 @@ object WizardForm: TWizardForm
           end
         end
         object FPreparingPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FPreparingErrorBitmapImage: TBitmapImage
             Left = 0
             Top = 0
@@ -623,9 +584,6 @@ object WizardForm: TWizardForm
           end
         end
         object FInstallingPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FFilenameLabel: TNewStaticText
             Left = 0
             Top = 16
@@ -659,9 +617,6 @@ object WizardForm: TWizardForm
           end
         end
         object FInfoAfterPage: TNewNotebookPage
-          DesignSize = (
-            417
-            237)
           object FInfoAfterMemo: TRichEditViewer
             Left = 0
             Top = 24
@@ -699,9 +654,6 @@ object WizardForm: TWizardForm
         BevelOuter = bvNone
         Color = clWindow
         TabOrder = 0
-        DesignSize = (
-          497
-          58)
         object FWizardSmallBitmapImage: TBitmapImage
           Left = 440
           Top = 0
@@ -738,9 +690,6 @@ object WizardForm: TWizardForm
     object FFinishedPage: TNewNotebookPage
       Color = clWindow
       ParentColor = False
-      DesignSize = (
-        497
-        313)
       object FWizardBitmapImage2: TBitmapImage
         Left = 0
         Top = 0

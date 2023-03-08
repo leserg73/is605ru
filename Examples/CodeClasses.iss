@@ -361,7 +361,7 @@ begin
   RichEditViewer.Height := Page.SurfaceHeight;
   RichEditViewer.Anchors := [akLeft, akTop, akRight, akBottom];
   RichEditViewer.BevelKind := bkFlat;
-  RichEditViewer.BorderStyle := bsSingle;
+  RichEditViewer.BorderStyle := bsNone;
   RichEditViewer.Parent := Page.Surface;
   RichEditViewer.ScrollBars := ssVertical;
   RichEditViewer.UseRichEdit := True;

@@ -14,9 +14,6 @@ object UninstSharedFileForm: TUninstSharedFileForm
   Font.Style = []
   OldCreateOrder = True
   Scaled = False
-  DesignSize = (
-    397
-    225)
   PixelsPerInch = 96
   TextHeight = 13
   object NoToAllButton: TNewButton
@@ -60,7 +57,7 @@ object UninstSharedFileForm: TUninstSharedFileForm
     ModalResult = 6
     TabOrder = 0
   end
-  object LocationEdit: TEdit
+  object LocationEdit: TNewEdit
     Left = 88
     Top = 148
     Width = 297
@@ -78,7 +75,7 @@ object UninstSharedFileForm: TUninstSharedFileForm
     Caption = '*'
     TabOrder = 7
   end
-  object FilenameEdit: TEdit
+  object FilenameEdit: TNewEdit
     Left = 88
     Top = 116
     Width = 297

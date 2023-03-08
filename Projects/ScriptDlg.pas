@@ -73,7 +73,7 @@ type
       FY: Integer;
       procedure ButtonClick(Sender: TObject);
       function GetButton(Index: Integer): TNewButton;
-      function GetEdit(Index: Integer): TEdit;
+      function GetEdit(Index: Integer): TNewEdit;
       function GetPromptLabel(Index: Integer): TNewStaticText;
       function GetValue(Index: Integer): String;
       procedure SetValue(Index: Integer; const Value: String);
@@ -84,7 +84,7 @@ type
       destructor Destroy; override;
       function Add(const APrompt: String): Integer;
       property Buttons[Index: Integer]: TNewButton read GetButton;
-      property Edits[Index: Integer]: TEdit read GetEdit;
+      property Edits[Index: Integer]: TNewEdit read GetEdit;
       procedure Initialize(const SubCaption: String; const AppendDir: Boolean;
         const NewFolderName: String);
       property PromptLabels[Index: Integer]: TNewStaticText read GetPromptLabel;
@@ -104,7 +104,7 @@ type
       FY: Integer;
       procedure ButtonClick(Sender: TObject);
       function GetButton(Index: Integer): TNewButton;
-      function GetEdit(Index: Integer): TEdit;
+      function GetEdit(Index: Integer): TNewEdit;
       function GetPromptLabel(Index: Integer): TNewStaticText;
       function GetValue(Index: Integer): String;
       procedure SetValue(Index: Integer; const Value: String);
@@ -115,7 +115,7 @@ type
       destructor Destroy; override;
       function Add(const APrompt, AFilter, ADefaultExtension: String): Integer;
       property Buttons[Index: Integer]: TNewButton read GetButton;
-      property Edits[Index: Integer]: TEdit read GetEdit;
+      property Edits[Index: Integer]: TNewEdit read GetEdit;
       procedure Initialize(const SubCaption: String);
       property PromptLabels[Index: Integer]: TNewStaticText read GetPromptLabel;
       property Values[Index: Integer]: String read GetValue write SetValue;
@@ -386,7 +386,7 @@ end;
 procedure TInputDirWizardPage.ButtonClick(Sender: TObject);
 var
   I: Integer;
-  Edit: TEdit;
+  Edit: TNewEdit;
   S{$IFNDEF PS_MINIVCL}, SModern{$ENDIF}: String;
 {$IFNDEF PS_MINIVCL}
 label
@@ -395,7 +395,7 @@ label
 begin
   I := FButtons.IndexOf(Sender);
   if I <> -1 then begin
-    Edit := TEdit(FEdits[I]);
+    Edit := TNewEdit(FEdits[I]);
     S := Edit.Text;
 {$IFNDEF PS_MINIVCL}
   { Modern Select Dir Dialog - Vista+ }
@@ -431,7 +431,7 @@ end;
 procedure TInputDirWizardPage.NextButtonClick(var Continue: Boolean);
 var
   I: Integer;
-  Edit: TEdit;
+  Edit: TNewEdit;
 begin
   for I := 0 to FEdits.Count-1 do begin
     Edit := FEdits[I];
@@ -468,7 +468,7 @@ function TInputDirWizardPage.Add(const APrompt: String): Integer;
 var
   ButtonWidth: Integer;
   PromptLabel: TNewStaticText;
-  Edit: TEdit;
+  Edit: TNewEdit;
   Button: TNewButton;
 begin
   ButtonWidth := WizardForm.CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
@@ -489,7 +489,7 @@ begin
   end else
     PromptLabel := nil;
 
-  Edit := TEdit.Create(Self);
+  Edit := TNewEdit.Create(Self);
   with Edit do begin
     Top := FY;
     Width := SurfaceWidth-ButtonWidth-WizardForm.ScalePixelsX(10);
@@ -528,9 +528,9 @@ begin
   Result := TNewButton(FButtons[Index]);
 end;
 
-function TInputDirWizardPage.GetEdit(Index: Integer): TEdit;
+function TInputDirWizardPage.GetEdit(Index: Integer): TNewEdit;
 begin
-  Result := TEdit(FEdits[Index]);
+  Result := TNewEdit(FEdits[Index]);
 end;
 
 function TInputDirWizardPage.GetPromptLabel(Index: Integer): TNewStaticText;
@@ -573,12 +573,12 @@ end;
 procedure TInputFileWizardPage.ButtonClick(Sender: TObject);
 var
   I: Integer;
-  Edit: TEdit;
+  Edit: TNewEdit;
   FileName: String;
 begin
   I := FButtons.IndexOf(Sender);
   if I <> -1 then begin
-    Edit := TEdit(FEdits[I]);
+    Edit := TNewEdit(FEdits[I]);
     FileName := Edit.Text;
     if (not IsSaveButton[I] and NewGetOpenFileName(RemoveAccelChar(SetupMessages[msgButtonWizardBrowse]),
         FileName, PathExtractPath(FileName), FInputFileFilters[I],
@@ -610,7 +610,7 @@ function TInputFileWizardPage.Add(const APrompt, AFilter,
 var
   ButtonWidth: Integer;
   PromptLabel: TNewStaticText;
-  Edit: TEdit;
+  Edit: TNewEdit;
   Button: TNewButton;
 begin
   ButtonWidth := WizardForm.CalculateButtonWidth([SetupMessages[msgButtonWizardBrowse]]);
@@ -631,7 +631,7 @@ begin
   end else
     PromptLabel := nil;
 
-  Edit := TEdit.Create(Self);
+  Edit := TNewEdit.Create(Self);
   with Edit do begin
     Top := FY;
     Width := SurfaceWidth-ButtonWidth-WizardForm.ScalePixelsX(10);
@@ -672,9 +672,9 @@ begin
   Result := TNewButton(FButtons[Index]);
 end;
 
-function TInputFileWizardPage.GetEdit(Index: Integer): TEdit;
+function TInputFileWizardPage.GetEdit(Index: Integer): TNewEdit;
 begin
-  Result := TEdit(FEdits[Index]);
+  Result := TNewEdit(FEdits[Index]);
 end;
 
 function TInputFileWizardPage.GetPromptLabel(Index: Integer): TNewStaticText;
@@ -751,14 +751,8 @@ begin
     Width := SurfaceWidth;
     Height := WizardForm.ScalePixelsY(DefaultBoxBottom) - Y;
     Anchors := [akLeft, akTop, akRight, akBottom];
-    // Fix border style for TRichEditViewer
-    if SetupHeader.SetupStyle then begin
-       BevelKind := bkNone;
-       BorderStyle := bsSingle;
-    end else begin
        BevelKind := bkFlat;
        BorderStyle := bsNone;
-    end;
     ReadOnly := True;
     ScrollBars := ssVertical;
     WantReturns := False;

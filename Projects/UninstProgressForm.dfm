@@ -14,9 +14,6 @@ object UninstallProgressForm: TUninstallProgressForm
   Font.Style = []
   OldCreateOrder = True
   Scaled = False
-  DesignSize = (
-    497
-    360)
   PixelsPerInch = 96
   TextHeight = 13
   object FBevel: TBevel
@@ -49,9 +46,6 @@ object UninstallProgressForm: TUninstallProgressForm
     ParentColor = False
     TabOrder = 0
     object FInnerPage: TNewNotebookPage
-      DesignSize = (
-        497
-        313)
       object FBevel1: TBevel
         Left = 0
         Top = 58
@@ -69,9 +63,6 @@ object UninstallProgressForm: TUninstallProgressForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 1
         object FInstallingPage: TNewNotebookPage
-          DesignSize = (
-            489
-            245)
           object FProgressBar: TNewProgressBar
             Left = 36
             Top = 56
@@ -104,9 +95,6 @@ object UninstallProgressForm: TUninstallProgressForm
         BevelOuter = bvNone
         Color = clWindow
         TabOrder = 0
-        DesignSize = (
-          497
-          58)
         object FWizardSmallBitmapImage: TBitmapImage
           Left = 440
           Top = 1

@@ -447,8 +447,10 @@ var
   Context: TSHA1Context;
   AddrOffset: LongWord;
   BufSize: Cardinal;
-  Buf: array[0..65535] of Byte;  // 64K
-//  Buf: array [0..262143] of Byte;  // 256K
+  //Buf: array[0..65535] of Byte;  // 64K
+  //Buf: array [0..131071] of Byte;  // 128K
+  Buf: array [0..262143] of Byte;  // 256K
+  //Buf: array [0..524287] of Byte;  // 512K
   { ^ *must* be the same buffer size used by the compiler (TCompressionHandler),
     otherwise the TransformCallInstructions call will break }
 begin
@@ -476,8 +478,7 @@ begin
         end;
         Dec64(BytesLeft, BufSize);
         SHA1Update(Context, Buf, BufSize);
-        //Move(Buf[0], Pointer(DestB)^, BufSize * SizeOf(Char)); { work }
-        Move(Buf[0], PAnsiChar(Pointer(DestB)^), BufSize * SizeOf(Char));
+        Move(Buf, Pointer(DestB)^, BufSize * SizeOf(Byte));
 
         if Assigned(ProgressProc) then
           ProgressProc(BufSize);

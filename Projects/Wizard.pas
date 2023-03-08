@@ -18,7 +18,7 @@ uses
   Forms, Dialogs, StdCtrls, ExtCtrls,
   SetupForm, Struct, Int64Em, NewCheckListBox, RichEditViewer, NewStaticText,
   SetupTypes, NewProgressBar, MsgIDs, PasswordEdit, FolderTreeView, BitmapImage,
-  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles;
+  NewNotebook, BidiCtrls, Themes, Styles;
 
 type
   TWizardForm = class;
@@ -100,7 +100,7 @@ type
     FInstallingPage: TNewNotebookPage;
     FInfoAfterPage: TNewNotebookPage;
     FDiskSpaceLabel: TNewStaticText;
-    FDirEdit: TEdit;
+    FDirEdit: TNewEdit;
     FGroupEdit: TNewEdit;
     FNoIconsCheck: TNewCheckBox;
     FPasswordLabel: TNewStaticText;
@@ -265,7 +265,7 @@ type
     property InstallingPage: TNewNotebookPage read FInstallingPage;
     property InfoAfterPage: TNewNotebookPage read FInfoAfterPage;
     property DiskSpaceLabel: TNewStaticText read FDiskSpaceLabel;
-    property DirEdit: TEdit read FDirEdit;
+    property DirEdit: TNewEdit read FDirEdit;
     property GroupEdit: TNewEdit read FGroupEdit;
     property NoIconsCheck: TNewCheckBox read FNoIconsCheck;
     property PasswordLabel: TNewStaticText read FPasswordLabel;
@@ -334,7 +334,7 @@ function ExpandSetupMessage(const ID: TSetupMessageID): String;
 function ListContains(const List: TStringList; const S: String): Boolean;
 procedure TidyUpDirName(var Path: String);
 procedure TidyUpGroupName(var Path: String);
-function ValidateCustomDirEdit(const AEdit: TEdit;
+function ValidateCustomDirEdit(const AEdit: TNewEdit;
   const AllowUNCPath, AllowRootDirectory, AllowNetworkDrive: Boolean): Boolean;
 
 implementation
@@ -820,18 +820,6 @@ begin
   PrevSelectedTasks := TStringList.Create();
   PrevDeselectedTasks := TStringList.Create();
 
-  { Not sure why the following is needed but various things related to
-    positioning and anchoring don't work without this (you get positions of
-    page controls back as if there was no anchoring until the page handle
-    is automatically created. Cause might be related to the comment in
-    TNewNotebook.AlignControls. }
-  for I := 0 to OuterNotebook.PageCount-1 do
-    OuterNotebook.Pages[I].HandleNeeded;
-  for I := 0 to InnerNotebook.PageCount-1 do
-    InnerNotebook.Pages[I].HandleNeeded;
-
-  InitializeFont;
-
 {$IFDEF IS_D7}
   MainPanel.ParentBackground := False;
 {$ENDIF}
@@ -852,6 +840,17 @@ begin
     end;
   end;
 
+  { Not sure why the following is needed but various things related to
+    positioning and anchoring don't work without this (you get positions of
+    page controls back as if there was no anchoring until the page handle
+    is automatically created. Cause might be related to the comment in
+    TNewNotebook.AlignControls. }
+  for I := 0 to OuterNotebook.PageCount-1 do
+    OuterNotebook.Pages[I].HandleNeeded;
+  for I := 0 to InnerNotebook.PageCount-1 do
+    InnerNotebook.Pages[I].HandleNeeded;
+
+  InitializeFont;
   SetFontNameSize(WelcomeLabel1.Font, LangOptions.WelcomeFontName,
     LangOptions.WelcomeFontSize, '', 12);
   WelcomeLabel1.Font.Style := [fsBold];
@@ -932,8 +931,8 @@ begin
 
   if SetupHeader.SetupStyle then begin
      WizardSmallBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
-     {$IFNDEF IS_WINXP}
-       WizardSmallBitmapImage.Left := MainPanel.Width - WizardSmallBitmapImage.Width;
+     {$IFDEF IS_WINXP}
+       WizardSmallBitmapImage.Left := MainPanel.Width - WizardSmallBitmapImage.Width - ScalePixelsX(8);
      {$ENDIF}
   end;
 
@@ -959,13 +958,6 @@ begin
   IncTopDecHeight(LicenseMemo, I);
   LicenseAcceptedRadio.Caption := SetupMessages[msgLicenseAccepted];
   LicenseNotAcceptedRadio.Caption := SetupMessages[msgLicenseNotAccepted];
-  // Fix border style for LicenseMemo
-  if SetupHeader.SetupStyle then begin
-     LicenseMemo.BevelKind := bkNone;
-     LicenseMemo.BorderStyle := bsSingle;
-  end
-  else
-     LicenseMemo.BevelKind := bkFlat;
 
   { Initialize wpPassword page }
   RegisterExistingPage(wpPassword, InnerPage, PasswordPage,
@@ -983,13 +975,6 @@ begin
   InfoBeforeClickLabel.Caption := SetupMessages[msgInfoBeforeClickLabel];
   I := AdjustLabelHeight(InfoBeforeClickLabel);
   IncTopDecHeight(InfoBeforeMemo, I);
-  // Fix border style for InfoBeforeMemo
-  if SetupHeader.SetupStyle then begin
-     InfoBeforeMemo.BevelKind := bkNone;
-     InfoBeforeMemo.BorderStyle := bsSingle;
-  end
-  else
-     InfoBeforeMemo.BevelKind := bkFlat;
 
   { Initialize wpUserInfo page }
   RegisterExistingPage(wpUserInfo, InnerPage, UserInfoPage,
@@ -1113,13 +1098,6 @@ begin
   InfoAfterClickLabel.Caption := SetupMessages[msgInfoAfterClickLabel];
   I := AdjustLabelHeight(InfoAfterClickLabel);
   IncTopDecHeight(InfoAfterMemo, I);
-  // Fix border style for InfoAfterMemo
-  if SetupHeader.SetupStyle then begin
-     InfoAfterMemo.BevelKind := bkNone;
-     InfoAfterMemo.BorderStyle := bsSingle;
-  end
-  else
-     InfoAfterMemo.BevelKind := bkFlat;
 
   { Initialize wpFinished page }
   RegisterExistingPage(wpFinished, FinishedPage, nil, '', '');
@@ -2821,7 +2799,7 @@ begin
   end;
 end;
 
-function ValidateCustomDirEdit(const AEdit: TEdit;
+function ValidateCustomDirEdit(const AEdit: TNewEdit;
   const AllowUNCPath, AllowRootDirectory, AllowNetworkDrive: Boolean): Boolean;
 { Checks if AEdit.Text contains a valid-looking pathname, and returns True
   if so. May alter AEdit.Text to remove redundant spaces and backslashes. }

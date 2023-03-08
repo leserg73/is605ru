@@ -12,9 +12,21 @@ unit FolderTreeView;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, CommCtrl, StdCtrls;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, CommCtrl, StdCtrls, Themes, UITypes;
 
 type
+  TTreeViewStyleHook = class(TScrollingStyleHook)
+  strict private
+    procedure TVMSetBkColor(var Message: TMessage); message TVM_SETBKCOLOR;
+    procedure TVMSetTextColor(var Message: TMessage); message TVM_SETTEXTCOLOR;
+    procedure WMMouseMove(var Msg: TWMMouse); message WM_MOUSEMOVE;
+  strict protected
+    procedure WndProc(var Message: TMessage); override;
+  public
+    constructor Create(AControl: TWinControl); override;
+  end;
+
+
   TCustomFolderTreeView = class;
 
   TFolderRenameEvent = procedure(Sender: TCustomFolderTreeView;
@@ -29,6 +41,8 @@ type
     FItemExpanding: Boolean;
     FOnChange: TNotifyEvent;
     FOnRename: TFolderRenameEvent;
+    class constructor Create;
+    class destructor Destroy;
     procedure Change;
     procedure DeleteObsoleteNewItems(const ParentItem, ItemToKeep: HTREEITEM);
     function FindItem(const ParentItem: HTREEITEM; const AName: String): HTREEITEM;
@@ -68,6 +82,8 @@ type
 
   TFolderTreeView = class(TCustomFolderTreeView)
   private
+    class constructor Create;
+    class destructor Destroy;
     procedure RefreshDriveItem(const Item: HTREEITEM; const ANewDisplayName: String);
   protected
     function ItemChildrenNeeded(const Item: HTREEITEM): Boolean; override;
@@ -91,6 +107,8 @@ type
     FUserPrograms, FCommonPrograms: String;
     FUserStartup, FCommonStartup: String;
     FImageIndexes: array[Boolean] of Integer;
+    class constructor Create;
+    class destructor Destroy;
   protected
     procedure CreateParams(var Params: TCreateParams); override;
     function GetRootItem: HTREEITEM; override;
@@ -365,6 +383,148 @@ begin
     Result := False;
 end;
 
+{ TTreeViewStyleHook }
+
+type
+  TWinControlClass = class(TWinControl);
+
+constructor TTreeViewStyleHook.Create(AControl: TWinControl);
+var
+  LColor: TColor;
+begin
+  inherited;
+  OverrideEraseBkgnd := True;
+  with StyleServices do
+  begin
+    if not GetElementColor(GetElementDetails(ttItemNormal), ecTextColor, LColor) or
+       (LColor = clNone) then
+      LColor := GetSystemColor(clWindowText);
+  end;
+  if seFont in Control.StyleElements then
+    FontColor := LColor
+  else
+    FontColor := TWinControlClass(Control).Font.Color;
+  Brush.Color := StyleServices.GetStyleColor(scTreeView);
+end;
+
+procedure TTreeViewStyleHook.TVMSetBkColor(var Message: TMessage);
+begin
+  Message.LParam := LPARAM(ColorToRGB(Brush.Color));
+  Handled := False;
+end;
+
+procedure TTreeViewStyleHook.TVMSetTextColor(var Message: TMessage);
+begin
+  Message.LParam := LPARAM(ColorToRGB(FontColor));
+  Handled := False;
+end;
+
+procedure TTreeViewStyleHook.WMMouseMove(var Msg: TWMMouse);
+var
+  SF: TScrollInfo;
+begin
+  if VertSliderState = tsThumbBtnVertPressed then
+  begin
+    SF.fMask := SIF_ALL;
+    SF.cbSize := SizeOf(SF);
+    GetScrollInfo(Handle, SB_VERT, SF);
+    ScrollPos := ScrollPos + (SF.nMax - SF.nMin) * ((Mouse.CursorPos.Y - PrevScrollPos) / VertTrackRect.Height);
+    if ScrollPos < SF.nMin then
+      ScrollPos := SF.nMin;
+    if ScrollPos > SF.nMax then
+      ScrollPos := SF.nMax;
+
+    PrevScrollPos := Mouse.CursorPos.Y;
+    if Control is TCustomFolderTreeView then
+    begin
+      PostMessage(Handle, WM_VSCROLL, Integer(SmallPoint(SB_THUMBTRACK, Round(ScrollPos))), 0);
+      SF.nPos := Round(ScrollPos);
+      SF.nTrackPos := Round(ScrollPos);
+      SetScrollInfo(Handle, SB_VERT, SF, True);
+    end
+    else
+      PostMessage(Handle, WM_VSCROLL, Integer(SmallPoint(SB_THUMBPOSITION, Round(ScrollPos))), 0);
+    PaintScroll;
+    Handled := True;
+    Exit;
+  end;
+
+  if HorzSliderState = tsThumbBtnHorzPressed then
+  begin
+    SF.fMask := SIF_ALL;
+    SF.cbSize := SizeOf(SF);
+    GetScrollInfo(Handle, SB_HORZ, SF);
+    ScrollPos := ScrollPos + (SF.nMax - SF.nMin) * ((Mouse.CursorPos.X - PrevScrollPos) / HorzTrackRect.Width);
+    if ScrollPos < SF.nMin then
+      ScrollPos := SF.nMin;
+    if ScrollPos > SF.nMax then
+      ScrollPos := SF.nMax;
+
+    PrevScrollPos := Mouse.CursorPos.X;
+
+    if Control is TCustomFolderTreeView then
+    begin
+      PostMessage(Handle, WM_HSCROLL, Integer(SmallPoint(SB_THUMBTRACK, Round(ScrollPos))), 0);
+      SF.nPos := Round(ScrollPos);
+      SF.nTrackPos := Round(ScrollPos);
+      SetScrollInfo(Handle, SB_HORZ, SF, True);
+    end
+    else
+      PostMessage(Handle, WM_HSCROLL, Integer(SmallPoint(SB_THUMBPOSITION, Round(ScrollPos))), 0);
+    PaintScroll;
+    Handled := True;
+    Exit;
+  end;
+
+  if (HorzSliderState <> tsThumbBtnHorzPressed) and (HorzSliderState = tsThumbBtnHorzHot) then
+  begin
+    HorzSliderState := tsThumbBtnHorzNormal;
+    PaintScroll;
+  end;
+
+  if (VertSliderState <> tsThumbBtnVertPressed) and (VertSliderState = tsThumbBtnVertHot) then
+  begin
+    VertSliderState := tsThumbBtnVertNormal;
+    PaintScroll;
+  end;
+
+  if (HorzUpState <> tsArrowBtnLeftPressed) and (HorzUpState = tsArrowBtnLeftHot) then
+  begin
+    HorzUpState := tsArrowBtnLeftNormal;
+    PaintScroll;
+  end;
+
+  if (HorzDownState <> tsArrowBtnRightPressed) and (HorzDownState =tsArrowBtnRightHot) then
+  begin
+    HorzDownState := tsArrowBtnRightNormal;
+    PaintScroll;
+  end;
+
+  if (VertUpState <> tsArrowBtnUpPressed) and (VertUpState = tsArrowBtnUpHot) then
+  begin
+    VertUpState := tsArrowBtnUpNormal;
+    PaintScroll;
+  end;
+
+  if (VertDownState <> tsArrowBtnDownPressed) and (VertDownState = tsArrowBtnDownHot) then
+  begin
+    VertDownState := tsArrowBtnDownNormal;
+    PaintScroll;
+  end;
+
+  CallDefaultProc(TMessage(Msg));
+  if LeftButtonDown then
+    PaintScroll;
+  Handled := True;
+end;
+
+
+procedure TTreeViewStyleHook.WndProc(var Message: TMessage);
+begin
+  // Reserved for potential updates
+  inherited;
+end;
+
 { TCustomFolderTreeView }
 
 type
@@ -374,6 +534,11 @@ type
     NewItem: Boolean;
     ChildrenAdded: Boolean;
   end;
+
+class constructor TCustomFolderTreeView.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TCustomFolderTreeView, TTreeViewStyleHook);
+end;
 
 constructor TCustomFolderTreeView.Create(AOwner: TComponent);
 var
@@ -391,6 +556,11 @@ begin
     Cursor := crArrow;  { prevent hand cursor from appearing in TVS_TRACKSELECT mode }
   if SystemParametersInfo(SPI_GETICONTITLELOGFONT, SizeOf(LogFont), @LogFont, 0) then
     Font.Handle := CreateFontIndirect(LogFont);
+end;
+
+class destructor TCustomFolderTreeView.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TCustomFolderTreeView, TTreeViewStyleHook);
 end;
 
 procedure TCustomFolderTreeView.CreateParams(var Params: TCreateParams);
@@ -993,6 +1163,16 @@ end;
 
 { TFolderTreeView }
 
+class constructor TFolderTreeView.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TFolderTreeView, TTreeViewStyleHook);
+end;
+
+class destructor TFolderTreeView.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TFolderTreeView, TTreeViewStyleHook);
+end;
+
 function TFolderTreeView.ItemChildrenNeeded(const Item: HTREEITEM): Boolean;
 
   procedure AddDrives;
@@ -1112,6 +1292,16 @@ begin
 end;
 
 { TStartMenuFolderTreeView }
+
+class constructor TStartMenuFolderTreeView.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TStartMenuFolderTreeView, TTreeViewStyleHook);
+end;
+
+class destructor TStartMenuFolderTreeView.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TStartMenuFolderTreeView, TTreeViewStyleHook);
+end;
 
 procedure TStartMenuFolderTreeView.CreateParams(var Params: TCreateParams);
 begin

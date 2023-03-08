@@ -968,8 +968,8 @@ begin
              Brush.Color := StyleServices.GetStyleColor(scListBox)
           else
              Brush.Color := Color;
-             FillRect(Rect);
-             IntersectClipRect(Handle, CheckRect.Left, CheckRect.Top, CheckRect.Right, CheckRect.Bottom);
+             //FillRect(Rect);
+             //IntersectClipRect(Handle, CheckRect.Left, CheckRect.Top, CheckRect.Right, CheckRect.Bottom);
              StyleServices.DrawElement(Handle, ElementDetails, CheckRect, nil, FCurrentPPI);
           finally
              RestoreDC(Handle, SaveIndex);
@@ -1929,7 +1929,7 @@ begin
     VK_TAB:
       begin
         GoForward := GetKeyState(VK_SHIFT) >= 0;
-        Arrows := False
+        Arrows := False;
       end;
     VK_DOWN, VK_RIGHT: GoForward := True;
     VK_UP, VK_LEFT: GoForward := False

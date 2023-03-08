@@ -278,7 +278,7 @@ begin
 end;
 
 procedure TInputDirWizardPageButtons_R(Self: TInputDirWizardPage; var T: TNewButton; const t1: Integer); begin T := Self.Buttons[t1]; end;
-procedure TInputDirWizardPageEdits_R(Self: TInputDirWizardPage; var T: TEdit; const t1: Integer); begin T := Self.Edits[t1]; end;
+procedure TInputDirWizardPageEdits_R(Self: TInputDirWizardPage; var T: TNewEdit; const t1: Integer); begin T := Self.Edits[t1]; end;
 procedure TInputDirWizardPagePromptLabels_R(Self: TInputDirWizardPage; var T: TNewStaticText; const t1: Integer); begin T := Self.PromptLabels[t1]; end;
 procedure TInputDirWizardPageValues_W(Self: TInputDirWizardPage; const T: String; const t1: Integer); begin Self.Values[t1] := T; end;
 procedure TInputDirWizardPageValues_R(Self: TInputDirWizardPage; var T: String; const t1: Integer); begin T := Self.Values[t1]; end;
@@ -297,7 +297,7 @@ end;
 
 procedure TInputFileWizardPageButtons_R(Self: TInputFileWizardPage; var T: TNewButton; const t1: Integer); begin T := Self.Buttons[t1]; end;
 procedure TInputFileWizardPagePromptLabels_R(Self: TInputFileWizardPage; var T: TNewStaticText; const t1: Integer); begin T := Self.PromptLabels[t1]; end;
-procedure TInputFileWizardPageEdits_R(Self: TInputFileWizardPage; var T: TEdit; const t1: Integer); begin T := Self.Edits[t1]; end;
+procedure TInputFileWizardPageEdits_R(Self: TInputFileWizardPage; var T: TNewEdit; const t1: Integer); begin T := Self.Edits[t1]; end;
 procedure TInputFileWizardPageValues_W(Self: TInputFileWizardPage; const T: String; const t1: Integer); begin Self.Values[t1] := T; end;
 procedure TInputFileWizardPageValues_R(Self: TInputFileWizardPage; var T: String; const t1: Integer); begin T := Self.Values[t1]; end;
 procedure TInputFileWizardPageIsSaveButton_W(Self: TInputFileWizardPage; const T: Boolean; const t1: Integer); begin Self.IsSaveButton[t1] := T; end;
@@ -376,24 +376,39 @@ begin
     { Graphics }
     RIRegisterTGraphicsObject(Cl);
     RIRegisterTFont(Cl);
-    RIRegisterTCanvas(Cl);
     RIRegisterTPen(Cl);
     RIRegisterTBrush(Cl);
-    RIRegisterTGraphic(Cl);
+    RIRegisterTCustomCanvas(CL);
+    RIRegisterTCanvas(Cl);
+    RIRegisterTGraphic(Cl, True);
     RIRegisterTBitmap(Cl, True);
   {$IFNDEF PS_MINIVCL}
     RIRegisterTIcon(Cl, True);
+      RIRegisterTMetafile(CL);
+      RIRegisterTMetafileCanvas(CL);
     RIRegisterTPicture(Cl, True);
     RIRegisterTPngImage(Cl, True);
   {$ENDIF}
 
     { Controls }
+    RIRegister_TDragObject(Cl);
+    RIRegisterTSizeConstraints(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegister_TMargins(Cl);
+      RIRegister_TPadding(Cl);
+    {$ENDIF}
     RIRegisterTControl(Cl);
     RegisterWinControl_R(Cl);
     RIRegisterTGraphicControl(Cl);
     RIRegisterTCustomControl(Cl);
-    RIRegister_TDragObject(Cl);
-    RIRegisterTSizeConstraints(Cl);
+    {$IFNDEF PS_MINIVCL}
+      RIRegister_THintWindow(Cl);
+      RIRegister_TCustomImageList(Cl);
+      RIRegister_TImageList(Cl);
+      RIRegister_TCustomHintWindow(Cl);
+      RIRegister_TCustomHint(Cl);
+      RIRegister_TBalloonHint(Cl);
+    {$ENDIF}
 
     { Forms }
     {$IFNDEF PS_MINIVCL}
@@ -403,10 +418,11 @@ begin
     {$IFNDEF PS_MINIVCL}
       RIRegisterTScrollBox(Cl);
     {$ENDIF}
+    RIRegisterTCustomForm(Cl);
     RIRegisterTForm(Cl);
     {$IFNDEF PS_MINIVCL}
+      RIRegisterTScreen(Cl);
       RIRegisterTApplication(Cl);
-      RIRegisterTScreen(CL);
     {$ENDIF}
 
     { StdCtrls }
@@ -417,6 +433,7 @@ begin
     RIRegisterTCustomLabel(Cl);
     RIRegisterTLabel(Cl);
     RIRegisterTCustomEdit(Cl);
+    RIRegisterTCustomMaskEdit(Cl);
     RIRegisterTEdit(Cl);
     RIRegisterTCustomMemo(Cl);
     RIRegisterTMemo(Cl);
@@ -443,10 +460,11 @@ begin
       RIRegisterTUpDown(Cl);
       RIRegisterTCustomHotKey(Cl);
       RIRegisterTHotKey(Cl);
-      RIRegisterTCustomImageList(Cl);
-      RIRegisterTImageList(Cl);
-      RIRegister_StatusBar(Cl);
-      RIRegister_TListView(Cl);
+      RIRegisterTTStatusBar(Cl);
+      RIRegisterTListView(Cl);
+      RIRegisterTTreeView(Cl);
+      RIRegisterTTab(Cl);
+      RIRegisterTHeaderControl(Cl);
     {$ENDIF}
 
     { ExtCtrls }
@@ -455,6 +473,8 @@ begin
       RIRegisterTImage(Cl);
       RIRegisterTPaintBox(Cl);
       RIRegisterTHeader(Cl);
+      RIRegister_TCustomColorBox(CL);
+      RIRegister_TColorBox(CL);
     {$ENDIF}
     RIRegisterTBevel(Cl);
     {$IFNDEF PS_MINIVCL}
@@ -465,6 +485,18 @@ begin
 
     { ComObj }
     RIRegister_ComObj(ScriptInterpreter);
+
+    { Buttons }
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTSpeedButton(Cl);
+      RIRegisterTBitBtn(Cl);
+    {$ENDIF}
+
+    { Menu }
+    {$IFNDEF PS_MINIVCL}
+      RIRegister_Menus(CL);
+      RIRegister_Menus_Routines(ScriptInterpreter);
+    {$ENDIF}
 
     RegisterNewStaticText_R(Cl);
     RegisterNewCheckListBox_R(Cl);
@@ -496,18 +528,6 @@ begin
     RegisterOutputProgressWizardPage_R(Cl);
 
     RegisterHandCursor_R(Cl);
-
-    { Buttons }
-    {$IFNDEF PS_MINIVCL}
-      RIRegisterTSpeedButton(Cl);
-      RIRegisterTBitBtn(Cl);
-    {$ENDIF}
-
-    { Menu }
-    {$IFNDEF PS_MINIVCL}
-      RIRegister_Menus(CL);
-      RIRegister_Menus_Routines(ScriptInterpreter);
-    {$ENDIF}
 
     RegisterClassLibraryRuntime(ScriptInterpreter, Cl);
   except

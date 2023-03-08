@@ -14,9 +14,6 @@ object MBDForm: TMBDForm
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
-  DesignSize = (
-    548
-    380)
   PixelsPerInch = 96
   TextHeight = 13
   object TaskInstructionLabel: TNewStaticText
@@ -90,9 +87,6 @@ object MBDForm: TMBDForm
     Anchors = [akLeft, akTop, akRight]
     Caption = ' Сообщение '
     TabOrder = 0
-    DesignSize = (
-      532
-      81)
     object MSGText: TMemo
       Left = 7
       Top = 20
@@ -197,9 +191,6 @@ object MBDForm: TMBDForm
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Значки '
     TabOrder = 7
-    DesignSize = (
-      160
-      174)
     object IMGmbInformation: TImage
       Left = 10
       Top = 23
@@ -404,9 +395,6 @@ object MBDForm: TMBDForm
     Anchors = [akLeft, akTop, akBottom]
     Caption = ' Кнопки '
     TabOrder = 8
-    DesignSize = (
-      169
-      174)
     object rbMB_OK: TRadioButton
       Left = 14
       Top = 23
@@ -674,9 +662,6 @@ object MBDForm: TMBDForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 10
-    DesignSize = (
-      548
-      42)
     object Bevel1: TBevel
       Left = 0
       Top = 0
@@ -684,8 +669,6 @@ object MBDForm: TMBDForm
       Height = 3
       Align = alTop
       Shape = bsBottomLine
-      ExplicitLeft = 168
-      ExplicitWidth = 50
     end
     object MBDButtonPreview: TButton
       Left = 10

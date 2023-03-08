@@ -22,7 +22,7 @@ uses
   Windows, SysUtils, Messages, Forms, PathFunc, CmnFunc, CmnFunc2, Undo, Msgs,
   MsgIDs, InstFunc, Struct, SetupEnt, UninstProgressForm, UninstSharedFileForm,
   FileClass, ScriptRunner, DebugClient, SetupTypes, Logging, Main, Helper,
-  SpawnServer, Vcl.Themes, Vcl.Styles;
+  SpawnServer, Themes, Styles;
 
 type
   TExtUninstallLog = class(TUninstallLog)

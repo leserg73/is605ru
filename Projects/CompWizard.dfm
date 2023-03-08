@@ -18,9 +18,6 @@ object WizardForm: TWizardForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  DesignSize = (
-    495
-    358)
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel: TBevel
@@ -70,9 +67,6 @@ object WizardForm: TWizardForm
     object WelcomePage: TNewNotebookPage
       Color = clWindow
       ParentColor = False
-      DesignSize = (
-        496
-        314)
       object WelcomeImage: TImage
         Left = 0
         Top = 0
@@ -970,9 +964,6 @@ object WizardForm: TWizardForm
       end
     end
     object MainPage: TNewNotebookPage
-      DesignSize = (
-        496
-        314)
       object Bevel1: TBevel
         Left = 0
         Top = 58
@@ -990,9 +981,6 @@ object WizardForm: TWizardForm
         Anchors = [akLeft, akTop, akRight, akBottom]
         TabOrder = 0
         object AppInfoPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object AppNameLabel: TNewStaticText
             Left = 36
             Top = 8
@@ -1075,9 +1063,6 @@ object WizardForm: TWizardForm
           end
         end
         object AppDirPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object AppDirNameLabel: TNewStaticText
             Left = 36
             Top = 84
@@ -1162,9 +1147,6 @@ object WizardForm: TWizardForm
           end
         end
         object AppFilesPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object AppFilesLabel: TNewStaticText
             Left = 36
             Top = 100
@@ -1280,9 +1262,6 @@ object WizardForm: TWizardForm
           end
         end
         object AppIconsPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object AppGroupNameLabel: TNewStaticText
             Left = 36
             Top = 28
@@ -1388,9 +1367,6 @@ object WizardForm: TWizardForm
           end
         end
         object AppDocsPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object AppLicenseFileLabel: TNewStaticText
             Left = 36
             Top = 8
@@ -1483,9 +1459,6 @@ object WizardForm: TWizardForm
           end
         end
         object PrivilegesRequiredPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object PrivilegesRequiredLabel: TNewStaticText
             Left = 36
             Top = 8
@@ -1537,9 +1510,6 @@ object WizardForm: TWizardForm
           end
         end
         object LanguagesPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object LanguagesLabel: TNewStaticText
             Left = 36
             Top = 8
@@ -1583,9 +1553,6 @@ object WizardForm: TWizardForm
           end
         end
         object CompilerPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object OutputDirLabel: TNewStaticText
             Left = 36
             Top = 8
@@ -1699,9 +1666,6 @@ object WizardForm: TWizardForm
           end
         end
         object ISPPPage: TNewNotebookPage
-          DesignSize = (
-            485
-            245)
           object ISPPLabel: TLabel
             Left = 36
             Top = 8
@@ -1733,9 +1697,6 @@ object WizardForm: TWizardForm
         BevelOuter = bvNone
         Color = clWindow
         TabOrder = 1
-        DesignSize = (
-          497
-          58)
         object InnerImage: TImage
           Left = 438
           Top = 1
@@ -1825,9 +1786,6 @@ object WizardForm: TWizardForm
     object FinishedPage: TNewNotebookPage
       Color = clWindow
       ParentColor = False
-      DesignSize = (
-        496
-        314)
       object FinishedImage: TImage
         Left = 0
         Top = 0

@@ -102,7 +102,8 @@ uses
   Vcl.Styles.Utils.Misc in '..\Components\VCL\Vcl.Styles.Utils.Misc.pas',
   DDetours in '..\Components\VCL\delphi-detours-library\DDetours.pas',
   InstDecode in '..\Components\VCL\delphi-detours-library\InstDecode.pas',
-  CPUID in '..\Components\VCL\delphi-detours-library\CPUID.pas'; 
+  CPUID in '..\Components\VCL\delphi-detours-library\CPUID.pas',
+  LegacyTypes in '..\Components\VCL\delphi-detours-library\LegacyTypes.pas'; 
 
 {$R *.RES}
 {$IFDEF UNICODE}

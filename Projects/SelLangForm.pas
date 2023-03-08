@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls, Vcl.Themes, Vcl.Styles;
+  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls, Themes, Styles;
 
 type
   TSelectLanguageForm = class(TSetupForm)
@@ -155,7 +155,7 @@ begin
 {$ENDIF}
 
   InitializeFont;
-  KeepSizeY := True;
+
   Caption := SetupMessages[msgSelectLanguageTitle];
   SelectLabel.Caption := SetupMessages[msgSelectLanguageLabel];
   OKButton.Caption := SetupMessages[msgButtonOK];
@@ -171,10 +171,9 @@ begin
   IconBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
   IconBitmapImage.Width := IconBitmapImage.Bitmap.Width;
   IconBitmapImage.Height := IconBitmapImage.Bitmap.Height;
-
-  MainPanel.Width := ClientWidth;
-  CancelButton.Left := {ClientWidth} LangCombo.Left + LangCombo.Width - CancelButton.Width;
-  OKButton.Left := LangCombo.Left + LangCombo.Width - CancelButton.Width * 2 - 6; 
+  { restoring the original value of the ClientWidth when resizing the WizardForm }
+  ClientWidth := MulDiv(ClientWidth, 100, SetupHeader.WizardSizePercentX);
+  KeepSizeY := True;
 end;
 
 end.

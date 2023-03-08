@@ -467,6 +467,7 @@ type
     procedure WMStartNormally(var Message: TMessage); message WM_StartNormally;
     procedure WMSettingChange(var Message: TMessage); message WM_SETTINGCHANGE;
     procedure WMThemeChanged(var Message: TMessage); message WM_THEMECHANGED;
+    procedure WMGetMinMaxInfo(var Message: TWMGetMinMaxInfo);message WM_GETMINMAXINFO;
 {$IFDEF IS_D4}
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -495,7 +496,7 @@ type
 var
   CompileForm: TCompileForm;
   MSGTextInsert: TStringList;
-  CommandLineFilename, CommandLineWizardName: String;
+  CommandLineFilename, CommandLineWizardName, SP: String;
   CommandLineCompile: Boolean;
   CommandLineWizard: Boolean;
 
@@ -913,6 +914,110 @@ constructor TCompileForm.Create(AOwner: TComponent);
     FOptionsLoaded := True;
   end;
 
+  procedure ReadConfigP;
+{$IFNDEF UNICODE}
+  const
+    { "MS Gothic" in Japanese (CP 932) }
+    SMSGothicLocalized = #$82'l'#$82'r '#$83'S'#$83'V'#$83'b'#$83'N';
+{$ENDIF}
+  var
+    Ini: TPConfigIniFile;
+    WindowPlacement: TWindowPlacement;
+    I: Integer;
+  begin
+    Ini := TPConfigIniFile.Create;
+    try
+      { Menu check boxes state }
+      Toolbar.Visible := Ini.ReadBool('Options', 'ShowToolbar', True);
+      StatusBar.Visible := Ini.ReadBool('Options', 'ShowStatusBar', True);
+      FOptions.LowPriorityDuringCompile := Ini.ReadBool('Options', 'LowPriorityDuringCompile', False);
+
+      { Menu check boxes state  for nonvisual character  }
+      VEOLString.Checked := Ini.ReadBool('Options', 'ShowEOLStr', False);
+      VWCCString.Checked := Ini.ReadBool('Options', 'ShowWCCStr', False);
+      VWordWrapString.Checked := Ini.ReadBool('Options', 'ShowWWpStr', False);
+      VCaretLine.Checked := Ini.ReadBool('Options', 'ShowCrtLine', False);
+
+      { Configuration options }
+      FOptions.ShowStartupForm := Ini.ReadBool('Options', 'ShowStartupForm', True);
+      FOptions.UseWizard := Ini.ReadBool('Options', 'UseWizard', True);
+      FOptions.Autosave := Ini.ReadBool('Options', 'Autosave', False);
+      FOptions.MakeBackups := Ini.ReadBool('Options', 'MakeBackups', False);
+      FOptions.FullPathInTitleBar := Ini.ReadBool('Options', 'FullPathInTitleBar', False);
+      FOptions.UndoAfterSave := Ini.ReadBool('Options', 'UndoAfterSave', True);
+      FOptions.PauseOnDebuggerExceptions := Ini.ReadBool('Options', 'PauseOnDebuggerExceptions', True);
+      FOptions.RunAsDifferentUser := Ini.ReadBool('Options', 'RunAsDifferentUser', False);
+      FOptions.AutoComplete := Ini.ReadBool('Options', 'AutoComplete', True);
+      FOptions.UseSyntaxHighlighting := Ini.ReadBool('Options', 'UseSynHigh', True);
+      FOptions.ColorizeCompilerOutput := Ini.ReadBool('Options', 'ColorizeCompilerOutput', True);
+      FOptions.UnderlineErrors := Ini.ReadBool('Options', 'UnderlineErrors', True);
+      FOptions.CursorPastEOL := Ini.ReadBool('Options', 'EditorCursorPastEOL', True);
+      FOptions.TabWidth := Ini.ReadInteger('Options', 'TabWidth', 2);
+      FOptions.UseTabCharacter := Ini.ReadBool('Options', 'UseTabCharacter', False);
+      FOptions.WordWrap := Ini.ReadBool('Options', 'WordWrap', False);
+      FOptions.AutoIndent := Ini.ReadBool('Options', 'AutoIndent', True);
+      FOptions.IndentationGuides := Ini.ReadBool('Options', 'IndentationGuides', True);
+      FOptions.GutterLineNumbers := Ini.ReadBool('Options', 'GutterLineNumbers', False);
+      FOptions.BorderLineEnd := Ini.ReadBool('Options', 'BorderLineEnd', False);
+      FOptions.LineEndColon := Ini.ReadInteger('Options', 'LineEndColon', 80);
+      I := Ini.ReadInteger('Options', 'ThemeType', Ord(GetDefaultThemeType));
+      if (I >= 0) and (I <= Ord(High(TThemeType))) then
+        FOptions.ThemeType := TThemeType(I);
+      if GetACP = 932 then begin
+        { Default to MS Gothic font on CP 932 (Japanese), as Courier New is
+          only capable of displaying Japanese characters on XP and later. }
+{$IFNDEF UNICODE}
+        { Use the English name if it's supported on this version of Windows
+          (I believe it was first added in Windows 2000), because the CP 932
+          localized Japanese name will no longer be valid if the user later
+          switches out of CP 932. }
+        if FontExists('MS Gothic') then
+          Memo.Font.Name := 'MS Gothic'
+        else
+          Memo.Font.Name := SMSGothicLocalized;
+{$ELSE}
+        { UNICODE requires 2000+, so we can just use the English name }
+        Memo.Font.Name := 'MS Gothic';
+{$ENDIF}
+        Memo.Font.Size := 9;
+        Memo.Font.Charset := SHIFTJIS_CHARSET;
+      end;
+      Memo.Font.Name := Ini.ReadString('Options', 'EditorFontName', Memo.Font.Name);
+      Memo.Font.Size := Ini.ReadInteger('Options', 'EditorFontSize', Memo.Font.Size);
+      Memo.Font.Charset := Ini.ReadInteger('Options', 'EditorFontCharset', Memo.Font.Charset);
+      Memo.Zoom := Ini.ReadInteger('Options', 'Zoom', 0);
+      SyncEditorOptions;
+      UpdateNewButtons;
+      UpdateTheme;
+
+      { Window state }
+      WindowPlacement.length := SizeOf(WindowPlacement);
+      GetWindowPlacement(Handle, @WindowPlacement);
+      WindowPlacement.showCmd := SW_HIDE;  { the form isn't Visible yet }
+      WindowPlacement.rcNormalPosition.Left := Ini.ReadInteger('State',
+        'WindowLeft', WindowPlacement.rcNormalPosition.Left);
+      WindowPlacement.rcNormalPosition.Top := Ini.ReadInteger('State',
+        'WindowTop', WindowPlacement.rcNormalPosition.Top);
+      WindowPlacement.rcNormalPosition.Right := Ini.ReadInteger('State',
+        'WindowRight', WindowPlacement.rcNormalPosition.Left + Width);
+      WindowPlacement.rcNormalPosition.Bottom := Ini.ReadInteger('State',
+        'WindowBottom', WindowPlacement.rcNormalPosition.Top + Height);
+      SetWindowPlacement(Handle, @WindowPlacement);
+      { Note: Must set WindowState *after* calling SetWindowPlacement, since
+        TCustomForm.WMSize resets WindowState }
+      if Ini.ReadBool('State', 'WindowMaximized', False) then
+        WindowState := wsMaximized;
+      { Note: Don't call UpdateStatusPanelHeight here since it clips to the
+        current form height, which hasn't been finalized yet }
+
+      StatusPanel.Height := ToCurrentPPI(Ini.ReadInteger('State', 'StatusPanelHeight',
+        (10 * FromCurrentPPI(DebugOutputList.ItemHeight) + 4) + FromCurrentPPI(TabSet.Height)));
+    finally
+      Ini.Free;
+    end;
+    FOptionsLoaded := True;
+  end;
+
   procedure SetFakeShortCutText(const MenuItem: TMenuItem; const S: String);
   begin
     MenuItem.Caption := MenuItem.Caption + #9 + S;
@@ -930,6 +1035,8 @@ var
   NewItem: TMenuItem;
 begin
   inherited;
+
+  SP := ExtractFilePath(ParamStr(0)) + 'portable.txt';
 
   {$IFNDEF STATICCOMPILER}
   FCompilerVersion := ISDllGetVersion;
@@ -1036,16 +1143,27 @@ begin
   UpdateThemeData(False, True);
 
   if CommandLineCompile then begin
-    ReadSignTools(FSignTools);
+    if FileExists(SP) then
+      ReadSignToolsP(FSignTools)
+    else
+      ReadSignTools(FSignTools);
     PostMessage(Handle, WM_StartCommandLineCompile, 0, 0)
   end else if CommandLineWizard then begin
     { Stop Delphi from showing the compiler form }
     Application.ShowMainForm := False;
     { Show wizard form later }
     PostMessage(Handle, WM_StartCommandLineWizard, 0, 0);
-  end else begin
-    ReadConfig;
-    ReadSignTools(FSignTools);
+  end else
+  begin
+    if FileExists(SP) then
+    begin
+      ReadConfigP;
+      ReadSignToolsP(FSignTools);
+    end else
+    begin
+      ReadConfig;
+      ReadSignTools(FSignTools);
+    end;
     PostMessage(Handle, WM_StartNormally, 0, 0);
   end;
 end;
@@ -1090,6 +1208,44 @@ destructor TCompileForm.Destroy;
     end;
   end;
 
+  procedure SaveConfigP;
+  var
+    Ini: TPConfigIniFile;
+    WindowPlacement: TWindowPlacement;
+  begin
+    Ini := TPConfigIniFile.Create;
+    try
+      { Theme state }
+      Ini.WriteInteger('Options', 'ThemeType', Ord(FOptions.ThemeType));  { Also see TOptionsClick }
+
+      { Menu check boxes state }
+      Ini.WriteBool('Options', 'ShowToolbar', Toolbar.Visible);
+      Ini.WriteBool('Options', 'ShowStatusBar', StatusBar.Visible);
+      Ini.WriteBool('Options', 'LowPriorityDuringCompile', FOptions.LowPriorityDuringCompile);
+
+      { Menu check boxes state  for nonvisual character  }
+      Ini.WriteBool('Options', 'ShowEOLStr', VEOLString.Checked);
+      Ini.WriteBool('Options', 'ShowWCCStr', VWCCString.Checked);
+      Ini.WriteBool('Options', 'ShowWWpStr', VWordWrapString.Checked);
+      Ini.WriteBool('Options', 'ShowCrtLine', VCaretLine.Checked);
+
+      { Window state }
+      WindowPlacement.length := SizeOf(WindowPlacement);
+      GetWindowPlacement(Handle, @WindowPlacement);
+      Ini.WriteInteger('State', 'WindowLeft', WindowPlacement.rcNormalPosition.Left);
+      Ini.WriteInteger('State', 'WindowTop', WindowPlacement.rcNormalPosition.Top);
+      Ini.WriteInteger('State', 'WindowRight', WindowPlacement.rcNormalPosition.Right);
+      Ini.WriteInteger('State', 'WindowBottom', WindowPlacement.rcNormalPosition.Bottom);
+      Ini.WriteBool('State', 'WindowMaximized', WindowState = wsMaximized);
+      Ini.WriteInteger('State', 'StatusPanelHeight', FromCurrentPPI(StatusPanel.Height));
+
+      { Zoom state }
+      Ini.WriteInteger('Options', 'Zoom', Memo.Zoom);
+    finally
+      Ini.Free;
+    end;
+  end;
+
 begin
   UpdateThemeData(True, False);
 
@@ -1097,7 +1253,13 @@ begin
   Application.OnIdle := nil;
 
   if FOptionsLoaded and not (CommandLineCompile or CommandLineWizard) then
-    SaveConfig;
+    if FileExists(SP) then
+    begin
+      SaveConfigP;
+      RegDelKeyIS;
+    end
+    else
+      SaveConfig;
 
   FTheme.Free;
   FBreakPoints.Free;
@@ -1478,22 +1640,28 @@ procedure TCompileForm.ReadMRUList;
 { Loads the list of MRU items from the registry }
 var
   Ini: TConfigIniFile;
+  IniP: TPConfigIniFile;
   I: Integer;
   S: String;
 begin
   try
+    IniP := TPConfigIniFile.Create;
     Ini := TConfigIniFile.Create;
     try
       FMRUList.Clear;
       for I := 0 to High(FMRUMenuItems) do begin
-        S := Ini.ReadString('ScriptFileHistoryNew', 'History' + IntToStr(I), '');
+        if FileExists(SP) then
+          S := IniP.ReadString('ScriptFileHistoryNew', 'History' + IntToStr(I), '')
+        else
+          S := Ini.ReadString('ScriptFileHistoryNew', 'History' + IntToStr(I), '');
         if S <> '' then begin
            FMRUList.Add(S);
            FClear.Enabled := True;
         end;
       end;
     finally
-      Ini.Free;
+        IniP.Free;
+        Ini.Free;
     end;
   except
     { Ignore any exceptions; don't want to hold up the display of the
@@ -1506,6 +1674,7 @@ procedure TCompileForm.ModifyMRUList(const AFilename: String;
 var
   I: Integer;
   Ini: TConfigIniFile;
+  IniP: TPConfigIniFile;
   S: String;
 begin
   try
@@ -1527,6 +1696,7 @@ begin
       FMRUList.Delete(FMRUList.Count-1);
 
     { Save new MRU items }
+    IniP := TPConfigIniFile.Create;
     Ini := TConfigIniFile.Create;
     try
       { MRU list }
@@ -1535,9 +1705,13 @@ begin
           S := FMRUList[I]
         else
           S := '';
-        Ini.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S);
+        if FileExists(SP) then
+          IniP.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S)
+        else
+          Ini.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S);
       end;
     finally
+      IniP.Free;
       Ini.Free;
     end;
   except
@@ -2098,6 +2272,7 @@ procedure TCompileForm.FClearClick(Sender: TObject);
 var
   I: Integer;
   Ini: TConfigIniFile;
+  IniP: TPConfigIniFile;
   S: String;
 begin
   try
@@ -2113,14 +2288,19 @@ begin
     FClear.Enabled := False;
 
     { Remove MRU items }
+    IniP := TPConfigIniFile.Create;
     Ini := TConfigIniFile.Create;
     try
       { MRU list }
       for I := 0 to High(FMRUMenuItems) do begin
         if I < FMRUList.Count then S := '';
-        Ini.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S);
+        if FileExists(SP) then
+          IniP.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S)
+        else
+          Ini.WriteString('ScriptFileHistoryNew', 'History' + IntToStr(I), S);
       end;
     finally
+      IniP.Free;
       Ini.Free;
     end;
   except
@@ -2837,7 +3017,9 @@ procedure TCompileForm.TOptionsClick(Sender: TObject);
 var
   OptionsForm: TOptionsForm;
   Ini: TConfigIniFile;
+  IniP: TPConfigIniFile;
 begin
+
   OptionsForm := TOptionsForm.Create(Application);
   try
     OptionsForm.StartupCheck.Checked := FOptions.ShowStartupForm;
@@ -2902,34 +3084,64 @@ begin
     UpdateTheme;
 
     { Save new options }
+    IniP := TPConfigIniFile.Create;
     Ini := TConfigIniFile.Create;
     try
-      Ini.WriteBool('Options', 'ShowStartupForm', FOptions.ShowStartupForm);
-      Ini.WriteBool('Options', 'UseWizard', FOptions.UseWizard);
-      Ini.WriteBool('Options', 'Autosave', FOptions.Autosave);
-      Ini.WriteBool('Options', 'MakeBackups', FOptions.MakeBackups);
-      Ini.WriteBool('Options', 'FullPathInTitleBar', FOptions.FullPathInTitleBar);
-      Ini.WriteBool('Options', 'UndoAfterSave', FOptions.UndoAfterSave);
-      Ini.WriteBool('Options', 'PauseOnDebuggerExceptions', FOptions.PauseOnDebuggerExceptions);
-      Ini.WriteBool('Options', 'RunAsDifferentUser', FOptions.RunAsDifferentUser);
-      Ini.WriteBool('Options', 'AutoComplete', FOptions.AutoComplete);
-      Ini.WriteBool('Options', 'UseSynHigh', FOptions.UseSyntaxHighlighting);
-      Ini.WriteBool('Options', 'ColorizeCompilerOutput', FOptions.ColorizeCompilerOutput);
-      Ini.WriteBool('Options', 'UnderlineErrors', FOptions.UnderlineErrors);
-      Ini.WriteBool('Options', 'EditorCursorPastEOL', FOptions.CursorPastEOL);
-      Ini.WriteInteger('Options', 'TabWidth', FOptions.TabWidth);
-      Ini.WriteBool('Options', 'UseTabCharacter', FOptions.UseTabCharacter);
-      Ini.WriteBool('Options', 'WordWrap', FOptions.WordWrap);
-      Ini.WriteBool('Options', 'AutoIndent', FOptions.AutoIndent);
-      Ini.WriteBool('Options', 'IndentationGuides', FOptions.IndentationGuides);
-      Ini.WriteBool('Options', 'GutterLineNumbers', FOptions.GutterLineNumbers);
-      Ini.WriteInteger('Options', 'ThemeType', Ord(FOptions.ThemeType)); { Also see Destroy }
-      Ini.WriteString('Options', 'EditorFontName', Memo.Font.Name);
-      Ini.WriteInteger('Options', 'EditorFontSize', Memo.Font.Size);
-      Ini.WriteInteger('Options', 'EditorFontCharset', Memo.Font.Charset);
-      Ini.WriteBool('Options', 'BorderLineEnd', FOptions.BorderLineEnd);
-      Ini.WriteInteger('Options', 'LineEndColon', FOptions.LineEndColon);
+      if FileExists(SP) then begin
+        IniP.WriteBool('Options', 'ShowStartupForm', FOptions.ShowStartupForm);
+        IniP.WriteBool('Options', 'UseWizard', FOptions.UseWizard);
+        IniP.WriteBool('Options', 'Autosave', FOptions.Autosave);
+        IniP.WriteBool('Options', 'MakeBackups', FOptions.MakeBackups);
+        IniP.WriteBool('Options', 'FullPathInTitleBar', FOptions.FullPathInTitleBar);
+        IniP.WriteBool('Options', 'UndoAfterSave', FOptions.UndoAfterSave);
+        IniP.WriteBool('Options', 'PauseOnDebuggerExceptions', FOptions.PauseOnDebuggerExceptions);
+        IniP.WriteBool('Options', 'RunAsDifferentUser', FOptions.RunAsDifferentUser);
+        IniP.WriteBool('Options', 'AutoComplete', FOptions.AutoComplete);
+        IniP.WriteBool('Options', 'UseSynHigh', FOptions.UseSyntaxHighlighting);
+        IniP.WriteBool('Options', 'ColorizeCompilerOutput', FOptions.ColorizeCompilerOutput);
+        IniP.WriteBool('Options', 'UnderlineErrors', FOptions.UnderlineErrors);
+        IniP.WriteBool('Options', 'EditorCursorPastEOL', FOptions.CursorPastEOL);
+        IniP.WriteInteger('Options', 'TabWidth', FOptions.TabWidth);
+        IniP.WriteBool('Options', 'UseTabCharacter', FOptions.UseTabCharacter);
+        IniP.WriteBool('Options', 'WordWrap', FOptions.WordWrap);
+        IniP.WriteBool('Options', 'AutoIndent', FOptions.AutoIndent);
+        IniP.WriteBool('Options', 'IndentationGuides', FOptions.IndentationGuides);
+        IniP.WriteBool('Options', 'GutterLineNumbers', FOptions.GutterLineNumbers);
+        IniP.WriteInteger('Options', 'ThemeType', Ord(FOptions.ThemeType)); { Also see Destroy }
+        IniP.WriteString('Options', 'EditorFontName', Memo.Font.Name);
+        IniP.WriteInteger('Options', 'EditorFontSize', Memo.Font.Size);
+        IniP.WriteInteger('Options', 'EditorFontCharset', Memo.Font.Charset);
+        IniP.WriteBool('Options', 'BorderLineEnd', FOptions.BorderLineEnd);
+        IniP.WriteInteger('Options', 'LineEndColon', FOptions.LineEndColon);
+      end else begin
+        Ini.WriteBool('Options', 'ShowStartupForm', FOptions.ShowStartupForm);
+        Ini.WriteBool('Options', 'UseWizard', FOptions.UseWizard);
+        Ini.WriteBool('Options', 'Autosave', FOptions.Autosave);
+        Ini.WriteBool('Options', 'MakeBackups', FOptions.MakeBackups);
+        Ini.WriteBool('Options', 'FullPathInTitleBar', FOptions.FullPathInTitleBar);
+        Ini.WriteBool('Options', 'UndoAfterSave', FOptions.UndoAfterSave);
+        Ini.WriteBool('Options', 'PauseOnDebuggerExceptions', FOptions.PauseOnDebuggerExceptions);
+        Ini.WriteBool('Options', 'RunAsDifferentUser', FOptions.RunAsDifferentUser);
+        Ini.WriteBool('Options', 'AutoComplete', FOptions.AutoComplete);
+        Ini.WriteBool('Options', 'UseSynHigh', FOptions.UseSyntaxHighlighting);
+        Ini.WriteBool('Options', 'ColorizeCompilerOutput', FOptions.ColorizeCompilerOutput);
+        Ini.WriteBool('Options', 'UnderlineErrors', FOptions.UnderlineErrors);
+        Ini.WriteBool('Options', 'EditorCursorPastEOL', FOptions.CursorPastEOL);
+        Ini.WriteInteger('Options', 'TabWidth', FOptions.TabWidth);
+        Ini.WriteBool('Options', 'UseTabCharacter', FOptions.UseTabCharacter);
+        Ini.WriteBool('Options', 'WordWrap', FOptions.WordWrap);
+        Ini.WriteBool('Options', 'AutoIndent', FOptions.AutoIndent);
+        Ini.WriteBool('Options', 'IndentationGuides', FOptions.IndentationGuides);
+        Ini.WriteBool('Options', 'GutterLineNumbers', FOptions.GutterLineNumbers);
+        Ini.WriteInteger('Options', 'ThemeType', Ord(FOptions.ThemeType)); { Also see Destroy }
+        Ini.WriteString('Options', 'EditorFontName', Memo.Font.Name);
+        Ini.WriteInteger('Options', 'EditorFontSize', Memo.Font.Size);
+        Ini.WriteInteger('Options', 'EditorFontCharset', Memo.Font.Charset);
+        Ini.WriteBool('Options', 'BorderLineEnd', FOptions.BorderLineEnd);
+        Ini.WriteInteger('Options', 'LineEndColon', FOptions.LineEndColon);
+      end;
     finally
+      IniP.Free;
       Ini.Free;
     end;
   finally
@@ -4375,6 +4587,16 @@ begin
   { Don't Run to Cursor into this function, it will interrupt up the theme change }
   UpdateThemeData(True, True);
   inherited;
+end;
+
+procedure TCompileForm.WMGetMinMaxInfo(var Message: TWMGetMinMaxInfo);
+begin
+ inherited;
+  with Message.MinMaxInfo^.ptMinTrackSize do
+   begin
+    x:= 800;
+    y:= 550;
+   end;
 end;
 
 procedure TCompileForm.WordWrapButtonClick(Sender: TObject);

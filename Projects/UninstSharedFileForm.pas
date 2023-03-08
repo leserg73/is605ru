@@ -21,9 +21,9 @@ type
   TUninstSharedFileForm = class(TSetupForm)
     BodyLabel: TNewStaticText;
     FilenameLabel: TNewStaticText;
-    FilenameEdit: TEdit;
+    FilenameEdit: TNewEdit;
     LocationLabel: TNewStaticText;
-    LocationEdit: TEdit;
+    LocationEdit: TNewEdit;
     YesButton: TNewButton;
     YesToAllButton: TNewButton;
     NoButton: TNewButton;

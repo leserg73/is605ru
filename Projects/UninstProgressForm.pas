@@ -16,7 +16,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   SetupForm, StdCtrls, ExtCtrls, BitmapImage, NewProgressBar, NewStaticText,
-  NewNotebook, BidiCtrls, Vcl.Themes, Vcl.Styles;
+  NewNotebook, BidiCtrls, Themes, Styles;
 
 type
   TUninstallProgressForm = class(TSetupForm)
@@ -113,6 +113,7 @@ begin
 
   PageNameLabel.Font.Style := [fsBold];
   PageNameLabel.Caption := SetupMessages[msgWizardUninstalling];
+
   if ASetupStyle then begin
      WizardSmallBitmapImage.Bitmap.Canvas.Brush.Color := StyleServices.GetStyleColor(scPanel){clBtnFace};
      WizardSmallBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};

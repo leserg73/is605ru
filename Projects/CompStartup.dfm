@@ -15,9 +15,6 @@ object StartupForm: TStartupForm
   Position = poScreenCenter
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCreate = FormCreate
-  DesignSize = (
-    579
-    419)
   PixelsPerInch = 96
   TextHeight = 13
   object OKButton: TButton
@@ -51,9 +48,6 @@ object StartupForm: TStartupForm
     Anchors = [akLeft, akTop, akRight]
     Caption = ' Новый файл '
     TabOrder = 0
-    DesignSize = (
-      563
-      61)
     object NewImage: TImage
       Left = 12
       Top = 16
@@ -92,9 +86,6 @@ object StartupForm: TStartupForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = ' Открыть файл '
     TabOrder = 1
-    DesignSize = (
-      563
-      303)
     object OpenImage: TImage
       Left = 12
       Top = 19

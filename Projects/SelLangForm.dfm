@@ -14,9 +14,6 @@ object SelectLanguageForm: TSelectLanguageForm
   Font.Style = []
   OldCreateOrder = True
   Scaled = False
-  DesignSize = (
-    297
-    140)
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel: TBevel
@@ -58,9 +55,6 @@ object SelectLanguageForm: TSelectLanguageForm
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
-    DesignSize = (
-      297
-      97)
     object IconBitmapImage: TBitmapImage
       Left = 8
       Top = 8

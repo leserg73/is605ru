@@ -24,7 +24,7 @@ type
     DiskBitmapImage: TBitmapImage;
     SelectDiskLabel: TNewStaticText;
     PathLabel: TNewStaticText;
-    PathEdit: TEdit;
+    PathEdit: TNewEdit;
     BrowseButton: TNewButton;
     OKButton: TNewButton;
     CancelButton: TNewButton;

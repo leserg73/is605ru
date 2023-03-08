@@ -12,7 +12,7 @@ unit CompResUpdate;
 interface
 
 uses
-  Windows{$IFNDEF PS_MINIVCL}, Types{$ENDIF}, SysUtils, FileClass, VerInfo, Classes, Vcl.Themes, Vcl.Styles;
+  Windows{$IFNDEF PS_MINIVCL}, Types{$ENDIF}, SysUtils, FileClass, VerInfo, Classes, Themes, Styles;
 
 {$I VERSION.INC}
 
@@ -691,7 +691,7 @@ begin
           NewGroupIconDir.ItemCount := Ico.ItemCount;
           for I := 0 to NewGroupIconDir.ItemCount-1 do begin
             NewGroupIconDir.Items[I].Header := Ico.Items[I].Header;
-            NewGroupIconDir.Items[I].Id := I+1; //assumes that there aren't any icons left
+            NewGroupIconDir.Items[I].Id := I+100; //assumes that there aren't any icons left
           end;
 
           { Update 'MAINICON' }

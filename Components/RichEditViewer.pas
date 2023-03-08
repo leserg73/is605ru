@@ -12,7 +12,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, RichEdit, ActiveX;
+  StdCtrls, RichEdit, ActiveX, Themes;
 
 type
   IRichEditOleCallback = interface(IUnknown)
@@ -36,12 +36,25 @@ type
     function GetContextMenu(seltype: Word; const oleobj: IOleObject;
       const chrg: TCharRange; out menu: HMENU): HResult; stdcall;
   end;
+
+  TRichEditViewerCustomShellExecute = procedure(hWnd: HWND; Operation, FileName, Parameters, Directory: LPWSTR; ShowCmd: Integer); stdcall;
+
+  TRichEditStyleHook = class(TStyleHook)
+  strict private
+    procedure EMSetBkgndColor(var Message: TMessage); message EM_SETBKGNDCOLOR;
+    procedure EMSetCharFormat(var Message: TMessage); message EM_SETCHARFORMAT;
+  strict protected
+    procedure WndProc(var Message: TMessage); override;
+  end;
   
   TRichEditViewer = class(TMemo)
   private
     FUseRichEdit: Boolean;
     FRichEditLoaded: Boolean;
     FCallback: IRichEditOleCallback;
+    class var FCustomShellExecute: TRichEditViewerCustomShellExecute;
+    class constructor Create;
+    class destructor Destroy;
     procedure SetRTFTextProp(const Value: AnsiString);
     procedure SetUseRichEdit(Value: Boolean);
     procedure UpdateBackgroundColor;
@@ -56,6 +69,7 @@ type
     destructor Destroy; override;
     function SetRTFText(const Value: AnsiString): Integer;
     property RTFText: AnsiString write SetRTFTextProp;
+    class property CustomShellExecute: TRichEditViewerCustomShellExecute read FCustomShellExecute write FCustomShellExecute;
   published
     property UseRichEdit: Boolean read FUseRichEdit write SetUseRichEdit default True;
   end;
@@ -235,11 +249,21 @@ end;
 
 { TRichEditViewer }
 
+class constructor TRichEditViewer.Create;
+begin
+  TCustomStyleEngine.RegisterStyleHook(TRichEditViewer, TRichEditStyleHook);
+end;
+
 constructor TRichEditViewer.Create(AOwner: TComponent);
 begin
   inherited;
   FUseRichEdit := True;
   FCallback := TBasicRichEditOleCallback.Create;
+end;
+
+class destructor TRichEditViewer.Destroy;
+begin
+  TCustomStyleEngine.UnRegisterStyleHook(TRichEditViewer, TRichEditStyleHook);
 end;
 
 destructor TRichEditViewer.Destroy;
@@ -411,13 +435,66 @@ begin
             TextRange.chrg := CharRange;
             TextRange.lpstrText := PChar(URL);
             SetLength(URL, SendMessage(Handle, EM_GETTEXTRANGE, 0, LParam(@TextRange)));
-            if URL <> '' then
+            if URL <> '' then begin
+              if Assigned(FCustomShellExecute) then
+                FCustomShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOWNORMAL)
+              else
               ShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOWNORMAL);
+            end;
           end;
         end;
       end;
     end;
   end;
+end;
+
+{ TRichEditStyleHook }
+
+procedure TRichEditStyleHook.EMSetBkgndColor(var Message: TMessage);
+begin
+  if seClient in Control.StyleElements then
+  begin
+    Message.LParam := ColorToRGB(StyleServices.GetStyleColor(scEdit));
+    Handled := False;
+  end;
+end;
+
+procedure TRichEditStyleHook.EMSetCharFormat(var Message: TMessage);
+type
+  PCharFormat2 = ^TCharFormat2;
+const
+  TextColor: array[Boolean] of TStyleFont = (sfEditBoxTextDisabled, sfEditBoxTextNormal);
+  BkColor: array[Boolean] of TStyleColor = (scEditDisabled, scEdit);
+var
+  Format: PCharFormat2;
+begin
+  Format := PCharFormat2(Message.LParam);
+  if (seFont in Control.StyleElements) and (seClient in Control.StyleElements) and
+     (Format.dwMask and CFM_COLOR = CFM_COLOR) then
+  begin
+    Format.crTextColor := ColorToRGB(StyleServices.GetStyleFontColor(TextColor[Control.Enabled]));
+    Format.crBackColor := ColorToRGB(StyleServices.GetStyleColor(BkColor[Control.Enabled]));
+    Format.dwEffects := Format.dwEffects and not CFE_AUTOCOLOR;
+  end;
+  Handled := False;
+end;
+
+procedure TRichEditStyleHook.WndProc(var Message: TMessage);
+begin
+  // Reserved for potential updates
+  inherited;
+{  case Message.Msg of
+    WM_WINDOWPOSCHANGED:
+      begin
+        if TWMWindowPosChanged(Message).WindowPos^.flags and SWP_NOSIZE = 0 then
+          PaintScroll;
+      end;
+    CN_NOTIFY:
+      begin
+        if TWMNotifyRE(Message).NMHdr.code = EN_SELCHANGE then
+          PaintScroll;
+      end;
+  end;}
 end;
 
 procedure Register;

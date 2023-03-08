@@ -15,9 +15,6 @@ object OptionsForm: TOptionsForm
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
-  DesignSize = (
-    595
-    359)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
@@ -109,9 +106,6 @@ object OptionsForm: TOptionsForm
     Anchors = [akLeft, akBottom]
     Caption = ' Ассоциации файлов '
     TabOrder = 1
-    DesignSize = (
-      286
-      57)
     object AssocButton: TButton
       Left = 18
       Top = 20

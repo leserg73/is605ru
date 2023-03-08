@@ -14,9 +14,6 @@ object SelectFolderForm: TSelectFolderForm
   Font.Style = []
   OldCreateOrder = True
   Scaled = False
-  DesignSize = (
-    349
-    337)
   PixelsPerInch = 96
   TextHeight = 13
   object CancelButton: TNewButton
@@ -54,7 +51,7 @@ object SelectFolderForm: TSelectFolderForm
     TabOrder = 2
     OnClick = NewFolderButtonClick
   end
-  object PathEdit: TEdit
+  object PathEdit: TNewEdit
     Left = 16
     Top = 36
     Width = 317

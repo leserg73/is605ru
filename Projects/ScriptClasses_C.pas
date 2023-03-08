@@ -301,6 +301,10 @@ begin
   begin
     RegisterMethod('function FindNextPage(CurPage: TNewNotebookPage; GoForward: Boolean): TNewNotebookPage');
     RegisterProperty('Anchors', 'TAnchors', iptrw);
+    {$IFNDEF PS_MINIVCL}
+      RegisterProperty('Color', 'TColor', iptrw);
+      RegisterProperty('ParentColor', 'Boolean', iptrw);
+    {$ENDIF}
     RegisterProperty('PageCount', 'Integer', iptr);
     RegisterProperty('Pages', 'TNewNotebookPage Integer', iptr);
     RegisterProperty('ActivePage', 'TNewNotebookPage', iptrw);
@@ -312,6 +316,9 @@ begin
   with Cl.FindClass('TNewNotebookPage') do
   begin
     RegisterProperty('Color', 'TColor', iptrw);
+    {$IFNDEF PS_MINIVCL}
+      RegisterProperty('ParentColor', 'Boolean', iptrw);
+    {$ENDIF}
     RegisterProperty('Notebook', 'TNewNotebook', iptrw);
     RegisterProperty('PageIndex', 'Integer', iptrw);
   end;
@@ -371,7 +378,7 @@ begin
     RegisterProperty('InstallingPage', 'TNewNotebookPage', iptr);
     RegisterProperty('InfoAfterPage', 'TNewNotebookPage', iptr);
     RegisterProperty('DiskSpaceLabel', 'TNewStaticText', iptr);
-    RegisterProperty('DirEdit', 'TEdit', iptr);
+    RegisterProperty('DirEdit', 'TNewEdit', iptr);
     RegisterProperty('GroupEdit', 'TNewEdit', iptr);
     RegisterProperty('NoIconsCheck', 'TNewCheckBox', iptr);
     RegisterProperty('PasswordLabel', 'TNewStaticText', iptr);
@@ -516,7 +523,7 @@ begin
   begin
     RegisterMethod('function Add(const APrompt: String): Integer');
     RegisterProperty('Buttons', 'TNewButton Integer', iptr);
-    RegisterProperty('Edits', 'TEdit Integer', iptr);
+    RegisterProperty('Edits', 'TNewEdit Integer', iptr);
     RegisterProperty('PromptLabels', 'TNewStaticText Integer', iptr);
     RegisterProperty('SubCaptionLabel', 'TNewStaticText', iptr);
     RegisterProperty('Values', 'String Integer', iptrw);
@@ -529,7 +536,7 @@ begin
   begin
     RegisterMethod('function Add(const APrompt, AFilter, ADefaultExtension: String): Integer');
     RegisterProperty('Buttons', 'TNewButton Integer', iptr);
-    RegisterProperty('Edits', 'TEdit Integer', iptr);
+    RegisterProperty('Edits', 'TNewEdit Integer', iptr);
     RegisterProperty('PromptLabels', 'TNewStaticText Integer', iptr);
     RegisterProperty('SubCaptionLabel', 'TNewStaticText', iptr);
     RegisterProperty('Values', 'String Integer', iptrw);
@@ -616,11 +623,14 @@ begin
   SIRegisterTFont(Cl);
   SIRegisterTPen(Cl);
   SIRegisterTBrush(Cl);
+  SIRegisterTCustomCanvas(Cl);
   SIRegisterTCanvas(Cl);
-  SIRegisterTGraphic(Cl);
+  SIRegisterTGraphic(Cl, True);
   SIRegisterTBitmap(Cl, True);
   {$IFNDEF PS_MINIVCL}
     SIRegisterTIcon(Cl, True);
+    SIRegisterTMetafile(CL);
+    SIRegisterTMetafileCanvas(CL);
     SIRegisterTPicture(Cl, True);
     SIRegisterTPngImage(Cl, True);
   {$ENDIF}
@@ -629,10 +639,22 @@ begin
   SIRegister_Controls_TypesAndConsts(Cl);
   SIRegisterTDragObject(Cl);
   SIRegisterTSizeConstraints(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_TMargins(Cl);
+    SIRegister_TPadding(Cl);
+  {$ENDIF}
   SIRegisterTControl(Cl);
   RegisterWinControl_C(Cl);
   SIRegisterTGraphicControl(Cl);
   SIRegisterTCustomControl(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_THintWindow(Cl);
+    SIRegister_TCustomImageList(Cl);
+    SIRegister_TImageList(Cl);
+    SIRegister_TCustomHintWindow(Cl);
+    SIRegister_TCustomHint(Cl);
+    SIRegister_TBalloonHint(Cl);
+  {$ENDIF}
 
   { Forms }
   SIRegister_Forms_TypesAndConsts(Cl);
@@ -643,10 +665,11 @@ begin
   {$IFNDEF PS_MINIVCL}
     SIRegisterTScrollBox(Cl);
   {$ENDIF}
+  SIRegisterTCustomForm(Cl);
   SIRegisterTForm(Cl);
   {$IFNDEF PS_MINIVCL}
+    SIRegisterTScreen(Cl);
     SIRegisterTApplication(Cl);
-    SIRegisterTScreen(CL);
   {$ENDIF}
 
   { StdCtrls }
@@ -658,6 +681,7 @@ begin
   SIRegisterTCustomLabel(Cl);
   SIRegisterTLabel(Cl);
   SIRegisterTCustomEdit(Cl);
+  SIRegisterTCustomMaskEdit(Cl);
   SIRegisterTEdit(Cl);
   SIRegisterTCustomMemo(Cl);
   SIRegisterTMemo(Cl);
@@ -684,10 +708,11 @@ begin
     SIRegisterTUpDown(Cl);
     SIRegisterTCustomHotKey(Cl);
     SIRegisterTHotKey(Cl);
-    SIRegisterTCustomImageList(Cl);
-    SIRegisterTImageList(Cl);
-    SIRegister_StatusBar(Cl);
-    SIRegister_TListView(Cl);
+    SIRegisterTTStatusBar(Cl);
+    SIRegisterTListView(Cl);
+    SIRegisterTTreeView(Cl);
+    SIRegisterTTab(Cl);
+    SIRegisterTHeaderControl(Cl);
   {$ENDIF}
 
   { ExtCtrls }
@@ -697,6 +722,8 @@ begin
     SIRegisterTImage(Cl);
     SIRegisterTPaintBox(Cl);
     SIRegisterTHeader(Cl);
+    SIRegister_TCustomColorBox(CL);
+    SIRegister_TColorBox(CL);
   {$ENDIF}
   SIRegisterTBevel(Cl);
   {$IFNDEF PS_MINIVCL}
@@ -707,6 +734,18 @@ begin
 
   { ComObj }
   SIRegister_ComObj(Cl);
+
+  { Buttons }
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_Buttons_TypesAndConsts(Cl);
+    SIRegisterTSpeedButton(Cl);
+    SIRegisterTBitBtn(Cl);
+  {$ENDIF}
+
+  { Menus }
+  {$IFNDEF PS_MINIVCL}
+    SIRegister_Menus(Cl);
+  {$ENDIF}
 
   RegisterNewStaticText_C(Cl);
   RegisterNewCheckListBox_C(Cl);
@@ -738,18 +777,6 @@ begin
   RegisterOutputProgressWizardPage_C(Cl);
 
   RegisterHandCursor_C(Cl);
-
-  { Buttons }
-  {$IFNDEF PS_MINIVCL}
-    SIRegister_Buttons_TypesAndConsts(Cl);
-    SIRegisterTSpeedButton(Cl);
-    SIRegisterTBitBtn(Cl);
-  {$ENDIF}
-
-  { Menus }
-  {$IFNDEF PS_MINIVCL}
-    SIRegister_Menus(Cl);
-  {$ENDIF}
 
   {$IFNDEF PS_MINIVCL}
     AddImportedClassVariable(Cl, 'Application', 'TApplication');

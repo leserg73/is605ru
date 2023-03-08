@@ -15,9 +15,6 @@ object SignToolsForm: TSignToolsForm
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  DesignSize = (
-    577
-    247)
   PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
@@ -28,9 +25,6 @@ object SignToolsForm: TSignToolsForm
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = ' Цифровая подпись '
     TabOrder = 0
-    DesignSize = (
-      561
-      201)
     object SignToolsListBox: TListBox
       Left = 8
       Top = 16

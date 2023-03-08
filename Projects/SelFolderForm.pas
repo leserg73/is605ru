@@ -20,7 +20,7 @@ uses
 type
   TSelectFolderForm = class(TSetupForm)
     BrowseLabel: TNewStaticText;
-    PathEdit: TEdit;
+    PathEdit: TNewEdit;
     NewFolderButton: TNewButton;
     OKButton: TNewButton;
     CancelButton: TNewButton;

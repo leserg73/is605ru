@@ -15,9 +15,6 @@ object NewDiskForm: TNewDiskForm
   OldCreateOrder = True
   Scaled = False
   OnCloseQuery = FormCloseQuery
-  DesignSize = (
-    377
-    169)
   PixelsPerInch = 96
   TextHeight = 13
   object DiskBitmapImage: TBitmapImage
@@ -58,7 +55,7 @@ object NewDiskForm: TNewDiskForm
     TabOrder = 3
     OnClick = BrowseButtonClick
   end
-  object PathEdit: TEdit
+  object PathEdit: TNewEdit
     Left = 8
     Top = 96
     Width = 281
