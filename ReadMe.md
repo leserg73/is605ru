@@ -91,7 +91,7 @@
 
 * Для Windows XP добавлена поддержка диалогов задач (TaskDialog), появившихся в Windows Vista. Это сделано на базе стороннего компонента SynTaskDialog.
 
-* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage;
+* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage, TMargins, TPadding, THintWindow, TCustomHintWindow, TCustomHint, TBalloonHint, TCustomColorBox, TColorBox, TCustomForm, TCustomCanvas, TMetafile, TMetafileCanvas, TCustomMaskEdit, TCustomTreeView, TTreeView, TTreeNodes, TTreeNode, THeaderControl, THeaderSections, THeaderSection, TPageControl, TTabSheet, TTabControl, TCustomTabControl, TTab;
 
 * Поддержка компонентами свойств: *OnMouseEnter*, *OnMouseLeave*, *DoubleBuffered* и *ParentDoubleBuffered*;
 
@@ -111,7 +111,7 @@
     + function **FormatFloat(const Format: String; Value: Extended): String;** – форматирование числа с плавающей запятой в строку;
     + procedure **ExtractTemporaryFileEx(const FileName: String; const DestDir: String);** – распаковка файла в указанный каталог;
     + procedure **ExtractTemporaryFileToStream(const FileName: String; const Stream: TStream);** – распаковка файла в память;
-    + procedure **ExtractTemporaryFileToBuffer(const FileName: String; Buffer: Integer);** – распаковка файла в буфер (макс. размер 64 Кб).
+    + procedure **ExtractTemporaryFileToBuffer(const FileName: String; Buffer: Integer);** – распаковка файла в буфер (макс. размер 256 Кб).
     + function **ExtractTemporaryFileSize(const FileName: String): Cardinal;** – получение размера файла;
     + function **CastAnsiStringToInteger(var S: AnsiString): Longint;**
     + function **CastIntegerToAnsiString(const L: Longint): AnsiString;**.
@@ -179,6 +179,9 @@
 
 ### Известные проблемы
 
-Некорректное отображением границы у компонента TRichEditViewer на пользовательских страницах в виде прозрачной окантовки вокруг элемента, под которой просматривается предыдущая или следующая страница инсталлятора. Для её устранения в секции \[Code\] компоненту TRichEditViewer необходимо добавить свойство BevelKind  со значением bkNone (при инициализации или изменении текущей страницы (процедура CurPageChanged)).
+Исправлено 16.02.2023
+
+~~Некорректное отображением границы у компонента TRichEditViewer на пользовательских страницах в виде прозрачной окантовки вокруг элемента, под которой просматривается предыдущая или следующая страница инсталлятора. Для её устранения в секции \[Code\] компоненту TRichEditViewer необходимо добавить свойство BevelKind  со значением bkNone (при инициализации или изменении текущей страницы (процедура CurPageChanged)).~~
+
 
 ---
