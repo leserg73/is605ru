@@ -16,7 +16,7 @@
 *Примечание*:
 
 * компиляция файлов ISPP.dll, SetupLdr.e32, ISCC.exe выполнена в *Delphi 2009*;
-* компиляция файлов ISCmplr.dll, Setup.e32, Compil32.exe — *Delphi 10.3.3 Rio Community*.
+* компиляция файлов ISCmplr.dll, Setup.e32, Compil32.exe — *Delphi 10.3.2 Rio Community*.
 
 ### Особенности
 
@@ -91,7 +91,7 @@
 
 * Для Windows XP добавлена поддержка диалогов задач (TaskDialog), появившихся в Windows Vista. Это сделано на базе стороннего компонента SynTaskDialog.
 
-* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage, TMargins, TPadding, THintWindow, TCustomHintWindow, TCustomHint, TBalloonHint, TCustomColorBox, TColorBox, TCustomForm, TCustomCanvas, TMetafile, TMetafileCanvas, TCustomMaskEdit, TCustomTreeView, TTreeView, TTreeNodes, TTreeNode, THeaderControl, THeaderSections, THeaderSection, TPageControl, TTabSheet, TTabControl, TCustomTabControl, TTab;
+* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage, TMargins, TPadding, THintWindow, TCustomHintWindow, TCustomHint, TBalloonHint, TCustomColorBox, TColorBox, TCustomForm, TCustomCanvas, TMetafile, TMetafileCanvas, TCustomMaskEdit, TCustomTreeView, TTreeView, TTreeNodes, TTreeNode, THeaderControl, THeaderSections, THeaderSection, TPageControl, TTabSheet, TTabControl, TCustomTabControl, TTab, TMonthCalendar, TDateTimePicker;
 
 * Поддержка компонентами свойств: *OnMouseEnter*, *OnMouseLeave*, *DoubleBuffered* и *ParentDoubleBuffered*;
 
@@ -129,6 +129,7 @@
     + function **DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: Integer; cxWidth, cyWidth: Integer; istepIfAniCur: LongWord; hbrFlickerFreeDraw: LongWord; diFlags: LongWord): Boolean;** – рисует значок или курсор в контекст указанного устройства;
     + function **DestroyIcon(hIcon: Integer): Boolean;** – разрушает значок и освобождает любую память занятую значком;
     + function **SetWindowText(hWnd: HWND; const lpString: String): Boolean;** – изменяет текст заголовка заданного окна;
+    + function **SetWindowTheme(hWnd: HWND; pszSubAppName, pszSubIdList: PAnsiChar): Integer;** – позволяет включать или выключать программно визуальные стили Windows для отдельного окна.
 
 * Директивы секции \[Setup\]:
 

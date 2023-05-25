@@ -312,7 +312,7 @@ const
 
   { Windows }
 {$IFNDEF PS_MINIVCL}
-  WindowsTable: array [0..24] of AnsiString =
+  WindowsTable: array [0..25] of AnsiString =
 {$ELSE}
   WindowsTable: array [0..15] of AnsiString =
 {$ENDIF}
@@ -335,6 +335,7 @@ const
        'function DrawIconEx(hdc: LongInt; xLeft, yTop: Integer; hIcon: Integer; cxWidth, cyWidth: Integer; istepIfAniCur: LongWord; hbrFlickerFreeDraw: LongWord; diFlags: LongWord): Boolean;',
        'function DestroyIcon(hIcon: Integer): Boolean;',
        'function SetWindowText(hWnd: HWND; const lpString: String): Boolean;',
+       'function SetWindowTheme(hWnd: HWND; pszSubAppName, pszSubIdList: PAnsiChar): Integer;',
        'procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);',
        'procedure SetAppTaskbarOverlayIconRes(const ResOvIcon: String);',
        'procedure SetAppTaskbarThumbnailTooltip(const ToolTipStr: String);',

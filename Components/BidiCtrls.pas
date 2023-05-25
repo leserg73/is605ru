@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, SysUtils, Messages, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls;
+  StdCtrls{$IFNDEF PS_MINIVCL}, ComCtrls{$ENDIF};
 
 type
   TNewEdit = class(TEdit)
@@ -28,6 +28,22 @@ type
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   end;
+
+  TNewCommonCalendar = class(TCommonCalendar);
+  TNewMonthCalColors = class(TMonthCalColors);
+
+  TNewMonthCalendar = class(TMonthCalendar)
+  private
+    FOnChange:TNotifyEvent;
+    procedure CNNotify(var Message: TWMNotify); message CN_NOTIFY;
+    procedure WMGetDlgCode(var Msg:TWMGetDlgCode); message WM_GETDLGCODE;
+    procedure WMLButtonDown(var Msg: TWMLButtonDown); message WM_LBUTTONDOWN;
+    procedure DoChange;
+  published
+    property OnChange:TNotifyEvent read FOnChange write FOnChange;
+  end;
+
+  TNewDateTimePicker = class(TDateTimePicker);
   {$ENDIF}
 
   TNewMemo = class(TMemo)
@@ -65,7 +81,7 @@ procedure Register;
 implementation
 
 uses
-  BidiUtils;
+  BidiUtils{$IFNDEF PS_MINIVCL}, CommCtrl{$ENDIF};
 
 procedure Register;
 begin
@@ -81,14 +97,49 @@ begin
   SetBiDiStyles(Self, Params);
 end;
 
-{ TNewGroupBox }
-
 {$IFNDEF PS_MINIVCL}
+{ TNewGroupBox }
 procedure TNewGroupBox.CreateParams(var Params: TCreateParams);
 begin
   inherited;
   SetBiDiStyles(Self, Params);
 end;
+
+{ TNewMonthCalendar }
+procedure TNewMonthCalendar.CNNotify(var Message:TWMNotify);
+ var
+  bChanged:boolean;
+  dDate,dEndDate:TDateTime;
+ begin
+  with Message, NMHdr^ do
+   if (code=MCN_SELECT) or (Code=MCN_SELCHANGE) then
+    begin
+     dDate:=Date;
+     dEndDate:=EndDate;
+     inherited;
+     bChanged:=Date<>dDate;
+     if MultiSelect and (dEndDate<>EndDate) then bChanged:=true;
+     if bChanged then DoChange;
+     exit;
+    end;
+  inherited;
+end;
+
+procedure TNewMonthCalendar.WMGetDlgCode(var Msg:TWMGetDlgCode);
+ begin
+  Msg.Result:=DLGC_WANTARROWS;
+ end;
+
+procedure TNewMonthCalendar.WMLButtonDown(var Msg:TWMLButtonDown);
+ begin
+  SetFocus;
+  inherited;
+ end;
+
+procedure TNewMonthCalendar.DoChange;
+ begin
+  if Assigned(FOnChange) then FOnChange(Self);
+ end;
 {$ENDIF}
 
 { TNewMemo }

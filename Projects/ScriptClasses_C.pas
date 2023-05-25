@@ -23,7 +23,7 @@ implementation
 uses
   SetupTypes,
   uPSC_std, uPSC_classes, uPSC_graphics, uPSC_controls, uPSC_stdctrls, 
-  {$IFNDEF PS_MINIVCL}uPSC_menus, uPSC_buttons, {$ENDIF}
+  {$IFNDEF PS_MINIVCL}uPSC_menus, uPSC_buttons, uPSC_dateutils, {$ENDIF}
   uPSC_forms, uPSC_extctrls, uPSC_comobj;
 
 procedure RegisterWinControl_C(Cl: TPSPascalCompiler);
@@ -284,6 +284,11 @@ begin
   Cl.AddClassN(Cl.FindClass('TEdit'), 'TNewEdit');
   {$IFNDEF PS_MINIVCL}
     Cl.AddClassN(Cl.FindClass('TGroupBox'), 'TNewGroupBox');
+    Cl.AddClassN(Cl.FindClass('TMonthCalColors'), 'TNewMonthCalColors');
+    Cl.AddClassN(Cl.FindClass('TCommonCalendar'), 'TNewCommonCalendar');
+    with Cl.AddClassN(Cl.FindClass('TMonthCalendar'), 'TNewMonthCalendar') do
+       RegisterProperty('OnChange', 'TNotifyEvent', iptrw);
+    Cl.AddClassN(Cl.FindClass('TDateTimePicker'), 'TNewDateTimePicker');
   {$ENDIF}
   Cl.AddClassN(Cl.FindClass('TMemo'), 'TNewMemo');
   Cl.AddClassN(Cl.FindClass('TComboBox'), 'TNewComboBox');
@@ -623,7 +628,9 @@ begin
   SIRegisterTFont(Cl);
   SIRegisterTPen(Cl);
   SIRegisterTBrush(Cl);
-  SIRegisterTCustomCanvas(Cl);
+  {$IFNDEF PS_MINIVCL}
+    SIRegisterTCustomCanvas(Cl);
+  {$ENDIF}
   SIRegisterTCanvas(Cl);
   SIRegisterTGraphic(Cl, True);
   SIRegisterTBitmap(Cl, True);
@@ -664,8 +671,8 @@ begin
   SIRegisterTScrollingWinControl(Cl);
   {$IFNDEF PS_MINIVCL}
     SIRegisterTScrollBox(Cl);
+    SIRegisterTCustomForm(Cl);
   {$ENDIF}
-  SIRegisterTCustomForm(Cl);
   SIRegisterTForm(Cl);
   {$IFNDEF PS_MINIVCL}
     SIRegisterTScreen(Cl);
@@ -689,6 +696,7 @@ begin
   SIRegisterTComboBox(Cl);
   SIRegisterTButtonControl(Cl);
   {$IFNDEF PS_MINIVCL}
+    SIRegisterTImageMargins(Cl);
     SIRegisterTCustomButton(Cl);
   {$ENDIF}
   SIRegisterTButton(Cl);
@@ -713,6 +721,11 @@ begin
     SIRegisterTTreeView(Cl);
     SIRegisterTTab(Cl);
     SIRegisterTHeaderControl(Cl);
+    { Date&Time }
+    SIRegister_TMonthCalColors(CL);
+    SIRegister_TCommonCalendar(CL);
+    SIRegister_TMonthCalendar(CL);
+    SIRegister_TDateTimePicker(CL);
   {$ENDIF}
 
   { ExtCtrls }
@@ -745,6 +758,11 @@ begin
   { Menus }
   {$IFNDEF PS_MINIVCL}
     SIRegister_Menus(Cl);
+  {$ENDIF}
+
+  { Date and Time }
+  {$IFNDEF PS_MINIVCL}
+    RegisterDatetimeLibrary_C(Cl);
   {$ENDIF}
 
   RegisterNewStaticText_C(Cl);

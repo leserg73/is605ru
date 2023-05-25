@@ -21,7 +21,7 @@ procedure ScriptFuncLibraryRegister_R(ScriptInterpreter: TPSExec);
 implementation
 
 uses
-  Windows, ScriptFunc,
+  Windows, ScriptFunc, {$IFNDEF PS_MINIVCL}UxTheme,{$ENDIF}
   Forms, uPSUtils, SysUtils, Classes, Graphics, Controls, TypInfo,
   {$IFNDEF Delphi3orHigher} Ole2, {$ELSE} ActiveX, {$ENDIF}
   Struct, ScriptDlg, Main, PathFunc, CmnFunc, CmnFunc2, FileClass, RedirFunc,
@@ -1548,8 +1548,12 @@ begin
     { 'function DestroyIcon(hIcon: Integer): Boolean;', }
     end else if Proc.Name = 'DESTROYICON' then begin
       Stack.SetBool(PStart, DestroyIcon(Stack.GetInt(PStart-1)));
+    { 'function SetWindowText(hWnd: HWND; const lpString: String): Boolean;' }
     end else if Proc.Name = 'SETWINDOWTEXT' then begin
       Stack.SetBool(PStart, SetWindowText(Stack.GetUInt(PStart-1), Stack.GetString(PStart-2)));
+    { 'function SetWindowTheme(hWnd: HWND; pszSubAppName, pszSubIdList: PAnsiChar): Integer;' }
+    end else if Proc.Name = 'SETWINDOWTHEME' then begin
+      Stack.SetInt(PStart, SetWindowTheme(Stack.GetUInt(PStart-1), PChar(Stack.GetAnsiString(PStart-2)), PChar(Stack.GetAnsiString(PStart-3))));
     { 'procedure SetAppTaskbarOverlayIconFile(const FileIcon: String);' }
     end else if Proc.Name = 'SETAPPTASKBAROVERLAYICONFILE' then begin
       SetAppTaskbarOverlayIconFile(Stack.GetString(PStart));

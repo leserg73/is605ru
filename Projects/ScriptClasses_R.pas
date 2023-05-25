@@ -25,7 +25,7 @@ uses
   Windows, Controls, Forms, StdCtrls, Graphics,
   uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms, 
   {$IFNDEF PS_MINIVCL}
-    uPSR_menus, Menus, uPSR_buttons, Buttons, 
+    uPSR_menus, Menus, uPSR_buttons, Buttons, uPSR_dateutils, Classes, 
     {$IFNDEF VER200}
       Imaging.pngimage, Imaging.jpeg, 
     {$ELSE}
@@ -163,11 +163,21 @@ begin
   Cl.Add(TBitmapImage);
 end;
 
+{$IFNDEF PS_MINIVCL}
+  procedure TNewMonthCalendarOnChange_W(Self: TNewMonthCalendar; const T: TNotifyEvent); begin Self.OnChange := T; end;
+  procedure TNewMonthCalendarOnChange_R(Self: TNewMonthCalendar; var T: TNotifyEvent); begin T := Self.OnChange; end;
+{$ENDIF}
+
 procedure RegisterBidiCtrls_R(Cl: TPSRuntimeClassImporter);
 begin
   Cl.Add(TNewEdit);
   {$IFNDEF PS_MINIVCL}
     Cl.Add(TNewGroupBox);
+    Cl.Add(TNewMonthCalColors);
+    Cl.Add(TNewCommonCalendar);
+    with Cl.Add(TNewMonthCalendar) do
+      RegisterPropertyHelper(@TNewMonthCalendarOnChange_R,@TNewMonthCalendarOnChange_W,'OnChange');
+    Cl.Add(TNewDateTimePicker);
   {$ENDIF}
   Cl.Add(TNewMemo);
   Cl.Add(TNewComboBox);
@@ -378,17 +388,19 @@ begin
     RIRegisterTFont(Cl);
     RIRegisterTPen(Cl);
     RIRegisterTBrush(Cl);
-    RIRegisterTCustomCanvas(CL);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTCustomCanvas(CL);
+    {$ENDIF}
     RIRegisterTCanvas(Cl);
     RIRegisterTGraphic(Cl, True);
     RIRegisterTBitmap(Cl, True);
-  {$IFNDEF PS_MINIVCL}
-    RIRegisterTIcon(Cl, True);
+    {$IFNDEF PS_MINIVCL}
+      RIRegisterTIcon(Cl, True);
       RIRegisterTMetafile(CL);
       RIRegisterTMetafileCanvas(CL);
-    RIRegisterTPicture(Cl, True);
-    RIRegisterTPngImage(Cl, True);
-  {$ENDIF}
+      RIRegisterTPicture(Cl, True);
+      RIRegisterTPngImage(Cl, True);
+    {$ENDIF}
 
     { Controls }
     RIRegister_TDragObject(Cl);
@@ -417,8 +429,8 @@ begin
     RIRegisterTScrollingWinControl(Cl);
     {$IFNDEF PS_MINIVCL}
       RIRegisterTScrollBox(Cl);
+      RIRegisterTCustomForm(Cl);
     {$ENDIF}
-    RIRegisterTCustomForm(Cl);
     RIRegisterTForm(Cl);
     {$IFNDEF PS_MINIVCL}
       RIRegisterTScreen(Cl);
@@ -441,6 +453,7 @@ begin
     RIRegisterTComboBox(Cl);
     RIRegisterTButtonControl(Cl);
     {$IFNDEF PS_MINIVCL}
+      RIRegisterTImageMargins(Cl);
       RIRegisterTCustomButton(Cl);
     {$ENDIF}
     RIRegisterTButton(Cl);
@@ -465,6 +478,8 @@ begin
       RIRegisterTTreeView(Cl);
       RIRegisterTTab(Cl);
       RIRegisterTHeaderControl(Cl);
+      { Date&Time }
+      RIRegister_DateTime(CL);
     {$ENDIF}
 
     { ExtCtrls }
@@ -496,6 +511,11 @@ begin
     {$IFNDEF PS_MINIVCL}
       RIRegister_Menus(CL);
       RIRegister_Menus_Routines(ScriptInterpreter);
+    {$ENDIF}
+
+    { Date and Time }
+    {$IFNDEF PS_MINIVCL}
+      RegisterDateTimeLibrary_R(ScriptInterpreter);
     {$ENDIF}
 
     RegisterNewStaticText_R(Cl);
