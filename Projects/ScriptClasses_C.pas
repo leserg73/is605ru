@@ -23,7 +23,7 @@ implementation
 uses
   SetupTypes,
   uPSC_std, uPSC_classes, uPSC_graphics, uPSC_controls, uPSC_stdctrls, 
-  {$IFNDEF PS_MINIVCL}uPSC_menus, uPSC_buttons, uPSC_dateutils, {$ENDIF}
+  {$IFNDEF PS_MINIVCL}uPSC_menus, uPSC_buttons, uPSC_dateutils, uPSC_fontawesome, {$ENDIF}
   uPSC_forms, uPSC_extctrls, uPSC_comobj;
 
 procedure RegisterWinControl_C(Cl: TPSPascalCompiler);
@@ -763,6 +763,7 @@ begin
   { Date and Time }
   {$IFNDEF PS_MINIVCL}
     RegisterDatetimeLibrary_C(Cl);
+    SIRegister_FontAwesome(Cl);
   {$ENDIF}
 
   RegisterNewStaticText_C(Cl);
@@ -799,6 +800,7 @@ begin
   {$IFNDEF PS_MINIVCL}
     AddImportedClassVariable(Cl, 'Application', 'TApplication');
     AddImportedClassVariable(Cl, 'Screen', 'TScreen');
+    AddImportedClassVariable(Cl, 'FontAwesome', 'TFontAwesome');
   {$ENDIF}
   AddImportedClassVariable(Cl, 'WizardForm', 'TWizardForm');
   AddImportedClassVariable(Cl, 'MainForm', 'TMainForm');

@@ -25,7 +25,7 @@ uses
   Windows, Controls, Forms, StdCtrls, Graphics,
   uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms, 
   {$IFNDEF PS_MINIVCL}
-    uPSR_menus, Menus, uPSR_buttons, Buttons, uPSR_dateutils, Classes, 
+    Vcl.Styles.FontAwesome, uPSR_menus, Menus, uPSR_buttons, Buttons, uPSR_dateutils, uPSR_fontawesome, Classes, 
     {$IFNDEF VER200}
       Imaging.pngimage, Imaging.jpeg, 
     {$ELSE}
@@ -516,6 +516,7 @@ begin
     { Date and Time }
     {$IFNDEF PS_MINIVCL}
       RegisterDateTimeLibrary_R(ScriptInterpreter);
+      RIRegister_FontAwesome(Cl);
     {$ENDIF}
 
     RegisterNewStaticText_R(Cl);
@@ -563,6 +564,7 @@ begin
   {$IFNDEF PS_MINIVCL}
     SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('APPLICATION')), Application);
     SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('SCREEN')), Screen);
+    SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('FONTAWESOME')), FontAwesome);
   {$ENDIF}
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('WIZARDFORM')), WizardForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('MAINFORM')), MainForm);
