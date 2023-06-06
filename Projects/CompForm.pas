@@ -1036,7 +1036,7 @@ var
 begin
   inherited;
 
-  SP := ExtractFilePath(ParamStr(0)) + 'portable.txt';
+  SP := ExtractFilePath(ParamStr(0)) + 'Compil32.ini';
 
   {$IFNDEF STATICCOMPILER}
   FCompilerVersion := ISDllGetVersion;

@@ -579,7 +579,7 @@ begin
       { Also automatically read and add SignTools defined using the IDE. Adding
         these after the command line SignTools so that the latter are always
         found first by the compiler. }
-      if FileExists(ExtractFilePath(ParamStr(0)) + 'portable.txt') then
+      if FileExists(ExtractFilePath(ParamStr(0)) + 'Compil32.ini') then
         ReadSignToolsP(IDESignTools)
       else
         ReadSignTools(IDESignTools);
