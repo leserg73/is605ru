@@ -385,6 +385,7 @@ begin
 
     { Graphics }
     RIRegisterTGraphicsObject(Cl);
+    RIRegisterTGraphic(Cl, True);
     RIRegisterTFont(Cl);
     RIRegisterTPen(Cl);
     RIRegisterTBrush(Cl);
@@ -392,7 +393,6 @@ begin
       RIRegisterTCustomCanvas(CL);
     {$ENDIF}
     RIRegisterTCanvas(Cl);
-    RIRegisterTGraphic(Cl, True);
     RIRegisterTBitmap(Cl, True);
     {$IFNDEF PS_MINIVCL}
       RIRegisterTIcon(Cl, True);

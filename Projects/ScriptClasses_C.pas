@@ -625,6 +625,7 @@ begin
   SIRegister_Graphics_TypesAndConsts(Cl);
   cl.AddConstantN('clHotLight', 'Integer').Value.ts32 := Integer(clSystemColor or COLOR_HOTLIGHT);
   SIRegisterTGraphicsObject(Cl);
+  SIRegisterTGraphic(Cl, True);
   SIRegisterTFont(Cl);
   SIRegisterTPen(Cl);
   SIRegisterTBrush(Cl);
@@ -632,7 +633,6 @@ begin
     SIRegisterTCustomCanvas(Cl);
   {$ENDIF}
   SIRegisterTCanvas(Cl);
-  SIRegisterTGraphic(Cl, True);
   SIRegisterTBitmap(Cl, True);
   {$IFNDEF PS_MINIVCL}
     SIRegisterTIcon(Cl, True);
