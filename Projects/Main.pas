@@ -216,6 +216,7 @@ procedure InitializeAdminInstallMode(const AAdminInstallMode: Boolean);
 procedure Initialize64BitInstallMode(const A64BitInstallMode: Boolean);
 procedure Log64BitInstallMode;
 procedure InitializeCommonVars;
+procedure InitializeLanguageDialog;
 procedure InitializeSetup;
 procedure InitMainNonSHFolderConsts;
 function InstallOnThisVersion(const MinVersion: TSetupVersionData;
@@ -2582,6 +2583,83 @@ begin
   LogFmt('64-bit install mode: %s', [SYesNo[Is64BitInstallMode]]);
 end;
 
+{ Load Script code and Init Lang Dialog }
+procedure InitializeLanguageDialog;
+
+  function HandleInitPassword(const NeedPassword: Boolean): Boolean;
+  { Handles InitPassword and returns the updated value of NeedPassword }
+  { Also see Wizard.CheckPassword }
+  var
+    S: String;
+    PasswordOk: Boolean;
+  begin
+    Result := NeedPassword;
+
+    if NeedPassword and (InitPassword <> '') then begin
+      PasswordOk := False;
+      S := InitPassword;
+      if shPassword in SetupHeader.Options then
+        PasswordOk := TestPassword(S);
+      if not PasswordOk and (CodeRunner <> nil) then
+        PasswordOk := CodeRunner.RunBooleanFunctions('CheckPassword', [S], bcTrue, False, PasswordOk);
+
+      if PasswordOk then begin
+        Result := False;
+        if shEncryptionUsed in SetupHeader.Options then
+          FileExtractor.CryptKey := S;
+      end;
+    end;
+  end;
+
+var
+  I: Integer;
+  Res: Boolean;
+begin
+  { Load Code }
+  if SetupHeader.CompiledCodeText <> '' then begin
+    CodeRunner := TScriptRunner.Create();
+    try
+      CodeRunner.NamingAttribute := CodeRunnerNamingAttribute;
+      CodeRunner.OnLog := CodeRunnerOnLog;
+      CodeRunner.OnLogFmt := CodeRunnerOnLogFmt;
+      CodeRunner.OnDllImport := CodeRunnerOnDllImport;
+      CodeRunner.OnDebug := CodeRunnerOnDebug;
+      CodeRunner.OnDebugIntermediate := CodeRunnerOnDebugIntermediate;
+      CodeRunner.OnException := CodeRunnerOnException;
+      CodeRunner.LoadScript(SetupHeader.CompiledCodeText, DebugClientCompiledCodeDebugInfo);
+      if not NeedPassword then
+        NeedPassword := CodeRunner.FunctionExists('CheckPassword', True);
+      NeedPassword := HandleInitPassword(NeedPassword);
+      if not NeedSerial then
+        NeedSerial := CodeRunner.FunctionExists('CheckSerial', True);
+    except
+      { Don't let DeinitSetup see a partially-initialized CodeRunner }
+      FreeAndNil(CodeRunner);
+      raise;
+    end;
+  end
+  else
+    NeedPassword := HandleInitPassword(NeedPassword);
+
+  { Show "Select Language" dialog if necessary - requires "64-bit mode" to be
+    initialized else it might query the previous language from the wrong registry
+    view }
+  if Entries[seLanguage].Count > 1 then begin
+    if ShowLanguageDialog and not InitSilent and not InitVerySilent then begin
+      if not AskForLanguage then
+        Abort;
+    end else if not MatchedLangParameter and (shUsePreviousLanguage in SetupHeader.Options) then begin
+      { Replicate the dialog's UsePreviousLanguage functionality. }
+      { Note: if UsePreviousLanguage is set to "yes" then the compiler does not
+        allow AppId to include constants but we should still call ExpandConst
+        to handle any '{{'. }
+      I := GetPreviousLanguage(ExpandConst(SetupHeader.AppId));
+      if I <> -1 then
+        SetActiveLanguage(I);
+    end;
+  end;
+end;
+
 procedure InitializeSetup;
 { Initializes various vars used by the setup. This is called in the project
   source. }
@@ -2753,31 +2831,6 @@ var
       end
       else
         SEFreeRec(P, EntryStrings[EntryType], EntryAnsiStrings[EntryType]);
-    end;
-  end;
-
-  function HandleInitPassword(const NeedPassword: Boolean): Boolean;
-  { Handles InitPassword and returns the updated value of NeedPassword }
-  { Also see Wizard.CheckPassword }
-  var
-    S: String;
-    PasswordOk: Boolean;
-  begin
-    Result := NeedPassword;
-
-    if NeedPassword and (InitPassword <> '') then begin
-      PasswordOk := False;
-      S := InitPassword;
-      if shPassword in SetupHeader.Options then
-        PasswordOk := TestPassword(S);
-      if not PasswordOk and (CodeRunner <> nil) then
-        PasswordOk := CodeRunner.RunBooleanFunctions('CheckPassword', [S], bcTrue, False, PasswordOk);
-
-      if PasswordOk then begin
-        Result := False;
-        if shEncryptionUsed in SetupHeader.Options then
-          FileExtractor.CryptKey := S;
-      end;
     end;
   end;
 
@@ -3292,24 +3345,9 @@ begin
 
   Log64BitInstallMode;
 
-  { Show "Select Language" dialog if necessary - requires "64-bit mode" to be
-    initialized else it might query the previous language from the wrong registry
-    view }
-  if Entries[seLanguage].Count > 1 then begin
-    if ShowLanguageDialog and not InitSilent and not InitVerySilent then begin
-      if not AskForLanguage then
-        Abort;
-    end else if not MatchedLangParameter and (shUsePreviousLanguage in SetupHeader.Options) then begin
-      { Replicate the dialog's UsePreviousLanguage functionality. }
-      { Note: if UsePreviousLanguage is set to "yes" then the compiler does not
-        allow AppId to include constants but we should still call ExpandConst
-        to handle any '{{'. }
-      I := GetPreviousLanguage(ExpandConst(SetupHeader.AppId));
-      if I <> -1 then
-        SetActiveLanguage(I);
-    end;
-  end;
-  
+  { Load Code and Init/Show Lang Dialog }
+  InitializeLanguageDialog;
+
   { Check processor architecture }
   if (SetupHeader.ArchitecturesAllowed <> []) and
      not(ProcessorArchitecture in SetupHeader.ArchitecturesAllowed) then
@@ -3366,41 +3404,20 @@ begin
   { Set install mode }
   SetupInstallMode;
 
-  { Load and initialize code }
-  if SetupHeader.CompiledCodeText <> '' then begin
-    CodeRunner := TScriptRunner.Create();
-    try
-      CodeRunner.NamingAttribute := CodeRunnerNamingAttribute;
-      CodeRunner.OnLog := CodeRunnerOnLog;
-      CodeRunner.OnLogFmt := CodeRunnerOnLogFmt;
-      CodeRunner.OnDllImport := CodeRunnerOnDllImport;
-      CodeRunner.OnDebug := CodeRunnerOnDebug;
-      CodeRunner.OnDebugIntermediate := CodeRunnerOnDebugIntermediate;
-      CodeRunner.OnException := CodeRunnerOnException;
-      CodeRunner.LoadScript(SetupHeader.CompiledCodeText, DebugClientCompiledCodeDebugInfo);
-      if not NeedPassword then
-        NeedPassword := CodeRunner.FunctionExists('CheckPassword', True);
-      NeedPassword := HandleInitPassword(NeedPassword);
-      if not NeedSerial then
-        NeedSerial := CodeRunner.FunctionExists('CheckSerial', True);
-    except
-      { Don't let DeinitSetup see a partially-initialized CodeRunner }
-      FreeAndNil(CodeRunner);
-      raise;
-    end;
+  { Initialize code }
+  if (CodeRunner <> nil) and CodeRunner.FunctionExists('InitializeSetup', True) then
+  begin
     try
       Res := CodeRunner.RunBooleanFunctions('InitializeSetup', [''], bcFalse, False, True);
     except
       Log('InitializeSetup raised an exception (fatal).');
-      raise;
+    raise;
     end;
     if not Res then begin
       Log('InitializeSetup returned False; aborting.');
       Abort;
     end;
-  end
-  else
-    NeedPassword := HandleInitPassword(NeedPassword);
+  end;
 
   { Expand AppName, AppVerName, and AppCopyright now since they're used often,
     especially by the background window painting. }

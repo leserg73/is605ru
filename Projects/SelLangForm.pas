@@ -19,26 +19,39 @@ uses
 
 type
   TSelectLanguageForm = class(TSetupForm)
-    SelectLabel: TNewStaticText;
-    LangCombo: TNewComboBox;
-    OKButton: TNewButton;
-    CancelButton: TNewButton;
-    IconBitmapImage: TBitmapImage;
-    MainPanel: TPanel;
-    Bevel: TBevel;
+    FSelectLabel: TNewStaticText;
+    FLangCombo: TNewComboBox;
+    FOKButton: TNewButton;
+    FCancelButton: TNewButton;
+    FIconBitmapImage: TBitmapImage;
+    FMainPanel: TPanel;
+    FBevel: TBevel;
   private
     { Private declarations }
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+    //destructor Destroy; override;
+  published
+    { Published declarations }
+    property SelectLabel: TNewStaticText read FSelectLabel;
+    property LangCombo: TNewComboBox read FLangCombo;
+    property OKButton: TNewButton read FOKButton;
+    property CancelButton: TNewButton read FCancelButton;
+    property IconBitmapImage: TBitmapImage read FIconBitmapImage;
+    property MainPanel: TPanel read FMainPanel;
+    property Bevel: TBevel read FBevel;
   end;
 
 function AskForLanguage: Boolean;
 
+var
+  SelectLanguageForm: TSelectLanguageForm;
+
 implementation
 
 uses
-  Struct, Msgs, MsgIDs, Main;
+  Struct, Msgs, MsgIDs, Main, Logging, ScriptRunner;
 
 {$R *.DFM}
 
@@ -64,7 +77,7 @@ function AskForLanguage: Boolean;
 { Creates and shows the "Select Language" dialog. Returns True and activates
   the selected language if the user clicks OK, or False otherwise. }
 var
-  LangForm: TSelectLanguageForm;
+//  SelectLanguageForm: TSelectLanguageForm;
   I, J: Integer;
   LangEntry: PSetupLanguageEntry;
 {$IFNDEF UNICODE}
@@ -72,7 +85,7 @@ var
   N: String;
 {$ENDIF}
 begin
-  LangForm := TSelectLanguageForm.Create(Application);
+  SelectLanguageForm := TSelectLanguageForm.Create(Application);
   try
 {$IFNDEF UNICODE}
     { On NT, make it possible to add Unicode strings to our ANSI combo box by
@@ -82,7 +95,7 @@ begin
     if Win32Platform = VER_PLATFORM_WIN32_NT then begin
       if GetClassInfoW(0, 'COMBOBOX', ClassInfo) then begin
         DefComboWndProcW := ClassInfo.lpfnWndProc;
-        Longint(PrevComboWndProc) := SetWindowLongW(LangForm.LangCombo.Handle,
+        Longint(PrevComboWndProc) := SetWindowLongW(SelectLanguageForm.LangCombo.Handle,
           GWL_WNDPROC, Longint(@NewComboWndProc));
       end;
     end;
@@ -91,8 +104,8 @@ begin
     for I := 0 to Entries[seLanguage].Count-1 do begin
       LangEntry := Entries[seLanguage][I];
 {$IFDEF UNICODE}
-      J := LangForm.LangCombo.Items.Add(LangEntry.LanguageName);
-      LangForm.LangCombo.Items.Objects[J] := TObject(I);
+      J := SelectLanguageForm.LangCombo.Items.Add(LangEntry.LanguageName);
+      SelectLanguageForm.LangCombo.Items.Objects[J] := TObject(I);
 {$ELSE}
       if (I = ActiveLanguage) or (LangEntry.LanguageCodePage = 0) or
          (LangEntry.LanguageCodePage = GetACP) or
@@ -100,37 +113,52 @@ begin
         { Note: LanguageName is Unicode }
         N := LangEntry.LanguageName + #0#0;  { need wide null! }
         if Win32Platform = VER_PLATFORM_WIN32_NT then
-          J := SendMessageW(LangForm.LangCombo.Handle, CB_ADDSTRING, 0,
+          J := SendMessageW(SelectLanguageForm.LangCombo.Handle, CB_ADDSTRING, 0,
             Longint(PWideChar(Pointer(N))))
         else
-          J := LangForm.LangCombo.Items.Add(WideCharToString(PWideChar(Pointer(N))));
+          J := SelectLanguageForm.LangCombo.Items.Add(WideCharToString(PWideChar(Pointer(N))));
         if J >= 0 then
-          LangForm.LangCombo.Items.Objects[J] := TObject(I);
+          SelectLanguageForm.LangCombo.Items.Objects[J] := TObject(I);
       end;
 {$ENDIF}
     end;
 
    { If there's multiple languages, select the previous language, if available }
     if (shUsePreviousLanguage in SetupHeader.Options) and
-       (LangForm.LangCombo.Items.Count > 1) then begin
+       (SelectLanguageForm.LangCombo.Items.Count > 1) then begin
       { Note: if UsePreviousLanguage is set to "yes" then the compiler does not
         allow AppId to include constants but we should still call ExpandConst
         to handle any '{{'. }
       I := GetPreviousLanguage(ExpandConst(SetupHeader.AppId));
       if I <> -1 then
-        LangForm.LangCombo.ItemIndex := LangForm.LangCombo.Items.IndexOfObject(TObject(I));
+        SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(I));
     end;
 
     { Select the active language if no previous language was selected }
-    if LangForm.LangCombo.ItemIndex = -1 then
-      LangForm.LangCombo.ItemIndex := LangForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
+    if SelectLanguageForm.LangCombo.ItemIndex = -1 then
+      SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
 
-    if LangForm.LangCombo.Items.Count > 1 then begin
-      Result := (LangForm.ShowModal = mrOK);
+    if SelectLanguageForm.LangCombo.Items.Count > 1 then begin
+
+      { Run Code Lang Dialog }
+      if CodeRunner <> nil then begin
+        try
+          Result := CodeRunner.RunBooleanFunctions('InitializeLanguageDialog', [''], bcFalse, False, True);
+        except
+          Log('InitializeLanguageDialog raised an exception (fatal).');
+          raise;
+        end;
+        if not Result then begin
+          Log('InitializeLanguageDialog returned False; aborting.');
+          Abort;
+        end;
+      end;
+
+      Result := (SelectLanguageForm.ShowModal = mrOK);
       if Result then begin
-        I := LangForm.LangCombo.ItemIndex;
+        I := SelectLanguageForm.LangCombo.ItemIndex;
         if I >= 0 then
-          SetActiveLanguage(Integer(LangForm.LangCombo.Items.Objects[I]));
+          SetActiveLanguage(Integer(SelectLanguageForm.LangCombo.Items.Objects[I]));
       end;
     end
     else begin
@@ -140,7 +168,7 @@ begin
       Result := True;
     end;
   finally
-    LangForm.Free;
+    SelectLanguageForm.Free;
   end;
 end;
 
@@ -160,12 +188,15 @@ begin
   SelectLabel.Caption := SetupMessages[msgSelectLanguageLabel];
   OKButton.Caption := SetupMessages[msgButtonOK];
   CancelButton.Caption := SetupMessages[msgButtonCancel];
-  if SetupHeader.SetupStyle then begin
-     IconBitmapImage.Bitmap.Canvas.Brush.Color := StyleServices.GetStyleColor(scPanel){clBtnFace};
-     IconBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
+
+  if SetupHeader.SetupStyle then
+  begin
+    IconBitmapImage.Bitmap.Canvas.Brush.Color := StyleServices.GetStyleColor(scPanel){clBtnFace};
+    IconBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
   end
   else
-     IconBitmapImage.Bitmap.Canvas.Brush.Color := MainPanel.Color;
+    IconBitmapImage.Bitmap.Canvas.Brush.Color := MainPanel.Color;
+
   IconBitmapImage.Bitmap.Width := Application.Icon.Width;
   IconBitmapImage.Bitmap.Height := Application.Icon.Height;
   IconBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
@@ -173,6 +204,10 @@ begin
   IconBitmapImage.Height := IconBitmapImage.Bitmap.Height;
   { restoring the original value of the ClientWidth when resizing the WizardForm }
   ClientWidth := MulDiv(ClientWidth, 100, SetupHeader.WizardSizePercentX);
+
+  { Aligning buttons to the right edge of the combo box }
+  OKButton.Left := LangCombo.Left + LangCombo.Width + OKButton.Left - CancelButton.Left - OKButton.Width;
+  CancelButton.Left := LangCombo.Left + LangCombo.Width - CancelButton.Width;
   KeepSizeY := True;
 end;
 

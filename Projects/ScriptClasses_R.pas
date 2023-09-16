@@ -25,7 +25,8 @@ uses
   Windows, Controls, Forms, StdCtrls, Graphics,
   uPSR_std, uPSR_classes, uPSR_graphics, uPSR_controls, uPSR_forms, 
   {$IFNDEF PS_MINIVCL}
-    Vcl.Styles.FontAwesome, uPSR_menus, Menus, uPSR_buttons, Buttons, uPSR_dateutils, uPSR_fontawesome, Classes, 
+    Vcl.Styles.FontAwesome, uPSR_menus, Menus, uPSR_buttons,
+    Buttons, uPSR_dateutils, uPSR_fontawesome, Classes, 
     {$IFNDEF VER200}
       Imaging.pngimage, Imaging.jpeg, 
     {$ELSE}
@@ -36,7 +37,7 @@ uses
   NewStaticText, NewCheckListBox, NewProgressBar, RichEditViewer,
   ExtCtrls, UIStateForm, SetupForm, Main, Wizard, SetupTypes, PasswordEdit,
   FolderTreeView, BitmapImage, NewNotebook, ScriptDlg, BidiCtrls,
-  UninstProgressForm;
+  UninstProgressForm, SelLangForm;
 
 type
   TWinControlAccess = class(TWinControl);
@@ -235,11 +236,17 @@ begin
   end;
 end;
 
+procedure RegisterSelLangForm_R(Cl: TPSRuntimeClassImporter);
+begin
+  with Cl.Add(TSelectLanguageForm) do
+  begin
+  end;
+end;
+
 procedure RegisterWizardForm_R(Cl: TPSRuntimeClassImporter);
 begin
   with Cl.Add(TWizardForm) do
   begin
-
     RegisterMethod(@TWizardForm.AdjustLabelHeight, 'AdjustLabelHeight');
     RegisterMethod(@TWizardForm.IncTopDecHeight, 'IncTopDecHeight');
   end;
@@ -536,6 +543,7 @@ begin
     RegisterUIStateForm_R(Cl);
     RegisterSetupForm_R(Cl);
     RegisterMainForm_R(Cl);
+    RegisterSelLangForm_R(Cl);
     RegisterWizardForm_R(Cl);
     RegisterUninstallProgressForm_R(Cl);
 
@@ -566,6 +574,7 @@ begin
     SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('SCREEN')), Screen);
     SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('FONTAWESOME')), FontAwesome);
   {$ENDIF}
+  SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('SELECTLANGUAGEFORM')), SelectLanguageForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('WIZARDFORM')), WizardForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('MAINFORM')), MainForm);
   SetVariantToClass(ScriptInterpreter.GetVarNo(ScriptInterpreter.GetVar('UNINSTALLPROGRESSFORM')), UninstallProgressForm);

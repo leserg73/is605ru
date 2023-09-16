@@ -358,6 +358,20 @@ begin
   end;
 end;
 
+procedure RegisterSelLangForm_C(Cl: TPSPascalCompiler);
+begin
+  with CL.AddClassN(CL.FindClass('TSetupForm'), 'TSelectLanguageForm') do
+  begin
+    RegisterProperty('SelectLabel', 'TNewStaticText', iptr);
+    RegisterProperty('LangCombo', 'TNewComboBox', iptr);
+    RegisterProperty('OKButton', 'TNewButton', iptr);
+    RegisterProperty('CancelButton', 'TNewButton', iptr);
+    RegisterProperty('IconBitmapImage', 'TBitmapImage', iptr);
+    RegisterProperty('MainPanel', 'TPanel', iptr);
+    RegisterProperty('Bevel', 'TBevel', iptr);
+  end;
+end;
+
 procedure RegisterWizardForm_C(Cl: TPSPascalCompiler);
 begin
   with Cl.AddClassN(Cl.FindClass('TSetupForm'), 'TWizardForm') do
@@ -783,6 +797,7 @@ begin
   RegisterUIStateForm_C(Cl);
   RegisterSetupForm_C(Cl);
   RegisterMainForm_C(Cl);
+  RegisterSelLangForm_C(Cl);
   RegisterWizardForm_C(Cl);
   RegisterUninstallProgressForm_C(Cl);
 
@@ -802,6 +817,7 @@ begin
     AddImportedClassVariable(Cl, 'Screen', 'TScreen');
     AddImportedClassVariable(Cl, 'FontAwesome', 'TFontAwesome');
   {$ENDIF}
+  AddImportedClassVariable(Cl, 'SelectLanguageForm', 'TSelectLanguageForm');
   AddImportedClassVariable(Cl, 'WizardForm', 'TWizardForm');
   AddImportedClassVariable(Cl, 'MainForm', 'TMainForm');
   AddImportedClassVariable(Cl, 'UninstallProgressForm', 'TUninstallProgressForm');

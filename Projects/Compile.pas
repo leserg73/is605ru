@@ -7601,6 +7601,7 @@ begin
 
     //don't forget highlighter!
     //setup
+    CodeCompiler.AddExport('InitializeLanguageDialog', 'Boolean', True, False, '', 0);
     CodeCompiler.AddExport('InitializeSetup', 'Boolean', True, False, '', 0);
     CodeCompiler.AddExport('DeinitializeSetup', '0', True, False, '', 0);
     CodeCompiler.AddExport('CurStepChanged', '0 @TSetupStep', True, False, '', 0);

@@ -16,7 +16,7 @@ object SelectLanguageForm: TSelectLanguageForm
   Scaled = False
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel: TBevel
+  object FBevel: TBevel
     Left = 0
     Top = 97
     Width = 297
@@ -24,8 +24,8 @@ object SelectLanguageForm: TSelectLanguageForm
     Anchors = [akLeft, akRight, akBottom]
     Shape = bsTopLine
   end
-  object CancelButton: TNewButton
-    Left = 214
+  object FCancelButton: TNewButton
+    Left = 211
     Top = 108
     Width = 75
     Height = 23
@@ -35,8 +35,8 @@ object SelectLanguageForm: TSelectLanguageForm
     ModalResult = 2
     TabOrder = 2
   end
-  object OKButton: TNewButton
-    Left = 133
+  object FOKButton: TNewButton
+    Left = 128
     Top = 108
     Width = 75
     Height = 23
@@ -46,25 +46,26 @@ object SelectLanguageForm: TSelectLanguageForm
     ModalResult = 1
     TabOrder = 1
   end
-  object MainPanel: TPanel
+  object FMainPanel: TPanel
     Left = 0
     Top = 0
     Width = 297
     Height = 97
+    Align = alTop
     Anchors = [akLeft, akTop, akRight, akBottom]
     BevelOuter = bvNone
     Color = clWindow
     TabOrder = 0
-    object IconBitmapImage: TBitmapImage
+    object FIconBitmapImage: TBitmapImage
       Left = 8
       Top = 8
       Width = 32
       Height = 32
     end
-    object LangCombo: TNewComboBox
+    object FLangCombo: TNewComboBox
       Left = 56
       Top = 56
-      Width = 233
+      Width = 230
       Height = 21
       Style = csDropDownList
       Anchors = [akLeft, akTop, akRight]
@@ -72,10 +73,10 @@ object SelectLanguageForm: TSelectLanguageForm
       Sorted = True
       TabOrder = 1
     end
-    object SelectLabel: TNewStaticText
+    object FSelectLabel: TNewStaticText
       Left = 56
       Top = 8
-      Width = 233
+      Width = 230
       Height = 39
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
