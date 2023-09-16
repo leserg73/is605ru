@@ -40,6 +40,7 @@ object UninstallProgressForm: TUninstallProgressForm
     Top = 0
     Width = 497
     Height = 313
+    Align = alTop
     ActivePage = FInnerPage
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBtnFace
@@ -91,6 +92,7 @@ object UninstallProgressForm: TUninstallProgressForm
         Top = 0
         Width = 497
         Height = 58
+        Align = alTop
         Anchors = [akLeft, akTop, akRight]
         BevelOuter = bvNone
         Color = clWindow
@@ -100,6 +102,7 @@ object UninstallProgressForm: TUninstallProgressForm
           Top = 1
           Width = 55
           Height = 55
+          Align = alRight
           Anchors = [akTop, akRight]
           BackColor = clWindow
           Center = True

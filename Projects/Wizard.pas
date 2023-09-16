@@ -931,9 +931,9 @@ begin
 
   if SetupHeader.SetupStyle then begin
      WizardSmallBitmapImage.BackColor := StyleServices.GetStyleColor(scPanel){clBtnFace};
-     {$IFDEF IS_WINXP}
-       WizardSmallBitmapImage.Left := MainPanel.Width - WizardSmallBitmapImage.Width - ScalePixelsX(8);
-     {$ENDIF}
+//     {$IFDEF IS_WINXP}
+//       WizardSmallBitmapImage.Left := MainPanel.Width - WizardSmallBitmapImage.Width - ScalePixelsX(8);
+//     {$ENDIF}
   end;
 
   PreparingErrorBitmapImage.Bitmap.Handle := LoadBitmap(HInstance, 'STOPIMAGE');

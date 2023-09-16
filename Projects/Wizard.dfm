@@ -63,6 +63,7 @@ object WizardForm: TWizardForm
     Top = 0
     Width = 497
     Height = 313
+    Align = alTop
     ActivePage = FInnerPage
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBtnFace
@@ -650,6 +651,7 @@ object WizardForm: TWizardForm
         Top = 0
         Width = 497
         Height = 58
+        Align = alTop
         Anchors = [akLeft, akTop, akRight]
         BevelOuter = bvNone
         Color = clWindow
@@ -659,6 +661,7 @@ object WizardForm: TWizardForm
           Top = 0
           Width = 55
           Height = 58
+          Align = alRight
           Anchors = [akTop, akRight]
           BackColor = clWindow
         end
