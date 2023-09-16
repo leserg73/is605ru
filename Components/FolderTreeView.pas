@@ -93,7 +93,7 @@ type
       const NewItem, SelectedImage: Boolean): Integer; override;
   published
     property Anchors;
-    property BorderStyle;
+    property BorderStyle default bsSingle;
     property Ctl3D;
     property TabOrder;
     property TabStop default True;
@@ -121,7 +121,7 @@ type
       AUserStartup, ACommonStartup: String);
   published
     property Anchors;
-    property BorderStyle;
+    property BorderStyle default bsSingle;
     property Ctl3D;
     property TabOrder;
     property TabStop default True;
@@ -548,7 +548,7 @@ begin
   ControlStyle := ControlStyle - [csCaptureMouse];
   Width := 121;
   Height := 97;
-//  FBorderStyle := bsNone;
+  FBorderStyle := bsSingle;
   Ctl3D := False;
   ParentColor := False;
   TabStop := True;
