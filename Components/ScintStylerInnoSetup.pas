@@ -763,7 +763,7 @@ const
     'program', 'record', 'repeat', 'set', 'shl', 'shr',
     'then', 'to', 'try', 'type', 'until', 'var', 'while',
     'with', 'xor');
-  EventFunctions: array[0..22] of TScintRawString = (
+  EventFunctions: array[0..23] of TScintRawString = (
     'InitializeSetup', 'DeinitializeSetup', 'CurStepChanged',
     'NextButtonClick', 'BackButtonClick', 'ShouldSkipPage',
     'CurPageChanged', 'CheckPassword', 'NeedRestart',
@@ -773,7 +773,7 @@ const
     'CurUninstallStepChanged', 'UninstallNeedRestart',
     'CancelButtonClick', 'InitializeUninstallProgressForm',
     'PrepareToInstall', 'RegisterExtraCloseApplicationsResources',
-    'CurInstallProgressChanged');
+    'CurInstallProgressChanged', 'InitializeLanguageDialog');
   EventNamingAttribute = 'event';
 var
   S: TScintRawString;

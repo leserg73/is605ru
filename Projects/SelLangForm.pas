@@ -139,7 +139,7 @@ begin
       SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
 
     if SelectLanguageForm.LangCombo.Items.Count > 1 then begin
-
+      Result := False;
       { Run Code Lang Dialog }
       if CodeRunner <> nil then begin
         try
@@ -149,17 +149,20 @@ begin
           raise;
         end;
         if not Result then begin
-          Log('InitializeLanguageDialog returned False; aborting.');
-          Abort;
+          Log('InitializeLanguageDialog returned False; SelectLanguageForm not show.');
         end;
       end;
 
-      Result := (SelectLanguageForm.ShowModal = mrOK);
       if Result then begin
-        I := SelectLanguageForm.LangCombo.ItemIndex;
-        if I >= 0 then
-          SetActiveLanguage(Integer(SelectLanguageForm.LangCombo.Items.Objects[I]));
-      end;
+        Result := (SelectLanguageForm.ShowModal = mrOK);
+        if Result then begin
+          I := SelectLanguageForm.LangCombo.ItemIndex;
+          if I >= 0 then
+            SetActiveLanguage(Integer(SelectLanguageForm.LangCombo.Items.Objects[I]));
+        end;
+      end
+       else
+         Result := True;
     end
     else begin
       { Don't show language dialog if there aren't multiple languages to choose

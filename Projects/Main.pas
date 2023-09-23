@@ -2613,7 +2613,6 @@ procedure InitializeLanguageDialog;
 
 var
   I: Integer;
-  Res: Boolean;
 begin
   { Load Code }
   if SetupHeader.CompiledCodeText <> '' then begin
@@ -3197,7 +3196,7 @@ begin
           Integer(@PSetupTypeEntry(nil).OnlyBelowVersion));
 
         ActivateDefaultLanguage;
-        
+
         { Set Is64BitInstallMode if we're on Win64 and the processor architecture is
           one on which a "64-bit mode" install should be performed. Doing this early
           so that UsePreviousPrivileges knows where to look. Will log later. }
@@ -3345,6 +3344,23 @@ begin
 
   Log64BitInstallMode;
 
+  { Init main constants, not depending on shfolder.dll/_shfoldr.dll }
+  InitMainNonSHFolderConsts;
+
+  { Create temporary directory and extract 64-bit helper EXE if necessary }
+  CreateTempInstallDir;
+
+  { Load system's "shfolder.dll" or extract "_shfoldr.dll" to TempInstallDir, and load it }
+  LoadSHFolderDLL;
+
+  { Extract "_isdecmp.dll" to TempInstallDir, and load it }
+  if SetupHeader.CompressMethod in [cmZip, cmBzip] then
+    LoadDecompressorDLL;
+
+  { Extract "_iscrypt.dll" to TempInstallDir, and load it }
+  if shEncryptionUsed in SetupHeader.Options then
+    LoadDecryptDLL;
+
   { Load Code and Init/Show Lang Dialog }
   InitializeLanguageDialog;
 
@@ -3369,23 +3385,6 @@ begin
     prAdmin:
       if not IsAdmin then AbortInit(msgAdminPrivilegesRequired);
   end;
-
-  { Init main constants, not depending on shfolder.dll/_shfoldr.dll }
-  InitMainNonSHFolderConsts;
-
-  { Create temporary directory and extract 64-bit helper EXE if necessary }
-  CreateTempInstallDir;
-
-  { Load system's "shfolder.dll" or extract "_shfoldr.dll" to TempInstallDir, and load it }
-  LoadSHFolderDLL;
-
-  { Extract "_isdecmp.dll" to TempInstallDir, and load it }
-  if SetupHeader.CompressMethod in [cmZip, cmBzip] then
-    LoadDecompressorDLL;
-
-  { Extract "_iscrypt.dll" to TempInstallDir, and load it }
-  if shEncryptionUsed in SetupHeader.Options then
-    LoadDecryptDLL;
 
   { Start RestartManager session }
   if InitCloseApplications or
