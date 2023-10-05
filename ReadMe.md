@@ -91,13 +91,23 @@
 
 * Для Windows XP добавлена поддержка диалогов задач (TaskDialog), появившихся в Windows Vista. Это сделано на базе стороннего компонента SynTaskDialog.
 
-* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage, TMargins, TPadding, THintWindow, TCustomHintWindow, TCustomHint, TBalloonHint, TCustomColorBox, TColorBox, TCustomForm, TCustomCanvas, TMetafile, TMetafileCanvas, TCustomMaskEdit, TCustomTreeView, TTreeView, TTreeNodes, TTreeNode, THeaderControl, THeaderSections, THeaderSection, TPageControl, TTabSheet, TTabControl, TCustomTabControl, TTab;
+* Поддержка стандартных компонентов VCL и их свойств (в пределах возможностей библиотеки RemObjects Pascal Script): TMemoryStream, TResourceStream, TParser, TCollectionItem, TCollection, TIcon, TControlScrollBar, TScrollBox, TApplication, TScreen, TGroupBox, TNewGroupBox, TScrollBar, TTrackBar, TUpDown, THotKey, TImageList, TStatusBar, TListView, TListBox, TShape, TImage, TPaintBox, THeader, TTimer, TSpeedButton, TBitBtn, TMenu, TPopupMenu, TPicture, TPngImage, TTreeView, TTab, TPageControl, THint, TBalloonHint, TMargins, TPadding, TMetafile, TMetafileCanvas, TMonthCalendar, TDateTimePicker;
 
 * Поддержка компонентами свойств: *OnMouseEnter*, *OnMouseLeave*, *DoubleBuffered* и *ParentDoubleBuffered*;
 
 * У компонента **TNewButton** активирован метод *Click*;
 
 * Поддержка изображений в формате JPG, PNG;
+
+* Изменение классов: **TForm = class(TCustomForm)** - ранее был *TScrollingWinControl*; **TCanvas = class(TCustomCanvas)** - ранее был *TPersistent*;
+
+* Поддержка функций даты и времени (см. в SupportClasses.txt);
+
+* Поддержка шрифта [FontAwesome](https://fontawesome.com/v4/cheatsheet/). Введена переменная **FontAwesome** (класс *TFontAwesome*) для вывода значков на Canvas (см. в SupportClasses.txt и пример в Example_FontAwesome.iss);
+
+* Добавлена функция события **InitializeLanguageDialog** для кастомизации диалога выбора языка. При использовании директивы ShowLanguageDialog=yes эта функция выполняется ранее функции InitializeSetup. При ShowLanguageDialog=no вызов функции InitializeLanguageDialog пропускается. Если функция вернёт значение False, то диалог выбора языка установки показан не будет, даже если используется директива ShowLanguageDialog=yes. Имейте в виду, что события InitializeLanguageDialog выполняются до инициализации некоторых параметров программы установки;
+
+* Добавлена глобальная переменная **SelectLanguageForm** (класс *TSelectLanguageForm*) для доступа к элементам диалога выбора языка (поддерживаемые компоненты и свойства см. в прилагаемом файле "Support Classes.txt", пример в Example_InitializeLanguageDialog.iss).
 
 #### Дополнения от RESTOOLS
 
@@ -186,3 +196,5 @@
 
 ---
 > Обновлено 02.06.2023
+
+> Обновлено 19.09.2023
