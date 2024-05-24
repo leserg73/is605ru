@@ -80,6 +80,7 @@ var
 //  SelectLanguageForm: TSelectLanguageForm;
   I, J: Integer;
   LangEntry: PSetupLanguageEntry;
+  Res: Boolean;
 {$IFNDEF UNICODE}
   ClassInfo: TWndClassW;
   N: String;
@@ -138,31 +139,31 @@ begin
     if SelectLanguageForm.LangCombo.ItemIndex = -1 then
       SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
 
-    if SelectLanguageForm.LangCombo.Items.Count > 1 then begin
-      Result := False;
+    if SelectLanguageForm.LangCombo.Items.Count > 1 then
+    begin
       { Run Code Lang Dialog }
-      if CodeRunner <> nil then begin
+      if (CodeRunner <> nil) and CodeRunner.FunctionExists('InitializeLanguageDialog', True) then
+      begin
         try
-          Result := CodeRunner.RunBooleanFunctions('InitializeLanguageDialog', [''], bcFalse, False, True);
+          Res := CodeRunner.RunBooleanFunctions('InitializeLanguageDialog', [''], bcFalse, False, True);
         except
           Log('InitializeLanguageDialog raised an exception (fatal).');
           raise;
         end;
-        if not Result then begin
+        if not Res then
           Log('InitializeLanguageDialog returned False; SelectLanguageForm not show.');
-        end;
-      end;
+      end
+      else
+        Res := True;
 
-      if Result then begin
+      if Res then begin
         Result := (SelectLanguageForm.ShowModal = mrOK);
         if Result then begin
           I := SelectLanguageForm.LangCombo.ItemIndex;
           if I >= 0 then
             SetActiveLanguage(Integer(SelectLanguageForm.LangCombo.Items.Objects[I]));
         end;
-      end
-       else
-         Result := True;
+      end else Result := True;
     end
     else begin
       { Don't show language dialog if there aren't multiple languages to choose
@@ -205,12 +206,11 @@ begin
   IconBitmapImage.Bitmap.Canvas.Draw(0, 0, Application.Icon);
   IconBitmapImage.Width := IconBitmapImage.Bitmap.Width;
   IconBitmapImage.Height := IconBitmapImage.Bitmap.Height;
-  { restoring the original value of the ClientWidth when resizing the WizardForm }
-  ClientWidth := MulDiv(ClientWidth, 100, SetupHeader.WizardSizePercentX);
-
   { Aligning buttons to the right edge of the combo box }
   OKButton.Left := LangCombo.Left + LangCombo.Width + OKButton.Left - CancelButton.Left - OKButton.Width;
   CancelButton.Left := LangCombo.Left + LangCombo.Width - CancelButton.Width;
+  { restoring the original value of the ClientWidth when resizing the WizardForm }
+  ClientWidth := MulDiv(ClientWidth, 100, SetupHeader.WizardSizePercentX);
   KeepSizeY := True;
 end;
 
