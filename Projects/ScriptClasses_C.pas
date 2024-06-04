@@ -296,6 +296,10 @@ begin
   Cl.AddClassN(Cl.FindClass('TButton'), 'TNewButton');
   Cl.AddClassN(Cl.FindClass('TCheckBox'), 'TNewCheckBox');
   Cl.AddClassN(Cl.FindClass('TRadioButton'), 'TNewRadioButton');
+  with Cl.AddClassN(Cl.FindClass('TLinkLabel'), 'TNewLinkLabel') do
+  begin
+    RegisterMethod('function AdjustHeight: Integer');
+  end;
 end;
 
 procedure RegisterNewNotebook_C(Cl: TPSPascalCompiler);
@@ -459,6 +463,7 @@ begin
     RegisterProperty('PreparingMemo', 'TNewMemo', iptr);
     RegisterProperty('CurPageID', 'Integer', iptr);
     RegisterMethod('function AdjustLabelHeight(ALabel: TNewStaticText): Integer');
+    RegisterMethod('function AdjustLinkLabelHeight(ALinkLabel: TNewLinkLabel): Integer');
     RegisterMethod('procedure IncTopDecHeight(AControl: TControl; Amount: Integer)');
     RegisterProperty('PrevAppDir', 'String', iptr);
   end;
@@ -601,7 +606,7 @@ end;
 
 procedure ScriptClassesLibraryRegister_C(Cl: TPSPascalCompiler);
 const
-  clSystemColor = {$IFDEF IS_D7} $FF000000 {$ELSE} $80000000 {$ENDIF};
+  clSystemColor = $FF000000;
   COLOR_HOTLIGHT = 26;
 begin
 {$IFNDEF UNICODE}
@@ -758,6 +763,8 @@ begin
   {$ENDIF}
   SIRegisterTCustomPanel(Cl);
   SIRegisterTPanel(Cl);
+  SIRegisterTCustomLinkLabel(Cl);
+  SIRegisterTLinkLabel(Cl);
 
   { ComObj }
   SIRegister_ComObj(Cl);

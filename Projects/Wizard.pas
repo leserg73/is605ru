@@ -218,6 +218,7 @@ type
     destructor Destroy; override;
     procedure AddPage(const APage: TWizardPage; const AfterID: Integer);
     function AdjustLabelHeight(const ALabel: TNewStaticText): Integer;
+    function AdjustLinkLabelHeight(const ALinkLabel: TNewLinkLabel): Integer;
     procedure CallCancelButtonClick(var ACancel, AConfirm: Boolean);
     procedure ChangeFinishedLabel(const S: String);
     procedure ClickToStartPage;
@@ -532,6 +533,11 @@ function TWizardForm.AdjustLabelHeight(const ALabel: TNewStaticText): Integer;
   Returns the difference in height. }
 begin
   Result := ALabel.AdjustHeight;
+end;
+
+function TWizardForm.AdjustLinkLabelHeight(const ALinkLabel: TNewLinkLabel): Integer;
+begin
+  Result := ALinkLabel.AdjustHeight;
 end;
 
 procedure TWizardForm.IncTopDecHeight(const AControl: TControl; const Amount: Integer);

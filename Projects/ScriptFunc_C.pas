@@ -34,7 +34,7 @@ procedure ScriptFuncLibraryRegister_C(ScriptCompiler: TPSPascalCompiler;
 
   procedure RegisterType(const Name, Value: tbtstring);
   begin
-    ScriptCompiler.AddTypes(Name, Value);
+    ScriptCompiler.AddTypeS(Name, Value);
   end;
 
   procedure RegisterFunctionTable(const FunctionTable: array of tbtstring);
@@ -102,7 +102,7 @@ begin
   RegisterType('UINT_PTR', 'LongWord');
   RegisterType('INT_PTR', 'Longint');
 
-  ScriptCompiler.AddTypeS('TFileTime',
+  RegisterType('TFileTime',
     'record' +
     '  dwLowDateTime: DWORD;' +
     '  dwHighDateTime: DWORD;' +
@@ -119,7 +119,7 @@ begin
   RegisterType('TExecWait', '(ewNoWait, ewWaitUntilTerminated, ewWaitUntilIdle)');
   RegisterType('TTaskbarProgressState', '(tpsNoProgress, tpsIndeterminate, tpsNormal, tpsError, tpsPaused)');
 
-  ScriptCompiler.AddTypeS('TFindRec',
+  RegisterType('TFindRec',
     'record' +
     '  Name: String;' +
     '  Attributes: LongWord;' +
@@ -131,7 +131,7 @@ begin
     '  AlternateName: String;' +
     '  FindHandle: THandle;' +
     'end');
-  ScriptCompiler.AddTypeS('TWindowsVersion',
+  RegisterType('TWindowsVersion',
     'record' +
     '  Major: Cardinal;' +
     '  Minor: Cardinal;' +

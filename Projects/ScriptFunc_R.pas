@@ -26,7 +26,7 @@ uses
   {$IFNDEF Delphi3orHigher} Ole2, {$ELSE} ActiveX, {$ENDIF}
   Struct, ScriptDlg, Main, PathFunc, CmnFunc, CmnFunc2, FileClass, RedirFunc,
   Install, InstFunc, InstFnc2, Msgs, MsgIDs, NewDisk, BrowseFunc, Wizard, VerInfo,
-  SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper,
+  SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper, BitmapImage,
   SpawnClient, UninstProgressForm, ASMInline,{$IFNDEF PS_MINIVCL} TaskbarProgressFunc,{$ENDIF} DotNet;
 
 var
@@ -98,7 +98,7 @@ function GetUninstallProgressForm: TUninstallProgressForm;
 begin
   Result := UninstallProgressForm;
   if Result = nil then
-    InternalError('An attempt was made to access UninstallProgressForm before it has been created'); 
+    InternalError('An attempt was made to access UninstallProgressForm before it has been created');
 end;
 
 function GetMsgBoxCaption: String;
@@ -575,12 +575,12 @@ begin
     CrackCodeRootKey(Stack.GetInt(PStart-1), RegView, RootKey);
     Arr := NewTPSVariantIFC(Stack[PStart-3], True);
     Stack.SetBool(PStart, GetSubkeyOrValueNames(RegView, RootKey,
-    Stack.GetString(PStart-2), @Arr, True));
+      Stack.GetString(PStart-2), @Arr, True));
   end else if Proc.Name = 'REGGETVALUENAMES' then begin
     CrackCodeRootKey(Stack.GetInt(PStart-1), RegView, RootKey);
     Arr := NewTPSVariantIFC(Stack[PStart-3], True);
     Stack.SetBool(PStart, GetSubkeyOrValueNames(RegView, RootKey,
-    Stack.GetString(PStart-2), @Arr, False));
+      Stack.GetString(PStart-2), @Arr, False));
   end else if Proc.Name = 'REGQUERYSTRINGVALUE' then begin
     CrackCodeRootKey(Stack.GetInt(PStart-1), RegView, RootKey);
     S := Stack.GetString(PStart-2);
@@ -1832,6 +1832,8 @@ var
   S: String;
   AnsiS: AnsiString;
   Arr: TPSVariantIFC;
+  N, I: Integer;
+  AscendingTrySizes: array of Integer;
 begin
   PStart := Stack.Count-1;
   Result := True;
@@ -1972,6 +1974,13 @@ begin
    Stack.SetInt(PStart, CreateCallback(Stack.Items[PStart-1]));
   end else if Proc.Name = 'ISDOTNETINSTALLED' then begin
    Stack.SetBool(PStart, IsDotNetInstalled(InstallDefaultRegView, TDotNetVersion(Stack.GetInt(PStart-1)), Stack.GetInt(PStart-2)));
+  end else if Proc.Name = 'INITIALIZEBITMAPIMAGEFROMICON' then begin
+    Arr := NewTPSVariantIFC(Stack[PStart-4], True);
+    N := PSDynArrayGetLength(Pointer(Arr.Dta^), Arr.aType);
+    SetLength(AscendingTrySizes, N);
+    for I := 0 to N-1 do
+      AscendingTrySizes[I] := VNGetInt(PSGetArrayField(Arr, I));
+    Stack.SetBool(PStart, TBitmapImage(Stack.GetClass(PStart-1)).InitializeFromIcon(0, PChar(Stack.GetString(PStart-2)), Stack.GetInt(PStart-3), AscendingTrySizes));
   end else
     Result := False;
 end;

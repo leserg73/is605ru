@@ -361,9 +361,9 @@ const
 
   { Other }
 {$IFNDEF PS_MINIVCL}
-    OtherTable: array [0..33] of AnsiString =
+    OtherTable: array [0..34] of AnsiString =
 {$ELSE}
-    OtherTable: array [0..31] of AnsiString =
+    OtherTable: array [0..32] of AnsiString =
 {$ENDIF}
   (
     'procedure BringToFrontAndRestore;',
@@ -401,7 +401,8 @@ const
     'function EnableFsRedirection(const Enable: Boolean): Boolean;',
     'function GetUninstallProgressForm: TUninstallProgressForm;',
     'function CreateCallback(Method: AnyMethod): Longword;',
-    'function IsDotNetInstalled(const MinVersion: TDotNetVersion; const MinServicePack: Cardinal): Boolean;'
+    'function IsDotNetInstalled(const MinVersion: TDotNetVersion; const MinServicePack: Cardinal): Boolean;',
+    'function InitializeBitmapImageFromIcon(const BitmapImage: TBitmapImage; const IconFilename: String; const BkColor: TColor; const AscendingTrySizes: TArrayOfInteger): Boolean;'
   );
 
 implementation

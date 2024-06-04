@@ -2,20 +2,18 @@ unit BidiCtrls;
 
 {
   Inno Setup
-  Copyright (C) 1997-2007 Jordan Russell
+  Copyright (C) 1997-2024 Jordan Russell
   Portions by Martijn Laan
   For conditions of distribution and use, see LICENSE.TXT.
 
   RTL-capable versions of standard controls
-
-  $jrsoftware: issrc/Components/BidiCtrls.pas,v 1.2 2007/11/27 04:52:53 jr Exp $
 }
 
 interface
 
 uses
   Windows, SysUtils, Messages, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls{$IFNDEF PS_MINIVCL}, ComCtrls{$ENDIF};
+  StdCtrls, ExtCtrls{$IFNDEF PS_MINIVCL}, ComCtrls{$ENDIF};
 
 type
   TNewEdit = class(TEdit)
@@ -76,12 +74,19 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
   end;
 
+  TNewLinkLabel = class(TLinkLabel)
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+  public
+    function AdjustHeight: Integer;
+  end;
+
 procedure Register;
   
 implementation
 
 uses
-  BidiUtils{$IFNDEF PS_MINIVCL}, CommCtrl{$ENDIF};
+  CommCtrl, BidiUtils;
 
 procedure Register;
 begin
@@ -189,6 +194,23 @@ procedure TNewRadioButton.CreateParams(var Params: TCreateParams);
 begin
   inherited;
   SetBiDiStyles(Self, Params);
+end;
+
+{ TNewLinkLabel }
+
+procedure TNewLinkLabel.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  SetBiDiStyles(Self, Params);
+end;
+
+function TNewLinkLabel.AdjustHeight: Integer;
+begin
+  var OldHeight := Height;
+  var IdealSize: TSize;
+  SendMessage(Handle, LM_GETIDEALSIZE, Width, LPARAM(@IdealSize));
+  Height := IdealSize.cy;
+  Result := Height - OldHeight;
 end;
 
 end.

@@ -42,8 +42,8 @@ uses
 type
   TWinControlAccess = class(TWinControl);
 
-procedure TWinControlParentBackground_R(Self: TWinControl; var T: Boolean); begin {$IFDEF IS_D7} T := TWinControlAccess(Self).ParentBackground {$ELSE} T := False {$ENDIF}; end;
-procedure TWinControlParentBackground_W(Self: TWinControl; const T: Boolean); begin {$IFDEF IS_D7} TWinControlAccess(Self).ParentBackground := T; {$ENDIF} end;
+procedure TWinControlParentBackground_R(Self: TWinControl; var T: Boolean); begin T := TWinControlAccess(Self).ParentBackground; end;
+procedure TWinControlParentBackground_W(Self: TWinControl; const T: Boolean); begin TWinControlAccess(Self).ParentBackground := T; end;
 
 procedure RegisterWinControl_R(Cl: TPSRuntimeClassImporter);
 begin
@@ -186,6 +186,10 @@ begin
   Cl.Add(TNewButton);
   Cl.Add(TNewCheckBox);
   Cl.Add(TNewRadioButton);
+  with Cl.Add(TNewLinkLabel) do
+  begin
+    RegisterMethod(@TNewLinkLabel.AdjustHeight, 'AdjustHeight');
+  end;
 end;
 
 procedure TNewNotebookPages_R(Self: TNewNotebook; var T: TNewNotebookPage; const t1: Integer); begin T := Self.Pages[t1]; end;
@@ -248,6 +252,7 @@ begin
   with Cl.Add(TWizardForm) do
   begin
     RegisterMethod(@TWizardForm.AdjustLabelHeight, 'AdjustLabelHeight');
+    RegisterMethod(@TWizardForm.AdjustLinkLabelHeight, 'AdjustLinkLabelHeight');
     RegisterMethod(@TWizardForm.IncTopDecHeight, 'IncTopDecHeight');
   end;
 end;
@@ -504,6 +509,8 @@ begin
     {$ENDIF}
     RIRegisterTCustomPanel(Cl);
     RIRegisterTPanel(Cl);
+    RIRegisterTCustomLinkLabel(Cl);
+    RIRegisterTLinkLabel(Cl);
 
     { ComObj }
     RIRegister_ComObj(ScriptInterpreter);

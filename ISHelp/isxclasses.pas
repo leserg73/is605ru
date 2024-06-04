@@ -54,12 +54,12 @@ TStringList = class(TStrings)
 end;
 
 TStream = class(TObject)
-  function Read(Buffer: String; Count: Longint): Longint;
-  function Write(Buffer: String; Count: Longint): Longint;
+  function Read(var Buffer: AnyString; ByteCount: Longint): Longint;
+  function Write(const Buffer: AnyString; ByteCount: Longint): Longint;
   function Seek(Offset: Int64; Origin: Word): Int64;
-  procedure ReadBuffer(Buffer: String; Count: Longint);
-  procedure WriteBuffer(Buffer: String; Count: Longint);
-  function CopyFrom(Source: TStream; Count: Int64): Int64;
+  procedure ReadBuffer(var Buffer: AnyString; ByteCount: Longint);
+  procedure WriteBuffer(const Buffer: AnyString; ByteCount: Longint);
+  function CopyFrom(Source: TStream; ByteCount: Int64): Int64;
   property Position: Longint; read write;
   property Size: Longint; read write;
 end;
@@ -452,6 +452,28 @@ end;
 TNewRadioButton = class(TRadioButton)
 end;
 
+TSysLinkType = (sltURL, sltID);
+
+TSysLinkEvent = procedure(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+
+TCustomLinkLabel = class(TWinControl)
+  property Alignment: TAlignment; read write;
+  property AutoSize: Boolean; read write;
+  property UseVisualStyle: Boolean; read write;
+  property OnLinkClick: TSysLinkEvent; read write;
+end;
+
+TLinkLabel = class(TCustomLinkLabel)
+  property Anchors: TAnchors; read write;
+  property Caption: String; read write;
+  property Color: TColor; read write;
+  property Font: TFont; read write;
+end;
+
+TNewLinkLabel = class(TLinkLabel)
+  function AdjustHeight: Integer;
+end;
+
 TCustomListBox = class(TWinControl)
   property Items: TStrings; read write;
   property ItemIndex: Integer; read write;
@@ -839,6 +861,7 @@ TWizardForm = class(TSetupForm)
   property PreparingMemo: TNewMemo; read;
   property CurPageID: Integer; read;
   function AdjustLabelHeight(ALabel: TNewStaticText): Integer;
+  function AdjustLinkLabelHeight(ALinkLabel: TNewLinkLabel): Integer;
   procedure IncTopDecHeight(AControl: TControl; Amount: Integer);
   property PrevAppDir: String; read;
 end;
