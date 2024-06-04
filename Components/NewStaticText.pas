@@ -1,21 +1,11 @@
 unit NewStaticText;
 
 {
-  TNewStaticText - similar to TStaticText on D3+ but with multi-line AutoSize
+  TNewStaticText - similar to TStaticText but with multi-line AutoSize
   support and a WordWrap property
 }
 
 interface
-
-{$IFNDEF VER90}
-  {$IFNDEF VER100}
-    {$IFNDEF VER120}
-      {$IFNDEF VER130}
-        {$DEFINE Delphi6OrHigher}
-      {$ENDIF}
-    {$ENDIF}
-  {$ENDIF}
-{$ENDIF}
 
 uses
   Windows, Messages, SysUtils, Classes, Controls, Forms, Menus, Graphics, CommCtrl, ImgList, Themes;
@@ -97,64 +87,6 @@ type
     property OnStartDrag;
   end;
 
-
-  TStaticText = class(TNewStaticText)
-  strict private
-    class constructor Create;
-    class destructor Destroy;
-  published
-    property Align;
-    property Alignment;
-    property Anchors;
-    property AutoSize;
-    property BevelEdges;
-    property BevelInner;
-    property BevelKind default bkNone;
-    property BevelOuter;
-    property BiDiMode;
-    property BorderStyle;
-    property Caption;
-    property Color nodefault;
-    property Constraints;
-    property DoubleBuffered;
-    property DragCursor;
-    property DragKind;
-    property DragMode;
-    property Enabled;
-    property FocusControl;
-    property Font;
-    property ParentBiDiMode;
-    property ParentColor;
-    property ParentDoubleBuffered;
-    property ParentFont;
-    property ParentShowHint;
-    property PopupMenu;
-    property ShowAccelChar;
-    property ShowHint;
-    property TabOrder;
-    property TabStop;
-    property Touch;
-    property Transparent;
-    property Visible;
-    property StyleElements;
-    property OnClick;
-    property OnContextPopup;
-    property OnDblClick;
-    property OnDragDrop;
-    property OnDragOver;
-    property OnEndDock;
-    property OnEndDrag;
-    property OnGesture;
-    property OnMouseActivate;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnStartDock;
-    property OnStartDrag;
-  end;
-
   TStaticTextStyleHook = class(TStyleHook)
   strict protected
     procedure Paint(Canvas: TCanvas); override;
@@ -169,48 +101,12 @@ procedure Register;
 implementation
 
 uses
-{$IF DEFINED(CLR)}
-  System.Runtime.InteropServices, System.Security, System.Security.Permissions, Types,
-{$ENDIF}
-  Vcl.Consts, System.RTLConsts, Vcl.ActnList, Winapi.UxTheme, Winapi.DwmApi,
-  System.Types, System.UITypes, System.StrUtils, Vcl.ExtCtrls, BidiUtils;
+  BidiUtils, Types, ExtCtrls;
 
 procedure Register;
 begin
   RegisterComponents('JR', [TNewStaticText]);
 end;
-
-procedure DrawTextACP(const DC: HDC; const S: String; var R: TRect;
-  const AFormat: UINT);
-{ Draws an ANSI string using the system's code page (CP_ACP), unlike DrawTextA
-  which uses the code page defined by the selected font. }
-{$IFDEF UNICODE}
-begin
-  DrawText(DC, PChar(S), Length(S), R, AFormat);
-end;
-{$ELSE}
-var
-  SLen, WideLen: Integer;
-  WideStr: PWideChar;
-begin
-  SLen := Length(S);
-  if SLen = 0 then
-    Exit;
-  if Win32Platform = VER_PLATFORM_WIN32_NT then begin
-    if SLen > High(Integer) div SizeOf(WideChar) then
-      Exit;
-    GetMem(WideStr, SLen * SizeOf(WideChar));
-    try
-      WideLen := MultiByteToWideChar(CP_ACP, 0, PChar(S), SLen, WideStr, SLen);
-      DrawTextW(DC, WideStr, WideLen, R, AFormat);
-    finally
-      FreeMem(WideStr);
-    end;
-  end
-  else
-    DrawText(DC, PChar(S), SLen, R, AFormat);
-end;
-{$ENDIF}
 
 { TNewStaticText }
 
@@ -329,15 +225,7 @@ begin
   DC := GetDC(0);
   try
     SelectObject(DC, Font.Handle);
-    { On NT platforms, static controls are Unicode-based internally; when
-      ANSI text is assigned to them, it is converted to Unicode using the
-      system code page (ACP). We must be sure to use the ACP here, too,
-      otherwise the calculated size could be incorrect. The code page used
-      by DrawTextA is defined by the font, and not necessarily equal to the
-      ACP, so we can't use it. (To reproduce: with the ACP set to Hebrew
-      (1255), try passing Hebrew text to DrawTextA with the font set to
-      "Lucida Console". It appears to use CP 1252, not 1255.) }
-    DrawTextACP(DC, S, R, DT_CALCRECT or GetDrawTextFlags);
+    DrawText(DC, PChar(S), Length(S), R, DT_CALCRECT or GetDrawTextFlags);
   finally
     ReleaseDC(0, DC);
   end;
@@ -501,7 +389,7 @@ begin
   if StyleServices.Available then
   begin
     R := Control.ClientRect;
-    if TStaticText(Control).Transparent then
+    if TNewStaticText(Control).Transparent then
     begin
       Details := StyleServices.GetElementDetails(tbCheckBoxUncheckedNormal);
       StyleServices.DrawParentBackground(Handle, Canvas.Handle, Details, False);
@@ -555,18 +443,6 @@ procedure TStaticTextStyleHook.WndProc(var Message: TMessage);
 begin
   // Reserved for potential updates
   inherited;
-end;
-
-{ TStaticText }
-
-class constructor TStaticText.Create;
-begin
-  TCustomStyleEngine.RegisterStyleHook(TStaticText, TStaticTextStyleHook);
-end;
-
-class destructor TStaticText.Destroy;
-begin
-  TCustomStyleEngine.UnRegisterStyleHook(TStaticText, TStaticTextStyleHook);
 end;
 
 end.

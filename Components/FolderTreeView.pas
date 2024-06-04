@@ -587,7 +587,7 @@ begin
     if Ctl3D and NewStyleControls and (FBorderStyle = bsSingle) then
     begin
       Style := Style and not WS_BORDER;
-      ExStyle := Params.ExStyle or WS_EX_CLIENTEDGE;
+      ExStyle := ExStyle or WS_EX_CLIENTEDGE;
     end;
     WindowClass.style := WindowClass.style and not (CS_HREDRAW or CS_VREDRAW);
   end;

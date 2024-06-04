@@ -1,21 +1,13 @@
 unit RestartManager;
 
 {
-  Basic RestartManager API interface Unit for Delphi 2 and higher
-  by Martijn Laan
+  Basic RestartManager API interface unit by Martijn Laan
 }
-
-{$IFNDEF VER90}
-{$IFNDEF VER93}
-  {$DEFINE Delphi3orHigher}
-{$ENDIF}
-{$ENDIF}
 
 interface
 
 uses
-  {$IFNDEF Delphi3orHigher} OLE2, {$ELSE} ActiveX, {$ENDIF}
-  Windows;
+  ActiveX, Windows;
 
 procedure FreeRestartManagerLibrary;
 function InitRestartManagerLibrary: Boolean;
