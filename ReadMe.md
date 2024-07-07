@@ -1,3 +1,7 @@
+[![Latest Version](https://img.shields.io/github/release/leserg73/is605ru.svg)](https://github.com/leserg73/is605ru/releases/latest)
+[![Total Downloads](https://img.shields.io/github/downloads/leserg73/is605ru/total.svg)](https://github.com/leserg73/is605ru/releases)
+[![Latest Release Downloads](https://img.shields.io/github/downloads/leserg73/is605ru/latest/total.svg)](https://github.com/leserg73/is605ru/releases/latest)
+
 # Inno Setup v6.0.5 RUS
 
 Неофициальная сборка Inno Setup v6.0.5 на русском языке, в которую встроена поддержка визуальных стилей *.vsf. Теперь не нужно использовать сторонние библиотеки и писать соответствующий код для применения стиля. Достаточно в сценарии указать параметр SetupStyleFile с выбранным файлом стиля и на этом все. Компиляция выполнена с максимальной поддержкой VCL компонентов (в пределах возможностей библиотеки RemObjects Pascal Script), а также дополнена некоторыми функциями и параметрами из расширенной версии компилятора от RESTOOLS.
